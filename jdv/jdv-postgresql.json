@@ -6,10 +6,10 @@
             "description": "Application template for KEYCLOAK 6 PostgreSQL applications built using STI.",
             "iconClass" : "icon-jboss"
         },
-        "name": "keycloak-postgresql"
+        "name": "jdv-postgresql"
     },
     "labels": {
-        "template": "keycloak-postgresql"
+        "template": "jdv-postgresql"
     },
     "parameters": [
         {
@@ -20,7 +20,7 @@
         {
             "description": "The name for the application.",
             "name": "APPLICATION_NAME",
-            "value": "keycloak-app"
+            "value": "jdv-app"
         },
         {
             "description": "Custom hostname for service routes.  Leave blank for default hostname, e.g.: <application-name>.<project>.<default-domain-suffix>",
@@ -64,7 +64,7 @@
         {
             "description": "The name of the secret containing the keystore file",
             "name": "KEYCLOAK_HTTPS_SECRET",
-            "value": "keycloak-app-secret"
+            "value": "jdv-app-secret"
         },
         {
             "description": "The name of the keystore file within the secret",
@@ -274,7 +274,7 @@
                              "from": {
                                 "kind": "ImageStreamTag",
                                 "namespace": "demo",
-                                "name": "jboss-keycloak-openshift:latest"
+                                "name": "jboss-dv-openshift:latest"
                             }
                         }
                     }
@@ -292,7 +292,7 @@
                         }
                     },
                     "spec": {
-                        "serviceAccount": "keycloak-service-account",
+                        "serviceAccount": "jdv-service-account",
                         "containers": [
                             {
                                 "name": "${APPLICATION_NAME}",
@@ -362,7 +362,7 @@
                                     },
                                     {
                                         "name": "KEYCLOAK_HTTPS_KEYSTORE_DIR",
-                                        "value": "/etc/keycloak-secret-volume"
+                                        "value": "/etc/jdv-secret-volume"
                                     },
                                     {
                                         "name": "KEYCLOAK_HTTPS_KEYSTORE",

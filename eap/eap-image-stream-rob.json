@@ -12,23 +12,23 @@
             "kind": "ImageStream",
             "apiVersion": "v1",
             "metadata": {
-                "name": "jboss-keycloak-openshift",
+                "name": "jboss-ceeap-openshift",
                  "annotations": {
                     "description": "Provides JBoss Test EAP6  STI images.",
                     "openshift.io/image.insecureRepository": "true"
                 }
             },
             "spec": {
-                "dockerImageRepository": "ose3-master.example.com:5000/jboss-keycloak-1/keycloak16-openshift",
+                "dockerImageRepository": "ce-os-registry.usersys.redhat.com:5000/robtest/eap64-openshift",
                 "tags": [
                     {
-                        "name": "1.2",
+                        "name": "1.1",
                         "annotations": {
-                            "description": "KeyCloak",
-                            "iconClass": "icon-keycloak",
-                            "tags": "keycloak",
-                            "supports":"keycloak:1.6.0.Final",
-                            "version": "1.2"
+                            "description": "eap",
+                            "iconClass": "icon-eap",
+                            "tags": "eap",
+                            "supports":"eap:6.4",
+                            "version": "1.1"
                         }
                     }
                 ]

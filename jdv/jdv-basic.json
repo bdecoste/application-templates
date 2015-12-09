@@ -6,10 +6,10 @@
             "description": "Application template for KEYCLOAK 6 PostgreSQL applications built using STI.",
             "iconClass" : "icon-jboss"
         },
-        "name": "keycloak-postgresql"
+        "name": "jdv-basic"
     },
     "labels": {
-        "template": "keycloak-postgresql"
+        "template": "jdv-basic"
     },
     "parameters": [
         {
@@ -20,7 +20,7 @@
         {
             "description": "The name for the application.",
             "name": "APPLICATION_NAME",
-            "value": "keycloak-app"
+            "value": "jdv-app"
         },
         {
             "description": "Custom hostname for service routes.  Leave blank for default hostname, e.g.: <application-name>.<project>.<default-domain-suffix>",
@@ -64,7 +64,7 @@
         {
             "description": "The name of the secret containing the keystore file",
             "name": "KEYCLOAK_HTTPS_SECRET",
-            "value": "keycloak-app-secret"
+            "value": "jdv-app-secret"
         },
         {
             "description": "The name of the keystore file within the secret",
@@ -207,30 +207,6 @@
             }
         },
         {
-            "kind": "Service",
-            "apiVersion": "v1",
-            "spec": {
-                "ports": [
-                    {
-                        "port": 5432,
-                        "targetPort": 5432
-                    }
-                ],
-                "selector": {
-                    "deploymentConfig": "${APPLICATION_NAME}-postgresql"
-                }
-            },
-            "metadata": {
-                "name": "${APPLICATION_NAME}-postgresql",
-                "labels": {
-                    "application": "${APPLICATION_NAME}"
-                },
-                "annotations": {
-                    "description": "The database server's port."
-                }
-            }
-        },
-        {
             "kind": "Route",
             "apiVersion": "v1",
             "id": "${APPLICATION_NAME}-http",
@@ -274,7 +250,7 @@
                              "from": {
                                 "kind": "ImageStreamTag",
                                 "namespace": "demo",
-                                "name": "jboss-keycloak-openshift:latest"
+                                "name": "jboss-dv-openshift:latest"
                             }
                         }
                     }
@@ -292,7 +268,7 @@
                         }
                     },
                     "spec": {
-                        "serviceAccount": "keycloak-service-account",
+                        "serviceAccount": "jdv-service-account",
                         "containers": [
                             {
                                 "name": "${APPLICATION_NAME}",
@@ -317,10 +293,6 @@
                                 ],
                                 "env": [
                                     {
-                                        "name": "DB_SERVICE_PREFIX_MAPPING",
-                                        "value": "${APPLICATION_NAME}-postgresql=DB"
-                                    },
-                                    {
                                         "name": "DB_JNDI",
                                         "value": "${DB_JNDI}"
                                     },
@@ -335,10 +307,6 @@
                                     {
                                         "name": "DB_DATABASE",
                                         "value": "${DB_DATABASE}"
-                                    },
-                                    {
-                                        "name": "TX_DATABASE_PREFIX_MAPPING",
-                                        "value": "${APPLICATION_NAME}-postgresql=DB"
                                     },
                                     {
                                         "name": "DB_MIN_POOL_SIZE",
@@ -362,7 +330,7 @@
                                     },
                                     {
                                         "name": "KEYCLOAK_HTTPS_KEYSTORE_DIR",
-                                        "value": "/etc/keycloak-secret-volume"
+                                        "value": "/etc/jdv-secret-volume"
                                     },
                                     {
                                         "name": "KEYCLOAK_HTTPS_KEYSTORE",
@@ -387,87 +355,6 @@
                                     {
                                         "name": "HORNETQ_TOPICS",
                                         "value": "${HORNETQ_TOPICS}"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            }
-        },
-        {
-            "kind": "DeploymentConfig",
-            "apiVersion": "v1",
-            "metadata": {
-                "name": "${APPLICATION_NAME}-postgresql",
-                "labels": {
-                    "application": "${APPLICATION_NAME}"
-                }
-            },
-            "spec": {
-                "strategy": {
-                    "type": "Recreate"
-                },
-                "triggers": [
-                    {
-                        "type": "ImageChange",
-                        "imageChangeParams": {
-                            "automatic": true,
-                            "containerNames": [
-                                "${APPLICATION_NAME}-postgresql"
-                            ],
-                            "from": {
-                                "kind": "ImageStreamTag",
-                                "namespace": "openshift",
-                                "name": "postgresql:latest"
-                            }
-                        }
-                    }
-                ],
-                "replicas": 1,
-                "selector": {
-                    "deploymentConfig": "${APPLICATION_NAME}-postgresql"
-                },
-                "template": {
-                    "metadata": {
-                        "name": "${APPLICATION_NAME}-postgresql",
-                        "labels": {
-                            "deploymentConfig": "${APPLICATION_NAME}-postgresql",
-                            "application": "${APPLICATION_NAME}"
-                        }
-                    },
-                    "spec": {
-                        "containers": [
-                            {
-                                "name": "${APPLICATION_NAME}-postgresql",
-                                "image": "postgresql",
-                                "imagePullPolicy": "Always",
-                                "ports": [
-                                    {
-                                        "containerPort": 5432,
-                                        "protocol": "TCP"
-                                    }
-                                ],
-                                "env": [
-                                    {
-                                        "name": "POSTGRESQL_USER",
-                                        "value": "${DB_USERNAME}"
-                                    },
-                                    {
-                                        "name": "POSTGRESQL_PASSWORD",
-                                        "value": "${DB_PASSWORD}"
-                                    },
-                                    {
-                                        "name": "POSTGRESQL_DATABASE",
-                                        "value": "${DB_DATABASE}"
-                                    },
-                                    {
-                                        "name": "POSTGRESQL_MAX_CONNECTIONS",
-                                        "value": "${POSTGRESQL_MAX_CONNECTIONS}"
-                                    },
-                                    {
-                                        "name": "POSTGRESQL_SHARED_BUFFERS",
-                                        "value": "${POSTGRESQL_SHARED_BUFFERS}"
                                     }
                                 ]
                             }

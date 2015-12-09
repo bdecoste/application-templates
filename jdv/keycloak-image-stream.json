@@ -19,16 +19,16 @@
                 }
             },
             "spec": {
-                "dockerImageRepository": "ose3-master.example.com:5000/jboss-keycloak-1/keycloak16-openshift",
+                "dockerImageRepository": "ose3-master.example.com:5000/bdecoste/keycloak",
                 "tags": [
                     {
-                        "name": "1.2",
+                        "name": "1.5.0.Final",
                         "annotations": {
                             "description": "KeyCloak",
                             "iconClass": "icon-keycloak",
                             "tags": "keycloak",
-                            "supports":"keycloak:1.6.0.Final",
-                            "version": "1.2"
+                            "supports":"keycloak:1.5.0.Final",
+                            "version": "1.5.0.Final"
                         }
                     }
                 ]

@@ -12,23 +12,23 @@
             "kind": "ImageStream",
             "apiVersion": "v1",
             "metadata": {
-                "name": "jboss-keycloak-openshift",
+                "name": "jboss-dv-openshift",
                  "annotations": {
-                    "description": "Provides JBoss Test EAP6  STI images.",
+                    "description": "Provides JBoss DV images.",
                     "openshift.io/image.insecureRepository": "true"
                 }
             },
             "spec": {
-                "dockerImageRepository": "ose3-master.example.com:5000/jboss-keycloak-1/keycloak16-openshift",
+                "dockerImageRepository": "ose3-master.example.com:5000/jboss-dv-6/jdv62-openshift",
                 "tags": [
                     {
-                        "name": "1.2",
+                        "name": "6.2",
                         "annotations": {
-                            "description": "KeyCloak",
-                            "iconClass": "icon-keycloak",
-                            "tags": "keycloak",
-                            "supports":"keycloak:1.6.0.Final",
-                            "version": "1.2"
+                            "description": "JDV",
+                            "iconClass": "icon-jdv",
+                            "tags": "jdv",
+                            "supports":"jdv:6.2",
+                            "version": "6.2"
                         }
                     }
                 ]

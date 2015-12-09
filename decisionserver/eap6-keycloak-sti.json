@@ -206,7 +206,7 @@
                         "from": {
                             "kind": "ImageStreamTag",
                             "namespace": "demo",
-                            "name": "jboss-keycloakeap-openshift:1.2"
+                            "name": "jboss-keycloakeap-openshift:${EAP_RELEASE}"
                         }
                     }
                 },
