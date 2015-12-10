@@ -19,7 +19,7 @@
                 }
             },
             "spec": {
-                "dockerImageRepository": "ose3-master.example.com:5000/jboss-keycloak-1/keycloak16-openshift",
+                "dockerImageRepository": "docker-registry.usersys.redhat.com/jboss-keycloak-1/keycloak16-openshift",
                 "tags": [
                     {
                         "name": "1.2",
