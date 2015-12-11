@@ -99,8 +99,12 @@
             "description": "KeyCloak Public Key",
             "name": "KEYCLOAK_PUBLIC_KEY",
             "value": ""
+        },
+        {
+            "description": "Route",
+            "name": "APPLICATION_ROUTE",
+            "value": "helloworld.cloudapps.example.com"
         }
-
    ],
     "objects": [
         {
@@ -348,6 +352,10 @@
                                     {
                                         "name": "KEYCLOAK_PUBLIC_KEY",
                                         "value": "${KEYCLOAK_PUBLIC_KEY}"
+                                    },
+                                    {
+                                        "name": "APPLICATION_ROUTE",
+                                        "value": "${APPLICATION_ROUTE}"
                                     }
                                 ]
                             }
