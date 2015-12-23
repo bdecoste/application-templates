@@ -104,6 +104,11 @@
             "description": "Route",
             "name": "APPLICATION_ROUTE",
             "value": "helloworld.cloudapps.example.com"
+        },
+        {
+            "description": "Artifacts",
+            "name": "ARTIFACT_DIR",
+            "value": "target"
         }
    ],
     "objects": [
@@ -356,6 +361,10 @@
                                     {
                                         "name": "APPLICATION_ROUTE",
                                         "value": "${APPLICATION_ROUTE}"
+                                    },
+                                    {
+                                        "name": "ARTIFACT_DIR",
+                                        "value": "${ARTIFACT_DIR}"
                                     }
                                 ]
                             }

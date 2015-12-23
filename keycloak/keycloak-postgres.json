@@ -130,6 +130,12 @@
             "name": "GENERIC_TRIGGER_SECRET",
             "from": "[a-zA-Z0-9]{8}",
             "generate": "expression"
+        },
+        {
+            "description": "Size of persistent storage for database volume.",
+            "name": "VOLUME_CAPACITY",
+            "value": "512Mi",
+            "required": true
         }
     ],
     "objects": [
@@ -455,6 +461,7 @@
                         }
                     },
                     "spec": {
+                        "terminationGracePeriodSeconds": 60,
                         "containers": [
                             {
                                 "name": "${APPLICATION_NAME}-postgresql",
@@ -464,6 +471,12 @@
                                     {
                                         "containerPort": 5432,
                                         "protocol": "TCP"
+                                    }
+                                ],
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/var/lib/pgsql/data",
+                                        "name": "${APPLICATION_NAME}-postgresql-pvol"
                                     }
                                 ],
                                 "env": [
@@ -489,7 +502,35 @@
                                     }
                                 ]
                             }
+                        ],
+                        "volumes": [
+                            {
+                                "name": "${APPLICATION_NAME}-postgresql-pvol",
+                                "persistentVolumeClaim": {
+                                    "claimName": "${APPLICATION_NAME}-postgresql-claim"
+                                }
+                            }
                         ]
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "PersistentVolumeClaim",
+            "metadata": {
+                "name": "${APPLICATION_NAME}-postgresql-claim",
+                "labels": {
+                    "application": "${APPLICATION_NAME}"
+                }
+            },
+            "spec": {
+                "accessModes": [
+                    "ReadWriteMany"
+                ],
+                "resources": {
+                    "requests": {
+                        "storage": "5Gi"
                     }
                 }
             }
