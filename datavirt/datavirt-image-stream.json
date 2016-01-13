@@ -1,0 +1,38 @@
+{
+    "kind": "List",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "jboss-image-streams",
+        "annotations": {
+            "description": "ImageStream definitions for JBoss Middleware products."
+        }
+    },
+    "items": [
+        {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "jboss-datavirt-openshift",
+                 "annotations": {
+                    "description": "Provides JBoss Test EAP6  STI images.",
+                    "openshift.io/image.insecureRepository": "true"
+                }
+            },
+            "spec": {
+                "dockerImageRepository": "ose3-master.example.com:5000/jboss-datavirt-6/datavirt62-openshift",
+                "tags": [
+                    {
+                        "name": "1.2",
+                        "annotations": {
+                            "description": "DataVirtualization",
+                            "iconClass": "icon-datavirt",
+                            "tags": "datavirt",
+                            "supports":"datavirt:6.2.0.GA",
+                            "version": "1.2"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}
