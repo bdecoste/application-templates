@@ -257,6 +257,29 @@
             }
         },
         {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "id": "${APPLICATION_NAME}-https",
+            "metadata": {
+                "name": "secure-${APPLICATION_NAME}",
+                "labels": {
+                    "application": "${APPLICATION_NAME}"
+                },
+                "annotations": {
+                    "description": "Route for application's https service."
+                }
+            },
+            "spec": {
+                "host": "secure-${APPLICATION_HOSTNAME}",
+                "to": {
+                    "name": "secure-${APPLICATION_NAME}"
+                },
+                "tls": {
+                    "termination": "passthrough"
+                }
+            }
+        },
+        {
             "kind": "DeploymentConfig",
             "apiVersion": "v1",
             "metadata": {
@@ -304,6 +327,13 @@
                                 "name": "${APPLICATION_NAME}",
                                 "image": "${APPLICATION_NAME}",
                                 "imagePullPolicy": "Always",
+                                "volumeMounts": [
+                                    {
+                                        "name": "eap-keystore-volume",
+                                        "mountPath": "/etc/eap-secret-volume",
+                                        "readOnly": true
+                                    }
+                                ],
                                 "livenessProbe": {
                                     "exec": {
                                         "command": [
@@ -385,19 +415,19 @@
                                         "value": "8888"
                                     },
                                     {
-                                        "name": "KEYCLOAK_HTTPS_KEYSTORE_DIR",
-                                        "value": "/etc/keycloak-secret-volume"
+                                        "name": "EAP_HTTPS_KEYSTORE_DIR",
+                                        "value": "/etc/eap-secret-volume"
                                     },
                                     {
-                                        "name": "KEYCLOAK_HTTPS_KEYSTORE",
+                                        "name": "EAP_HTTPS_KEYSTORE",
                                         "value": "${KEYCLOAK_HTTPS_KEYSTORE}"
                                     },
                                     {
-                                        "name": "KEYCLOAK_HTTPS_NAME",
+                                        "name": "EAP_HTTPS_NAME",
                                         "value": "${KEYCLOAK_HTTPS_NAME}"
                                     },
                                     {
-                                        "name": "KEYCLOAK_HTTPS_PASSWORD",
+                                        "name": "EAP_HTTPS_PASSWORD",
                                         "value": "${KEYCLOAK_HTTPS_PASSWORD}"
                                     },
                                     {
@@ -413,6 +443,14 @@
                                         "value": "${HORNETQ_TOPICS}"
                                     }
                                 ]
+                            }
+                        ],
+                        "volumes": [
+                            {
+                                "name": "eap-keystore-volume",
+                                "secret": {
+                                    "secretName": "${KEYCLOAK_HTTPS_SECRET}"
+                                }
                             }
                         ]
                     }
