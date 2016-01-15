@@ -138,6 +138,30 @@
             "name": "SSO_SAML_KEYSTORE_PASSWORD",
             "value": "",
             "required": false
+        },
+        {
+            "description": "The name of the secret containing the keystore file",
+            "name": "EAP_HTTPS_SECRET",
+            "value": "eap-app-secret",
+            "required": true
+        },
+        {
+            "description": "The name of the keystore file within the secret",
+            "name": "EAP_HTTPS_KEYSTORE",
+            "value": "keystore.jks",
+            "required": false
+        },
+        {
+            "description": "The name associated with the server certificate",
+            "name": "EAP_HTTPS_NAME",
+            "value": "",
+            "required": false
+        },
+        {
+            "description": "The password for the keystore and certificate",
+            "name": "EAP_HTTPS_PASSWORD",
+            "value": "",
+            "required": false
         }
    ],
     "objects": [
@@ -162,6 +186,30 @@
                 },
                 "annotations": {
                     "description": "The web server's http port."
+                }
+            }
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "spec": {
+                "ports": [
+                    {
+                        "port": 8443,
+                        "targetPort": 8443
+                    }
+                ],
+                "selector": {
+                    "deploymentConfig": "${APPLICATION_NAME}"
+                }
+            },
+            "metadata": {
+                "name": "secure-${APPLICATION_NAME}",
+                "labels": {
+                    "application": "${APPLICATION_NAME}"
+                },
+                "annotations": {
+                    "description": "The web server's https port."
                 }
             }
         },
@@ -207,6 +255,29 @@
                 "host": "${APPLICATION_HOSTNAME}",
                 "to": {
                     "name": "${APPLICATION_NAME}"
+                }
+            }
+        },
+        {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "id": "${APPLICATION_NAME}-https",
+            "metadata": {
+                "name": "secure-${APPLICATION_NAME}",
+                "labels": {
+                    "application": "${APPLICATION_NAME}"
+                },
+                "annotations": {
+                    "description": "Route for application's https service."
+                }
+            },
+            "spec": {
+                "host": "secure-${APPLICATION_HOSTNAME}",
+                "to": {
+                    "name": "secure-${APPLICATION_NAME}"
+                },
+                "tls": {
+                    "termination": "passthrough"
                 }
             }
         },
@@ -336,6 +407,11 @@
                                         "name": "sso-saml-keystore-volume",
                                         "mountPath": "/etc/sso-saml-secret-volume",
                                         "readOnly": true
+                                    },
+                                    {
+                                        "name": "eap-keystore-volume",
+                                        "mountPath": "/etc/eap-secret-volume",
+                                        "readOnly": true
                                     }
                                 ],
                                 "readinessProbe": {
@@ -351,6 +427,11 @@
                                     {
                                         "name": "http",
                                         "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "name": "https",
+                                        "containerPort": 8443,
                                         "protocol": "TCP"
                                     },
                                     {
@@ -431,6 +512,22 @@
                                     {
                                         "name": "SSO_SAML_KEYSTORE_PASSWORD",
                                         "value": "${SSO_SAML_KEYSTORE_PASSWORD}"
+                                    },
+                                     {
+                                        "name": "EAP_HTTPS_KEYSTORE_DIR",
+                                        "value": "/etc/eap-secret-volume"
+                                    },
+                                    {
+                                        "name": "EAP_HTTPS_KEYSTORE",
+                                        "value": "${EAP_HTTPS_KEYSTORE}"
+                                    },
+                                    {
+                                        "name": "EAP_HTTPS_NAME",
+                                        "value": "${EAP_HTTPS_NAME}"
+                                    },
+                                    {
+                                        "name": "EAP_HTTPS_PASSWORD",
+                                        "value": "${EAP_HTTPS_PASSWORD}"
                                     }
                                 ]
                             }
@@ -440,6 +537,12 @@
                                 "name": "sso-saml-keystore-volume",
                                 "secret": {
                                     "secretName": "${SSO_SAML_KEYSTORE_SECRET}"
+                                }
+                            },
+                            {
+                                "name": "eap-keystore-volume",
+                                "secret": {
+                                    "secretName": "${EAP_HTTPS_SECRET}"
                                 }
                             }
                         ]
