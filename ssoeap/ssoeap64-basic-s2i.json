@@ -101,9 +101,9 @@
             "value": ""
         },
         {
-            "description": "Route",
-            "name": "APPLICATION_ROUTE",
-            "value": "helloworld.cloudapps.example.com"
+            "description": "Routes",
+            "name": "APPLICATION_ROUTES",
+            "value": "http://helloworld.cloudapps.example.com;https://secure-helloworld.cloudapps.example.com"
         },
         {
             "description": "Artifacts",
@@ -486,8 +486,8 @@
                                         "value": "${KEYCLOAK_PUBLIC_KEY}"
                                     },
                                     {
-                                        "name": "APPLICATION_ROUTE",
-                                        "value": "${APPLICATION_ROUTE}"
+                                        "name": "APPLICATION_ROUTES",
+                                        "value": "${APPLICATION_ROUTES}"
                                     },
                                     {
                                         "name": "ARTIFACT_DIR",
