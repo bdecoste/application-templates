@@ -12,22 +12,22 @@
             "kind": "ImageStream",
             "apiVersion": "v1",
             "metadata": {
-                "name": "jboss-keycloak-openshift",
+                "name": "sso-openshift",
                  "annotations": {
-                    "description": "Provides JBoss Test EAP6  STI images.",
+                    "description": "Provides SSO",
                     "openshift.io/image.insecureRepository": "true"
                 }
             },
             "spec": {
-                "dockerImageRepository": "docker-registry.usersys.redhat.com/jboss-sso-7/sso70-openshift",
+                "dockerImageRepository": "ose3x-master.example.com:5000/jboss-sso-7/sso70-openshift",
                 "tags": [
                     {
                         "name": "1.2",
                         "annotations": {
-                            "description": "KeyCloak",
-                            "iconClass": "icon-keycloak",
-                            "tags": "keycloak",
-                            "supports":"keycloak:1.7.0.Final",
+                            "description": "SSO",
+                            "iconClass": "icon-jboss",
+                            "tags": "sso,keycloak",
+                            "supports":"sso:7.0.0.Final",
                             "version": "1.2"
                         }
                     }
