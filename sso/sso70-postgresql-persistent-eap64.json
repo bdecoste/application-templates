@@ -34,6 +34,24 @@
             "required": false
         },
         {
+            "description": "Git source URI for application",
+            "name": "SOURCE_REPOSITORY_URL",
+            "value": "https://github.com/jboss-openshift/openshift-quickstarts",
+            "required": true
+        },
+        {
+            "description": "Git branch/tag reference",
+            "name": "SOURCE_REPOSITORY_REF",
+            "value": "1.2",
+            "required": false
+        },
+        {
+            "description": "Path within Git project to build; empty for root project directory.",
+            "name": "CONTEXT_DIR",
+            "value": "todolist/todolist-jdbc",
+            "required": false
+        },
+        {
             "description": "Database JNDI name used by application to resolve the datasource, e.g. java:/jboss/datasources/postgresql",
             "name": "DB_JNDI",
             "value": "java:jboss/datasources/KeycloakDS",
@@ -151,9 +169,159 @@
             "from": "[a-zA-Z0-9]{8}",
             "generate": "expression",
             "required": true
+        },
+        {
+            "description": "SSO Location",
+            "name": "SSO_URI",
+            "value": "",
+            "required": false
+        },
+        {
+            "description": "SSO Realm",
+            "name": "SSO_REALM",
+            "value": "",
+            "required": false
+        },
+        {
+            "description": "SSO Client",
+            "name": "SSO_CLIENT",
+            "value": "",
+            "required": false
+        },
+        {
+            "description": "SSO Username",
+            "name": "SSO_USERNAME",
+            "value": "",
+            "required": false
+        },
+        {
+            "description": "SSO Password",
+            "name": "SSO_PASSWORD",
+            "value": "",
+            "required": false
+        },
+        {
+            "description": "SSO Public Key",
+            "name": "SSO_PUBLIC_KEY",
+            "value": "",
+            "required": false
+        },
+        {
+            "description": "Routes",
+            "name": "APPLICATION_ROUTES",
+            "value": "http://helloworld-demo.cloudapps.example.com;https://secure-helloworld-demo.cloudapps.example.com",
+            "required": false
+        },
+        {
+            "description": "Artifacts",
+            "name": "ARTIFACT_DIR",
+            "value": "app-jee/target;app-profile-jee/target;app-profile-jee-saml/target;service-jaxrs/target",
+            "required": false
+        },
+        {
+            "description": "maven",
+            "name": "MAVEN_ARGS_APPEND",
+            "value": "",
+            "required": false
+        },
+        {
+            "description": "The name of the secret containing the keystore file",
+            "name": "SSO_SAML_KEYSTORE_SECRET",
+            "value": "",
+            "required": false
+        },
+        {
+            "description": "The name of the keystore file within the secret",
+            "name": "SSO_SAML_KEYSTORE",
+            "value": "",
+            "required": false
+        },
+        {
+            "description": "The name associated with the server certificate",
+            "name": "SSO_SAML_CERTIFICATE_NAME",
+            "value": "",
+            "required": false
+        },
+        {
+            "description": "The password for the keystore and certificate",
+            "name": "SSO_SAML_KEYSTORE_PASSWORD",
+            "value": "",
+            "required": false
         }
     ],
     "objects": [
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "spec": {
+                "ports": [
+                    {
+                        "port": 8080,
+                        "targetPort": 8080
+                    }
+                ],
+                "selector": {
+                    "deploymentConfig": "sso"
+                }
+            },
+            "metadata": {
+                "name": "sso",
+                "labels": {
+                    "application": "sso"
+                },
+                "annotations": {
+                    "description": "The web server's http port."
+                }
+            }
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "spec": {
+                "ports": [
+                    {
+                        "port": 8443,
+                        "targetPort": 8443
+                    }
+                ],
+                "selector": {
+                    "deploymentConfig": "sso"
+                }
+            },
+            "metadata": {
+                "name": "secure-sso",
+                "labels": {
+                    "application": "sso"
+                },
+                "annotations": {
+                    "description": "The web server's https port."
+                }
+            }
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "spec": {
+                "ports": [
+                    {
+                        "port": 5432,
+                        "targetPort": 5432
+                    }
+                ],
+                "selector": {
+                    "deploymentConfig": "sso-postgresql"
+                }
+            },
+            "metadata": {
+                "name": "sso-postgresql",
+                "labels": {
+                    "application": "sso"
+                },
+                "annotations": {
+                    "description": "The database server's port."
+                }
+            }
+        },
         {
             "kind": "Service",
             "apiVersion": "v1",
@@ -203,26 +371,45 @@
             }
         },
         {
-            "kind": "Service",
+            "kind": "Route",
             "apiVersion": "v1",
-            "spec": {
-                "ports": [
-                    {
-                        "port": 5432,
-                        "targetPort": 5432
-                    }
-                ],
-                "selector": {
-                    "deploymentConfig": "${APPLICATION_NAME}-postgresql"
-                }
-            },
+            "id": "sso-http",
             "metadata": {
-                "name": "${APPLICATION_NAME}-postgresql",
+                "name": "sso",
                 "labels": {
-                    "application": "${APPLICATION_NAME}"
+                    "application": "sso"
                 },
                 "annotations": {
-                    "description": "The database server's port."
+                    "description": "Route for application's http service."
+                }
+            },
+            "spec": {
+                "host": "${HOSTNAME_HTTP}",
+                "to": {
+                    "name": "sso"
+                }
+            }
+        },
+        {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "id": "sso-https",
+            "metadata": {
+                "name": "secure-sso",
+                "labels": {
+                    "application": "sso"
+                },
+                "annotations": {
+                    "description": "Route for application's https service."
+                }
+            },
+            "spec": {
+                "host": "${HOSTNAME_HTTPS}",
+                "to": {
+                    "name": "secure-sso"
+                },
+                "tls": {
+                    "termination": "passthrough"
                 }
             }
         },
@@ -270,12 +457,90 @@
             }
         },
         {
-            "kind": "DeploymentConfig",
+            "kind": "ImageStream",
             "apiVersion": "v1",
             "metadata": {
                 "name": "${APPLICATION_NAME}",
                 "labels": {
                     "application": "${APPLICATION_NAME}"
+                }
+            }
+        },
+        {
+            "kind": "BuildConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${APPLICATION_NAME}",
+                "labels": {
+                    "application": "${APPLICATION_NAME}"
+                }
+            },
+            "spec": {
+                "source": {
+                    "type": "Git",
+                    "git": {
+                        "uri": "${SOURCE_REPOSITORY_URL}",
+                        "ref": "${SOURCE_REPOSITORY_REF}"
+                    },
+                    "contextDir": "${CONTEXT_DIR}"
+                },
+                "strategy": {
+                    "type": "Source",
+                    "sourceStrategy": {
+                        "forcePull": true,
+                        "from": {
+                            "kind": "ImageStreamTag",
+                            "namespace": "demo",
+                            "name": "jboss-ssoeap-openshift:1.2"
+                        },
+                        "env": [
+                            {
+                                "name": "ARTIFACT_DIR",
+                                "value": "${ARTIFACT_DIR}"
+                            },
+                            {
+                                "name": "MAVEN_ARGS_APPEND",
+                                "value": "${MAVEN_ARGS_APPEND}"
+                            }
+                        ]
+                    }
+                },
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "${APPLICATION_NAME}:latest"
+                    }
+                },
+                "triggers": [
+                    {
+                        "type": "GitHub",
+                        "github": {
+                            "secret": "${GITHUB_WEBHOOK_SECRET}"
+                        }
+                    },
+                    {
+                        "type": "Generic",
+                        "generic": {
+                            "secret": "${GENERIC_WEBHOOK_SECRET}"
+                        }
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChange": {}
+                    },
+                    {
+                        "type": "ConfigChange"
+                    }
+                ]
+            }
+        },  
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "sso",
+                "labels": {
+                    "application": "sso"
                 }
             },
             "spec": {
@@ -288,7 +553,7 @@
                         "imageChangeParams": {
                             "automatic": true,
                             "containerNames": [
-                                "${APPLICATION_NAME}"
+                                "sso"
                             ],
                              "from": {
                                 "kind": "ImageStreamTag",
@@ -303,14 +568,14 @@
                 ],
                 "replicas": 1,
                 "selector": {
-                    "deploymentConfig": "${APPLICATION_NAME}"
+                    "deploymentConfig": "sso"
                 },
                 "template": {
                     "metadata": {
-                        "name": "${APPLICATION_NAME}",
+                        "name": "sso",
                         "labels": {
-                            "deploymentConfig": "${APPLICATION_NAME}",
-                            "application": "${APPLICATION_NAME}"
+                            "deploymentConfig": "sso",
+                            "application": "sso"
                         }
                     },
                     "spec": {
@@ -318,8 +583,8 @@
                         "terminationGracePeriodSeconds": 60,
                         "containers": [
                             {
-                                "name": "${APPLICATION_NAME}",
-                                "image": "${APPLICATION_NAME}",
+                                "name": "sso",
+                                "image": "sso",
                                 "imagePullPolicy": "Always",
                                 "volumeMounts": [
                                     {
@@ -371,7 +636,7 @@
                                 "env": [
                                     {
                                         "name": "DB_SERVICE_PREFIX_MAPPING",
-                                        "value": "${APPLICATION_NAME}-postgresql=DB"
+                                        "value": "sso-postgresql=DB"
                                     },
                                     {
                                         "name": "DB_JNDI",
@@ -391,7 +656,7 @@
                                     },
                                     {
                                         "name": "TX_DATABASE_PREFIX_MAPPING",
-                                        "value": "${APPLICATION_NAME}-postgresql=DB"
+                                        "value": "sso-postgresql=DB"
                                     },
                                     {
                                         "name": "DB_MIN_POOL_SIZE",
@@ -407,7 +672,7 @@
                                     },
                                     {
                                         "name": "OPENSHIFT_KUBE_PING_LABELS",
-                                        "value": "application=${APPLICATION_NAME}"
+                                        "value": "application=sso"
                                     },
                                     {
                                         "name": "OPENSHIFT_KUBE_PING_NAMESPACE",
@@ -486,9 +751,9 @@
             "kind": "DeploymentConfig",
             "apiVersion": "v1",
             "metadata": {
-                "name": "${APPLICATION_NAME}-postgresql",
+                "name": "sso-postgresql",
                 "labels": {
-                    "application": "${APPLICATION_NAME}"
+                    "application": "sso"
                 }
             },
             "spec": {
@@ -501,7 +766,7 @@
                         "imageChangeParams": {
                             "automatic": true,
                             "containerNames": [
-                                "${APPLICATION_NAME}-postgresql"
+                                "sso-postgresql"
                             ],
                             "from": {
                                 "kind": "ImageStreamTag",
@@ -516,21 +781,21 @@
                 ],
                 "replicas": 1,
                 "selector": {
-                    "deploymentConfig": "${APPLICATION_NAME}-postgresql"
+                    "deploymentConfig": "sso-postgresql"
                 },
                 "template": {
                     "metadata": {
-                        "name": "${APPLICATION_NAME}-postgresql",
+                        "name": "sso-postgresql",
                         "labels": {
-                            "deploymentConfig": "${APPLICATION_NAME}-postgresql",
-                            "application": "${APPLICATION_NAME}"
+                            "deploymentConfig": "sso-postgresql",
+                            "application": "sso"
                         }
                     },
                     "spec": {
                         "terminationGracePeriodSeconds": 60,
                         "containers": [
                             {
-                                "name": "${APPLICATION_NAME}-postgresql",
+                                "name": "sso-postgresql",
                                 "image": "postgresql",
                                 "imagePullPolicy": "Always",
                                 "ports": [
@@ -542,7 +807,7 @@
                                 "volumeMounts": [
                                     {
                                         "mountPath": "/var/lib/pgsql/data",
-                                        "name": "${APPLICATION_NAME}-postgresql-pvol"
+                                        "name": "sso-postgresql-pvol"
                                     }
                                 ],
                                 "env": [
@@ -571,9 +836,245 @@
                         ],
                         "volumes": [
                             {
-                                "name": "${APPLICATION_NAME}-postgresql-pvol",
+                                "name": "sso-postgresql-pvol",
                                 "persistentVolumeClaim": {
-                                    "claimName": "${APPLICATION_NAME}-postgresql-claim"
+                                    "claimName": "sso-postgresql-claim"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${APPLICATION_NAME}",
+                "labels": {
+                    "application": "${APPLICATION_NAME}"
+                }
+            },
+            "spec": {
+                "strategy": {
+                    "type": "Recreate"
+                },
+                "triggers": [
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "${APPLICATION_NAME}"
+                            ],
+                            "from": {
+                                "kind": "ImageStream",
+                                "name": "${APPLICATION_NAME}"
+                            }
+                        }
+                    }
+                ],
+                "replicas": 1,
+                "selector": {
+                    "deploymentConfig": "${APPLICATION_NAME}"
+                },
+                "template": {
+                    "metadata": {
+                        "name": "${APPLICATION_NAME}",
+                        "labels": {
+                            "deploymentConfig": "${APPLICATION_NAME}",
+                            "application": "${APPLICATION_NAME}"
+                        }
+                    },
+                    "spec": {
+                        "serviceAccount": "eap-service-account",
+                        "terminationGracePeriodSeconds": 60,
+                        "containers": [
+                            {
+                                "name": "${APPLICATION_NAME}",
+                                "image": "${APPLICATION_NAME}",
+                                "imagePullPolicy": "Always",
+                                "volumeMounts": [
+                                    {
+                                        "name": "sso-saml-keystore-volume",
+                                        "mountPath": "/etc/sso-saml-secret-volume",
+                                        "readOnly": true
+                                    },
+                                    {
+                                        "name": "eap-keystore-volume",
+                                        "mountPath": "/etc/eap-secret-volume",
+                                        "readOnly": true
+                                    },
+                                    {
+                                        "name": "eap-jgroups-keystore-volume",
+                                        "mountPath": "/etc/jgroups-encrypt-secret-volume",
+                                        "readOnly": true
+                                    }
+                                ],
+                                "livenessProbe": {
+                                    "exec": {
+                                        "command": [
+                                            "/bin/bash",
+                                            "-c",
+                                            "/opt/eap/bin/livenessProbe.sh"
+                                        ]
+                                    }
+                                },
+                                "readinessProbe": {
+                                    "exec": {
+                                        "command": [
+                                            "/bin/bash",
+                                            "-c",
+                                            "/opt/eap/bin/readinessProbe.sh"
+                                        ]
+                                    }
+                                },
+                                "ports": [
+                                    {
+                                        "name": "jolokia",
+                                        "containerPort": 8778,
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "name": "http",
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "name": "https",
+                                        "containerPort": 8443,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "env": [
+                                    {
+                                        "name": "OPENSHIFT_KUBE_PING_LABELS",
+                                        "value": "application=${APPLICATION_NAME}"
+                                    },
+                                    {
+                                        "name": "OPENSHIFT_KUBE_PING_NAMESPACE",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "fieldPath": "metadata.namespace"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "HTTPS_KEYSTORE_DIR",
+                                        "value": "/etc/eap-secret-volume"
+                                    },
+                                    {
+                                        "name": "HTTPS_KEYSTORE",
+                                        "value": "${HTTPS_KEYSTORE}"
+                                    },
+                                    {
+                                        "name": "HTTPS_NAME",
+                                        "value": "${HTTPS_NAME}"
+                                    },
+                                    {
+                                        "name": "HTTPS_PASSWORD",
+                                        "value": "${HTTPS_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "HORNETQ_CLUSTER_PASSWORD",
+                                        "value": "${HORNETQ_CLUSTER_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "HORNETQ_QUEUES",
+                                        "value": "${HORNETQ_QUEUES}"
+                                    },
+                                    {
+                                        "name": "HORNETQ_TOPICS",
+                                        "value": "${HORNETQ_TOPICS}"
+                                    },
+                                    {
+                                        "name": "JGROUPS_ENCRYPT_SECRET",
+                                        "value": "${JGROUPS_ENCRYPT_SECRET}"
+                                    },
+                                    {
+                                        "name": "JGROUPS_ENCRYPT_KEYSTORE_DIR",
+                                        "value": "/etc/jgroups-encrypt-secret-volume"
+                                    },
+                                    {
+                                        "name": "JGROUPS_ENCRYPT_KEYSTORE",
+                                        "value": "${JGROUPS_ENCRYPT_KEYSTORE}"
+                                    },
+                                    {
+                                        "name": "JGROUPS_ENCRYPT_NAME",
+                                        "value": "${JGROUPS_ENCRYPT_NAME}"
+                                    },
+                                    {
+                                        "name": "JGROUPS_ENCRYPT_PASSWORD",
+                                        "value": "${JGROUPS_ENCRYPT_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "JGROUPS_CLUSTER_PASSWORD",
+                                        "value": "${JGROUPS_CLUSTER_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "KEYCLOAK_URI",
+                                        "value": "${SSO_URI}"
+                                    },
+                                    {
+                                        "name": "KEYCLOAK_REALM",
+                                        "value": "${SSO_REALM}"
+                                    },
+                                    {
+                                        "name": "KEYCLOAK_CLIENT",
+                                        "value": "${SSO_CLIENT}"
+                                    },
+                                    {
+                                        "name": "KEYCLOAK_USERNAME",
+                                        "value": "${SSO_USERNAME}"
+                                    },
+                                    {
+                                        "name": "KEYCLOAK_PASSWORD",
+                                        "value": "${SSO_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "KEYCLOAK_PUBLIC_KEY",
+                                        "value": "${SSO_PUBLIC_KEY}"
+                                    },
+                                    {
+                                        "name": "APPLICATION_ROUTES",
+                                        "value": "${APPLICATION_ROUTES}"
+                                    },
+                                    {
+                                        "name": "SSO_SAML_KEYSTORE_SECRET",
+                                        "value": "${SSO_SAML_KEYSTORE_SECRET}"
+                                    },
+                                    {
+                                        "name": "SSO_SAML_KEYSTORE",
+                                        "value": "${SSO_SAML_KEYSTORE}"
+                                    },
+                                    {
+                                        "name": "SSO_SAML_CERTIFICATE_NAME",
+                                        "value": "${SSO_SAML_CERTIFICATE_NAME}"
+                                    },
+                                    {
+                                        "name": "SSO_SAML_KEYSTORE_PASSWORD",
+                                        "value": "${SSO_SAML_KEYSTORE_PASSWORD}"
+                                    }
+                                ]
+                            }
+                        ],
+                        "volumes": [
+                            {
+                                "name": "sso-saml-keystore-volume",
+                                "secret": {
+                                    "secretName": "${SSO_SAML_KEYSTORE_SECRET}"
+                                }
+                            },
+                            {
+                                "name": "eap-keystore-volume",
+                                "secret": {
+                                    "secretName": "${HTTPS_SECRET}"
+                                }
+                            },
+                            {
+                                "name": "eap-jgroups-keystore-volume",
+                                "secret": {
+                                    "secretName": "${JGROUPS_ENCRYPT_SECRET}"
                                 }
                             }
                         ]
@@ -585,9 +1086,9 @@
             "apiVersion": "v1",
             "kind": "PersistentVolumeClaim",
             "metadata": {
-                "name": "${APPLICATION_NAME}-postgresql-claim",
+                "name": "sso-postgresql-claim",
                 "labels": {
-                    "application": "${APPLICATION_NAME}"
+                    "application": "sso"
                 }
             },
             "spec": {
