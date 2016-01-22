@@ -134,6 +134,18 @@
             "required": true
         },
         {
+            "description": "Queue names",
+            "name": "HORNETQ_QUEUES",
+            "value": "",
+            "required": false
+        },
+        {
+            "description": "Topic names",
+            "name": "HORNETQ_TOPICS",
+            "value": "",
+            "required": false
+        },
+        {
             "description": "Size of persistent storage for database volume.",
             "name": "VOLUME_CAPACITY",
             "value": "512Mi",
@@ -180,7 +192,7 @@
         {
             "description": "Artifacts",
             "name": "ARTIFACT_DIR",
-            "value": "app-jee/target;app-profile-jee/target;app-profile-jee-saml/target;service-jaxrs/target",
+            "value": "app-jee/target;app-profile-jee/target;service-jaxrs/target",
             "required": false
         },
         {
@@ -655,6 +667,14 @@
                                         "value": "${HORNETQ_CLUSTER_PASSWORD}"
                                     },
                                     {
+                                        "name": "HORNETQ_QUEUES",
+                                        "value": "${HORNETQ_QUEUES}"
+                                    },
+                                    {
+                                        "name": "HORNETQ_TOPICS",
+                                        "value": "${HORNETQ_TOPICS}"
+                                    },
+                                    {
                                         "name": "JGROUPS_ENCRYPT_SECRET",
                                         "value": "${JGROUPS_ENCRYPT_SECRET}"
                                     },
@@ -987,7 +1007,7 @@
                                     },
                                     {
                                         "name": "KEYCLOAK_PUBLIC_KEY",
-                                        "value": "${SSO_PUBLIC_KEY}"
+                                        "value": ""
                                     },
                                     {
                                         "name": "APPLICATION_ROUTES",
