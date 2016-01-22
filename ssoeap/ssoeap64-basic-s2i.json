@@ -214,12 +214,6 @@
             "required": false
         },
         {
-            "description": "SSO Client",
-            "name": "SSO_CLIENT",
-            "value": "",
-            "required": false
-        },
-        {
             "description": "SSO Username",
             "name": "SSO_USERNAME",
             "value": "",
@@ -622,10 +616,6 @@
                                     {
                                         "name": "KEYCLOAK_REALM",
                                         "value": "${SSO_REALM}"
-                                    },
-                                    {
-                                        "name": "KEYCLOAK_CLIENT",
-                                        "value": "${SSO_CLIENT}"
                                     },
                                     {
                                         "name": "KEYCLOAK_USERNAME",
