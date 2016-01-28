@@ -3,15 +3,15 @@
     "apiVersion": "v1",
     "metadata": {
         "annotations": {
-            "description": "Application template for SSO 7.0 PostgreSQL applications with persistent storage",
+            "description": "Application template for SSO 7.0 PostgreSQL with example EAP-based applications",
             "iconClass" : "icon-jboss",
             "tags" : "sso,keycloak,postrgresql,java,database,jboss,xpaas",
             "version" : "1.2"
         },
-        "name": "sso70-postgresql-persistent"
+        "name": "sso70-postgresql"
     },
     "labels": {
-        "template": "sso70-postgresql-persistent",
+        "template": "sso70-postgresql",
         "xpaas" : "1.2.0"
     },
     "parameters": [
@@ -144,12 +144,6 @@
             "name": "HORNETQ_TOPICS",
             "value": "",
             "required": false
-        },
-        {
-            "description": "Size of persistent storage for database volume.",
-            "name": "VOLUME_CAPACITY",
-            "value": "512Mi",
-            "required": true
         },
         {
             "description": "The name of the secret containing the keystore file",
@@ -782,12 +776,6 @@
                                         "protocol": "TCP"
                                     }
                                 ],
-                                "volumeMounts": [
-                                    {
-                                        "mountPath": "/var/lib/pgsql/data",
-                                        "name": "sso-postgresql-pvol"
-                                    }
-                                ],
                                 "env": [
                                     {
                                         "name": "POSTGRESQL_USER",
@@ -810,14 +798,6 @@
                                         "value": "${POSTGRESQL_SHARED_BUFFERS}"
                                     }
                                 ]
-                            }
-                        ],
-                        "volumes": [
-                            {
-                                "name": "sso-postgresql-pvol",
-                                "persistentVolumeClaim": {
-                                    "claimName": "sso-postgresql-claim"
-                                }
                             }
                         ]
                     }
@@ -1053,26 +1033,6 @@
                                 }
                             }
                         ]
-                    }
-                }
-            }
-        },
-        {
-            "apiVersion": "v1",
-            "kind": "PersistentVolumeClaim",
-            "metadata": {
-                "name": "sso-postgresql-claim",
-                "labels": {
-                    "application": "sso"
-                }
-            },
-            "spec": {
-                "accessModes": [
-                    "ReadWriteOnce"
-                ],
-                "resources": {
-                    "requests": {
-                        "storage": "${VOLUME_CAPACITY}"
                     }
                 }
             }
