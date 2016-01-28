@@ -35,19 +35,19 @@
         {
             "description": "Git source URI for application",
             "name": "SOURCE_REPOSITORY_URL",
-            "value": "https://github.com/jboss-openshift/openshift-quickstarts",
+            "value": "https://github.com/keycloak/keycloak-examples",
             "required": true
         },
         {
             "description": "Git branch/tag reference",
             "name": "SOURCE_REPOSITORY_REF",
-            "value": "1.2",
+            "value": "master",
             "required": false
         },
         {
             "description": "Path within Git project to build; empty for root project directory.",
             "name": "CONTEXT_DIR",
-            "value": "todolist/todolist-jdbc",
+            "value": "",
             "required": false
         },
         {
