@@ -14,17 +14,30 @@ Several templates are provided:
  * sso70-postgresql-persistent-eap64.json: All-in-one SSO/Keycloak template backed by persistent Postgresql with integrated EAP-based example applications
 
 Templates are configured with the following basic parameters:
- * APPLICATION_NAME: the name of the application.  This is also used as the name of the docker image created by the build. (defaults to sso)
+ * APPLICATION_NAME: the name of the application (defaults to sso)
  * HTTPS_SECRET: Name of the Secret to use to expose SSO/Keycloak over HTTPS (defaults to sso-app-secret)
  * HTTPS_KEYSTORE: Name of the keystore to use to expose SSO/Keycloak over HTTPS (defaults to keystore.jks)
  * HTTPS_NAME: The alias of the keys/certificate to use to expose SSO/Keycloak over HTTPS (defaults to jboss)
  * HTTPS_PASSWORD: The password of the keystore to use to expose SSO/Keycloak over HTTPS (defaults to mykeystorepass)
 
 
-##Example
+##SSO Example
 ```
 $ oc create -n myproject -f secrets/sso-secret.json
+$ oc create -n myproject -f sso/sso-image-stream.json
+$ oc import-image sso-openshift
 $ oc process -f sso/sso70-postgresql.json | oc create -f -
 ```
 After executing the above, you should be able to access the SSO/Keycloak server at http://sso-myproject.hostname and https://secure-sso-myproject.hostname
+
+##All-in-One Example
+```
+$ oc create -n myproject -f secrets/sso-secret.json
+$ oc create -n myproject -f sso/sso-image-stream.json
+$ oc import-image sso-openshift
+$ oc create -n myproject -f ssoeap/ssoeap-image-stream.json
+$ oc import-image jboss-ssoeap-openshift
+$ oc process -f sso/sso70-postgresql-eap64.json | oc create -f -
+```
+After executing the above, you should be able to access the SSO/Keycloak-enabled applications at http://helloworld-myproject.hostname/app-context and https://secure-helloworld-myproject.hostname/app-context
 

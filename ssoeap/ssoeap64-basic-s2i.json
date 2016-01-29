@@ -95,13 +95,13 @@
         {
             "description": "The name associated with the server certificate",
             "name": "HTTPS_NAME",
-            "value": "",
+            "value": "jboss",
             "required": false
         },
         {
             "description": "The password for the keystore and certificate",
             "name": "HTTPS_PASSWORD",
-            "value": "",
+            "value": "mykeystorepass",
             "required": false
         },
         {
@@ -258,19 +258,19 @@
         {
             "description": "The name of the keystore file within the secret",
             "name": "SSO_SAML_KEYSTORE",
-            "value": "",
+            "value": "/etc/sso-saml-secret-volume/keystore.jks",
             "required": false
         },
         {
             "description": "The name associated with the server certificate",
             "name": "SSO_SAML_CERTIFICATE_NAME",
-            "value": "",
+            "value": "jboss",
             "required": false
         },
         {
             "description": "The password for the keystore and certificate",
             "name": "SSO_SAML_KEYSTORE_PASSWORD",
-            "value": "",
+            "value": "mykeystorepass",
             "required": false
         }
    ],
