@@ -36,7 +36,7 @@
         {
             "description": "Git source URI for application",
             "name": "SOURCE_REPOSITORY_URL",
-            "value": "https://github.com/jboss-openshift/keycloak/keycloak-examples",
+            "value": "https://github.com/keycloak/keycloak-examples",
             "required": true
         },
         {
