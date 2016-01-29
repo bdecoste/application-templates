@@ -240,7 +240,7 @@
         {
             "description": "Artifacts",
             "name": "ARTIFACT_DIR",
-            "value": "app-jee/target;app-profile-jee/target;service-jaxrs/target",
+            "value": "app-jee/target;app-profile-jee/target;service-jaxrs/target;app-profile-jee-saml/target",
             "required": false
         },
         {
@@ -252,7 +252,7 @@
         {
             "description": "The name of the secret containing the keystore file",
             "name": "SSO_SAML_KEYSTORE_SECRET",
-            "value": "",
+            "value": "sso-app-secret",
             "required": false
         },
         {
