@@ -1,6 +1,6 @@
 #Application Templates
 This project contains OpenShift v3 application templates which support
-Red Hat SSO/Keycloak
+Red Hat SSO/Keycloak-enabled applications
 
 ##Structure
 Several templates are provided:
