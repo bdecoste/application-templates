@@ -155,8 +155,26 @@
             "required": true
         },
         {
-            "description": "List of .sql files to import into the database",
+            "description": "Comma-delimted list of .sql files to import into the database",
             "name": "POSTGRESQL_IMPORT_SQL",
+            "value": "",
+            "required": false
+        },
+        {
+            "description": "Comma delimited list of files containing <resource-adapter> element(s) to be included in standalone.xml",
+            "name": "DATAVIRT_RESOURCE_ADAPTERS",
+            "value": "",
+            "required": false
+        },
+        {
+            "description": "Comma delimited list of files to be executed before artifact deployment",
+            "name": "DATAVIRT_CLI_FILES",
+            "value": "",
+            "required": false
+        },
+        {
+            "description": "Comma delimited list of datasource *-ds.xml files to be deployed",
+            "name": "DATAVIRT_DS_FILES",
             "value": "",
             "required": false
         }
@@ -513,6 +531,18 @@
                                     {
                                         "name": "POSTGRESQL_IMPORT_SQL",
                                         "value": "${POSTGRESQL_IMPORT_SQL}"
+                                    },
+                                    {
+                                        "name": "DATAVIRT_RESOURCE_ADAPTERS",
+                                        "value": "${DATAVIRT_RESOURCE_ADAPTERS}"
+                                    },
+                                    {
+                                        "name": "DATAVIRT_CLI_FILES",
+                                        "value": "${DATAVIRT_CLI_FILES}"
+                                    },
+                                    {
+                                        "name": "DATAVIRT_DS_FILES",
+                                        "value": "${DATAVIRT_DS_FILES}"
                                     }
                                 ]
                             }
