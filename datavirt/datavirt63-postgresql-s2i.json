@@ -167,14 +167,14 @@
             "required": false
         },
         {
-            "description": "Comma delimited list of files to be executed before artifact deployment",
-            "name": "DATAVIRT_CLI_FILES",
+            "description": "Comma delimited list of files containing <datasource> element(s) to be included in standalone.xml",
+            "name": "DATAVIRT_DATASOURCES",
             "value": "",
             "required": false
         },
         {
-            "description": "Comma delimited list of datasource *-ds.xml files to be deployed",
-            "name": "DATAVIRT_DS_FILES",
+            "description": "Comma delimited list of files containing <translator> element(s) to be included in standalone.xml",
+            "name": "DATAVIRT_TRANSLATORS",
             "value": "",
             "required": false
         }
@@ -537,12 +537,12 @@
                                         "value": "${DATAVIRT_RESOURCE_ADAPTERS}"
                                     },
                                     {
-                                        "name": "DATAVIRT_CLI_FILES",
-                                        "value": "${DATAVIRT_CLI_FILES}"
+                                        "name": "DATAVIRT_DATASOURCES",
+                                        "value": "${DATAVIRT_DATASOURCES}"
                                     },
                                     {
-                                        "name": "DATAVIRT_DS_FILES",
-                                        "value": "${DATAVIRT_DS_FILES}"
+                                        "name": "DATAVIRT_TRANSLATORS",
+                                        "value": "${DATAVIRT_TRANSLATORS}"
                                     }
                                 ]
                             }
