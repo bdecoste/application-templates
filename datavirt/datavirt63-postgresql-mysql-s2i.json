@@ -208,6 +208,18 @@
             "name": "DATAVIRT_TRANSLATORS",
             "value": "",
             "required": false
+        },
+        {
+            "description": "Path to directory or tarball injected from secondary image",
+            "name": "DATAVIRT_INJECTED_ARTIFACTS",
+            "value": "",
+            "required": false
+        },
+        {
+            "description": "Comma delimited list of properties files from ConfigMap volumes containing datasource properties",
+            "name": "DATASOURCE_CONFIG_MAP",
+            "value": "",
+            "required": false
         }
     ],
     "objects": [
@@ -376,7 +388,22 @@
                         "uri": "${SOURCE_REPOSITORY_URL}",
                         "ref": "${SOURCE_REPOSITORY_REF}"
                     },
-                    "contextDir": "${CONTEXT_DIR}"
+                    "contextDir": "${CONTEXT_DIR}",
+                    "images": [
+                        {
+		            "from": {
+                                "kind": "ImageStreamTag",
+                                "namespace": "${IMAGE_STREAM_NAMESPACE}",
+                                "name": "jdv-quickstart-artifacts:latest"
+                            },
+                            "paths": [
+                                {
+                                    "destinationDir": "injected",
+                                    "sourcePath": "/tmp/jdv-quickstart-artifacts"
+                                }
+		 	     ]
+                        }
+                    ]
                 },
                 "strategy": {
                     "type": "Source",
@@ -395,6 +422,10 @@
                             {
                                 "name": "CONTEXT_DIR",
                                 "value": "${CONTEXT_DIR}"
+                            },
+                            {
+                                "name": "DATAVIRT_INJECTED_ARTIFACTS",
+                                "value": "${DATAVIRT_INJECTED_ARTIFACTS}"
                             }
                         ]
                     }
@@ -478,6 +509,13 @@
                                 "name": "${APPLICATION_NAME}",
                                 "image": "${APPLICATION_NAME}",
                                 "imagePullPolicy": "Always",
+                                "volumeMounts": [
+                                    {
+                                        "name": "jdv-config-volume",
+                                        "mountPath": "/etc/jdv-config",
+                                        "readOnly": true
+                                    }
+                                ],
                                 "livenessProbe": {
                                     "exec": {
                                         "command": [
@@ -521,7 +559,7 @@
                                 "env": [
                                     {
                                         "name": "DB_SERVICE_PREFIX_MAPPING",
-                                        "value": "${APPLICATION_NAME}-postgresql=POSTGRESQL,${APPLICATION_NAME}-mysql=MYSQL"
+                                        "value": "${APPLICATION_NAME}-account=ACCOUNT,${APPLICATION_NAME}-postgresql=POSTGRESQL,${APPLICATION_NAME}-mysql=MYSQL"
                                     },
                                     {
                                         "name": "POSTGRESQL_JNDI",
@@ -557,7 +595,7 @@
                                     },
                                     {
                                         "name": "TX_DATABASE_PREFIX_MAPPING",
-                                        "value": "${APPLICATION_NAME}-postgresql=POSTGRESQL,${APPLICATION_NAME}-mysql=MYSQL"
+                                        "value": "${APPLICATION_NAME}-account=ACCOUNT,${APPLICATION_NAME}-postgresql=POSTGRESQL,${APPLICATION_NAME}-mysql=MYSQL"
                                     },
                                     {
                                         "name": "POSTGRESQL_MIN_POOL_SIZE",
@@ -626,8 +664,20 @@
                                     {
                                         "name": "DATAVIRT_TRANSLATORS",
                                         "value": "${DATAVIRT_TRANSLATORS}"
+                                    },
+                                    {
+                                        "name": "DATASOURCE_CONFIG_MAP",
+                                        "value": "${DATASOURCE_CONFIG_MAP}"
                                     }
                                 ]
+                            }
+                        ],
+                        "volumes": [
+                            {
+                                "name": "jdv-config-volume",
+                                "configMap": {
+                                    "name": "jdv-quickstart-configmap"
+                                }
                             }
                         ]
                     }

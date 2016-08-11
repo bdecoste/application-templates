@@ -1,0 +1,34 @@
+{
+    "kind": "List",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "jboss-image-streams",
+        "annotations": {
+            "description": "ImageStream definitions for JBoss Middleware products."
+        }
+    },
+    "items": [
+        {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "jdv-quickstart-artifacts"
+            },
+            "spec": {
+                "dockerImageRepository": "registry.example.com:5000/jboss-jdv-6/quickstart-artifacts",
+                "tags": [
+                    {
+                        "name": "1.0",
+                        "annotations": {
+                            "description": "datavirt",
+                            "iconClass": "icon-jdv",
+                            "tags": "datavirt",
+                            "supports":"datavirt:6.3",
+                            "version": "1.0"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}
