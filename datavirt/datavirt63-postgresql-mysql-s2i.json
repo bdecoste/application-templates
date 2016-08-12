@@ -215,6 +215,12 @@
             "value": "",
             "required": false
         },
+         {
+            "description": "Path to directory or tarball injected from secondary image",
+            "name": "DATAVIRT_INJECTED_MODULES",
+            "value": "",
+            "required": false
+        },
         {
             "description": "Comma delimited list of properties files from ConfigMap volumes containing datasource properties",
             "name": "DATASOURCE_CONFIG_MAP",
@@ -400,6 +406,10 @@
                                 {
                                     "destinationDir": "injected",
                                     "sourcePath": "/tmp/jdv-quickstart-artifacts"
+                                },
+                                {
+                                    "destinationDir": "injected",
+                                    "sourcePath": "/tmp/jdv-quickstart-modules"
                                 }
 		 	     ]
                         }
@@ -426,6 +436,10 @@
                             {
                                 "name": "DATAVIRT_INJECTED_ARTIFACTS",
                                 "value": "${DATAVIRT_INJECTED_ARTIFACTS}"
+                            },
+                            {
+                                "name": "DATAVIRT_INJECTED_MODULES",
+                                "value": "${DATAVIRT_INJECTED_MODULES}"
                             }
                         ]
                     }
@@ -559,7 +573,7 @@
                                 "env": [
                                     {
                                         "name": "DB_SERVICE_PREFIX_MAPPING",
-                                        "value": "${APPLICATION_NAME}-account=ACCOUNT,${APPLICATION_NAME}-postgresql=POSTGRESQL,${APPLICATION_NAME}-mysql=MYSQL"
+                                        "value": "${APPLICATION_NAME}-oracle=ORACLE,${APPLICATION_NAME}-account=ACCOUNT,${APPLICATION_NAME}-postgresql=POSTGRESQL,${APPLICATION_NAME}-mysql=MYSQL"
                                     },
                                     {
                                         "name": "POSTGRESQL_JNDI",
@@ -595,7 +609,7 @@
                                     },
                                     {
                                         "name": "TX_DATABASE_PREFIX_MAPPING",
-                                        "value": "${APPLICATION_NAME}-account=ACCOUNT,${APPLICATION_NAME}-postgresql=POSTGRESQL,${APPLICATION_NAME}-mysql=MYSQL"
+                                        "value": "${APPLICATION_NAME}-oracle=ORACLE,${APPLICATION_NAME}-account=ACCOUNT,${APPLICATION_NAME}-postgresql=POSTGRESQL,${APPLICATION_NAME}-mysql=MYSQL"
                                     },
                                     {
                                         "name": "POSTGRESQL_MIN_POOL_SIZE",
