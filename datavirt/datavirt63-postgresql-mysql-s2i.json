@@ -573,7 +573,7 @@
                                 "env": [
                                     {
                                         "name": "DB_SERVICE_PREFIX_MAPPING",
-                                        "value": "${APPLICATION_NAME}-oracle=ORACLE,${APPLICATION_NAME}-account=ACCOUNT,${APPLICATION_NAME}-postgresql=POSTGRESQL,${APPLICATION_NAME}-mysql=MYSQL"
+                                        "value": "${APPLICATION_NAME}-postgresql=POSTGRESQL,${APPLICATION_NAME}-mysql=MYSQL"
                                     },
                                     {
                                         "name": "POSTGRESQL_JNDI",
@@ -609,7 +609,7 @@
                                     },
                                     {
                                         "name": "TX_DATABASE_PREFIX_MAPPING",
-                                        "value": "${APPLICATION_NAME}-oracle=ORACLE,${APPLICATION_NAME}-account=ACCOUNT,${APPLICATION_NAME}-postgresql=POSTGRESQL,${APPLICATION_NAME}-mysql=MYSQL"
+                                        "value": "${APPLICATION_NAME}-postgresql=POSTGRESQL,${APPLICATION_NAME}-mysql=MYSQL"
                                     },
                                     {
                                         "name": "POSTGRESQL_MIN_POOL_SIZE",
