@@ -211,7 +211,7 @@
         },
         {
             "description": "Path to directory or tarball injected from secondary image",
-            "name": "DATAVIRT_INJECTED_ARTIFACTS",
+            "name": "DATAVIRT_INJECTED_RESOURCE_ADAPTERS",
             "value": "",
             "required": false
         },
@@ -434,8 +434,8 @@
                                 "value": "${CONTEXT_DIR}"
                             },
                             {
-                                "name": "DATAVIRT_INJECTED_ARTIFACTS",
-                                "value": "${DATAVIRT_INJECTED_ARTIFACTS}"
+                                "name": "DATAVIRT_INJECTED_RESOURCE_ADAPTERS",
+                                "value": "${DATAVIRT_INJECTED_RESOURCE_ADAPTERS}"
                             },
                             {
                                 "name": "DATAVIRT_INJECTED_MODULES",
