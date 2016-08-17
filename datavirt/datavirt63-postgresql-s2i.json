@@ -36,7 +36,7 @@
         {
             "description": "Git source URI for application",
             "name": "SOURCE_REPOSITORY_URL",
-            "value": "https://github.com/bdecoste/datavirt-quickstarts",
+            "value": "https://github.com/bdecoste/jdv-test",
             "required": true
         },
         {
@@ -175,6 +175,12 @@
         {
             "description": "Comma delimited list of files containing <translator> element(s) to be included in standalone.xml",
             "name": "DATAVIRT_TRANSLATORS",
+            "value": "",
+            "required": false
+        },
+        {
+            "description": "Comma delimited list of properties files from ConfigMap volumes containing datasource properties",
+            "name": "DATASOURCE_CONFIG_MAP",
             "value": "",
             "required": false
         }
@@ -321,7 +327,22 @@
                         "uri": "${SOURCE_REPOSITORY_URL}",
                         "ref": "${SOURCE_REPOSITORY_REF}"
                     },
-                    "contextDir": "${CONTEXT_DIR}"
+                    "contextDir": "${CONTEXT_DIR}",
+                    "images": [
+                        {
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "namespace": "${IMAGE_STREAM_NAMESPACE}",
+                                "name": "jdv-test:latest"
+                            },
+                            "paths": [
+                                {
+                                    "destinationDir": "injected",
+                                    "sourcePath": "/tmp/injected-files"
+                                }
+                             ]
+                        }
+                    ]
                 },
                 "strategy": {
                     "type": "Source",
@@ -423,6 +444,13 @@
                                 "name": "${APPLICATION_NAME}",
                                 "image": "${APPLICATION_NAME}",
                                 "imagePullPolicy": "Always",
+                                "volumeMounts": [
+                                    {
+                                        "name": "jdv-test-volume",
+                                        "mountPath": "/etc/jdv-test",
+                                        "readOnly": true
+                                    }
+                                ],
                                 "livenessProbe": {
                                     "exec": {
                                         "command": [
@@ -466,38 +494,38 @@
                                 "env": [
                                     {
                                         "name": "DB_SERVICE_PREFIX_MAPPING",
-                                        "value": "${APPLICATION_NAME}-postgresql=DB"
+                                        "value": "${APPLICATION_NAME}-postgresql=POSTGRESQL"
                                     },
                                     {
-                                        "name": "DB_JNDI",
+                                        "name": "POSTGRESQL_JNDI",
                                         "value": "${DB_JNDI}"
                                     },
                                     {
-                                        "name": "DB_USERNAME",
+                                        "name": "POSTGRESQL_USERNAME",
                                         "value": "${DB_USERNAME}"
                                     },
                                     {
-                                        "name": "DB_PASSWORD",
+                                        "name": "POSTGRESQL_PASSWORD",
                                         "value": "${DB_PASSWORD}"
                                     },
                                     {
-                                        "name": "DB_DATABASE",
+                                        "name": "POSTGRESQL_DATABASE",
                                         "value": "${DB_DATABASE}"
                                     },
                                     {
                                         "name": "TX_DATABASE_PREFIX_MAPPING",
-                                        "value": "${APPLICATION_NAME}-postgresql=DB"
+                                        "value": "${APPLICATION_NAME}-postgresql=POSTGRESQL"
                                     },
                                     {
-                                        "name": "DB_MIN_POOL_SIZE",
+                                        "name": "POSTGRESQL_MIN_POOL_SIZE",
                                         "value": "${DB_MIN_POOL_SIZE}"
                                     },
                                     {
-                                        "name": "DB_MAX_POOL_SIZE",
+                                        "name": "POSTGRESQL_MAX_POOL_SIZE",
                                         "value": "${DB_MAX_POOL_SIZE}"
                                     },
                                     {
-                                        "name": "DB_TX_ISOLATION",
+                                        "name": "POSTGRESQL_TX_ISOLATION",
                                         "value": "${DB_TX_ISOLATION}"
                                     },
                                     {
@@ -543,8 +571,21 @@
                                     {
                                         "name": "DATAVIRT_TRANSLATORS",
                                         "value": "${DATAVIRT_TRANSLATORS}"
+                                    },
+                                    {
+                                        "name": "DATASOURCE_CONFIG_MAP",
+                                        "value": "${DATASOURCE_CONFIG_MAP}"
                                     }
+
                                 ]
+                            }
+                        ],
+                        "volumes": [
+                            {
+                                "name": "jdv-test-volume",
+                                "configMap": {
+                                    "name": "jdv-test-configmap"
+                                }
                             }
                         ]
                     }
