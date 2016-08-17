@@ -405,11 +405,15 @@
                             "paths": [
                                 {
                                     "destinationDir": "injected",
-                                    "sourcePath": "/tmp/jdv-quickstart-artifacts"
+                                    "sourcePath": "/tmp/injected-files"
                                 },
                                 {
                                     "destinationDir": "injected",
-                                    "sourcePath": "/tmp/jdv-quickstart-modules"
+                                    "sourcePath": "/tmp/injected-modules"
+                                },
+                                {
+                                    "destinationDir": "injected",
+                                    "sourcePath": "/tmp/injected-resource-adapters"
                                 }
 		 	     ]
                         }
