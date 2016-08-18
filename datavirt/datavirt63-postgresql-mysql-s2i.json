@@ -215,7 +215,7 @@
             "value": "",
             "required": false
         },
-         {
+        {
             "description": "Path to directory or tarball injected from secondary image",
             "name": "DATAVIRT_INJECTED_MODULES",
             "value": "",

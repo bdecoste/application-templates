@@ -183,6 +183,12 @@
             "name": "DATASOURCE_CONFIG_MAP",
             "value": "",
             "required": false
+        },
+        {
+            "description": "Path to directory or tarball injected from secondary image",
+            "name": "DATAVIRT_INJECTED_MODULES",
+            "value": "",
+            "required": false
         }
     ],
     "objects": [
@@ -339,6 +345,10 @@
                                 {
                                     "destinationDir": "injected",
                                     "sourcePath": "/tmp/injected-files"
+                                },
+                                {
+                                    "destinationDir": "injected",
+                                    "sourcePath": "/tmp/injected-modules"
                                 }
                              ]
                         }
@@ -361,6 +371,10 @@
                             {
                                 "name": "CONTEXT_DIR",
                                 "value": "${CONTEXT_DIR}"
+                            },
+                            {
+                                "name": "DATAVIRT_INJECTED_MODULES",
+                                "value": "${DATAVIRT_INJECTED_MODULES}"
                             }
                         ]
                     }
