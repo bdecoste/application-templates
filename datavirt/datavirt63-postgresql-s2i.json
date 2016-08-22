@@ -161,24 +161,6 @@
             "required": false
         },
         {
-            "description": "Comma delimited list of files containing <resource-adapter> element(s) to be included in standalone.xml",
-            "name": "DATAVIRT_RESOURCE_ADAPTERS",
-            "value": "",
-            "required": false
-        },
-        {
-            "description": "Comma delimited list of files containing <datasource> element(s) to be included in standalone.xml",
-            "name": "DATAVIRT_DATASOURCES",
-            "value": "",
-            "required": false
-        },
-        {
-            "description": "Comma delimited list of files containing <translator> element(s) to be included in standalone.xml",
-            "name": "DATAVIRT_TRANSLATORS",
-            "value": "",
-            "required": false
-        },
-        {
             "description": "Comma delimited list of properties files from ConfigMap volumes containing datasource properties",
             "name": "DATASOURCE_CONFIG_MAP",
             "value": "",
@@ -573,18 +555,6 @@
                                     {
                                         "name": "POSTGRESQL_IMPORT_SQL",
                                         "value": "${POSTGRESQL_IMPORT_SQL}"
-                                    },
-                                    {
-                                        "name": "DATAVIRT_RESOURCE_ADAPTERS",
-                                        "value": "${DATAVIRT_RESOURCE_ADAPTERS}"
-                                    },
-                                    {
-                                        "name": "DATAVIRT_DATASOURCES",
-                                        "value": "${DATAVIRT_DATASOURCES}"
-                                    },
-                                    {
-                                        "name": "DATAVIRT_TRANSLATORS",
-                                        "value": "${DATAVIRT_TRANSLATORS}"
                                     },
                                     {
                                         "name": "DATASOURCE_CONFIG_MAP",

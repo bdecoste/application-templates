@@ -36,7 +36,7 @@
         {
             "description": "Git source URI for application",
             "name": "SOURCE_REPOSITORY_URL",
-            "value": "https://github.com/bdecoste/jdv-test",
+            "value": "https://github.com/bdecoste/datavirt-quickstarts",
             "required": true
         },
         {
@@ -102,12 +102,36 @@
             "from": "[a-zA-Z0-9]{8}",
             "generate": "expression",
             "required": true
-        }
+        },
+        {
+            "description": "Comma-delimted list of .sql files to import into the database",
+            "name": "POSTGRESQL_IMPORT_SQL",
+            "value": "",
+            "required": false
+        },
+        {
+            "description": "Path to directory or tarball injected from secondary image",
+            "name": "DATAVIRT_INJECTED_RESOURCE_ADAPTERS",
+            "value": "",
+            "required": false
+        },
+        {
+            "description": "Path to directory or tarball injected from secondary image",
+            "name": "DATAVIRT_INJECTED_MODULES",
+            "value": "",
+            "required": false
+        },
         {
             "description": "Comma delimited list of properties files from ConfigMap volumes containing datasource properties",
             "name": "DATASOURCE_CONFIG_MAP",
             "value": "",
             "required": false
+        },
+        {
+            "description": "Size of persistent storage for jdv volume.",
+            "name": "VOLUME_CAPACITY",
+            "value": "512Mi",
+            "required": true
         }
     ],
     "objects": [
@@ -228,7 +252,30 @@
                         "uri": "${SOURCE_REPOSITORY_URL}",
                         "ref": "${SOURCE_REPOSITORY_REF}"
                     },
-                    "contextDir": "${CONTEXT_DIR}"
+                    "contextDir": "${CONTEXT_DIR}",
+                    "images": [
+                        {
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "namespace": "${IMAGE_STREAM_NAMESPACE}",
+                                "name": "jdv-quickstart-artifacts:latest"
+                            },
+                            "paths": [
+                                {
+                                    "destinationDir": "injected",
+                                    "sourcePath": "/tmp/injected-files"
+                                },
+                                {
+                                    "destinationDir": "injected",
+                                    "sourcePath": "/tmp/injected-modules"
+                                },
+                                {
+                                    "destinationDir": "injected",
+                                    "sourcePath": "/tmp/injected-resource-adapters"
+                                }
+                             ]
+                        }
+                    ]
                 },
                 "strategy": {
                     "type": "Source",
@@ -247,6 +294,14 @@
                             {
                                 "name": "CONTEXT_DIR",
                                 "value": "${CONTEXT_DIR}"
+                            },
+                            {
+                                "name": "DATAVIRT_INJECTED_RESOURCE_ADAPTERS",
+                                "value": "${DATAVIRT_INJECTED_RESOURCE_ADAPTERS}"
+                            },
+                            {
+                                "name": "DATAVIRT_INJECTED_MODULES",
+                                "value": "${DATAVIRT_INJECTED_MODULES}"
                             }
                         ]
                     }
@@ -332,9 +387,13 @@
                                 "imagePullPolicy": "Always",
                                 "volumeMounts": [
                                     {
-                                        "name": "jdv-test-volume",
-                                        "mountPath": "/etc/jdv-test",
+                                        "name": "jdv-config-volume",
+                                        "mountPath": "/etc/jdv-config",
                                         "readOnly": true
+                                    },
+                                    {
+                                        "mountPath": "/var/lib/jdv/data",
+                                        "name": "${APPLICATION_NAME}-jdv-pvol"
                                     }
                                 ],
                                 "livenessProbe": {
@@ -415,12 +474,38 @@
                         ],
                         "volumes": [
                             {
-                                "name": "jdv-test-volume",
+                                "name": "${APPLICATION_NAME}-jdv-pvol",
+                                "persistentVolumeClaim": {
+                                    "claimName": "${APPLICATION_NAME}-jdv-claim"
+                                }
+                            },
+                            {
+                                "name": "jdv-config-volume",
                                 "configMap": {
-                                    "name": "jdv-test-configmap"
+                                    "name": "jdv-quickstart-configmap"
                                 }
                             }
                         ]
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "PersistentVolumeClaim",
+            "metadata": {
+                "name": "${APPLICATION_NAME}-jdv-claim",
+                "labels": {
+                    "application": "${APPLICATION_NAME}"
+                }
+            },
+            "spec": {
+                "accessModes": [
+                    "ReadWriteOnce"
+                ],
+                "resources": {
+                    "requests": {
+                        "storage": "${VOLUME_CAPACITY}"
                     }
                 }
             }

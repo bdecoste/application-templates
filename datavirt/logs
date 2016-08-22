@@ -1,0 +1,1958 @@
++ configure_config_maps
++ '[' -n /etc/jdv-config/jdv-quickstart.properties ']'
+++ echo /etc/jdv-config/jdv-quickstart.properties
+++ sed 's/,/ /g'
++ for cm_file in '$(echo $DATASOURCE_CONFIG_MAP | sed "s/,/ /g")'
++ . /etc/jdv-config/jdv-quickstart.properties
+++ DATASOURCES=ACCOUNT,ORACLE
+++ ACCOUNT_JNDI=java:/accounts-ds
+++ ACCOUNT_DRIVER=h2
+++ ACCOUNT_USERNAME=sa
+++ ACCOUNT_PASSWORD=sa
+++ ACCOUNT_DATABASE='accounts;INIT\=RUNSCRIPT\ FROM\ '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;'
+++ ACCOUNT_PROTOCOL=jdbc:h2
+++ ACCOUNT_SERVICE_HOST=mem
+++ ACCOUNT_SERVICE_PORT=9092
+++ ACCOUNT_NONXA=true
+++ ORACLE_JNDI=java:/oracle-ds
+++ ORACLE_DRIVER=oracle
+++ ORACLE_USERNAME=oracleuser
+++ ORACLE_PASSWORD=oraclepass
+++ ORACLE_DATABASE=oracledb
+++ ORACLE_PROTOCOL=jdbc:oracle:thin
+++ ORACLE_SERVICE_HOST=ose3x-master.example.com
+++ ORACLE_SERVICE_PORT=1521
+++ ORACLE_NONXA=false
+++ ORACLE_TX_ISOLATION=TRANSACTION_READ_UNCOMMITTED
+++ ORACLE_MIN_POOL_SIZE=5
+++ ORACLE_MAX_POOL_SIZE=20
+++ ORACLE_JTA=true
+++ ORACLE_VALIDATE=true
+++ ORACLE_CONNECTION_CHECKER=org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker
+++ ORACLE_EXCEPTION_SORTER=org.jboss.jca.adapters.jdbc.extensions.oracle.OracleExceptionSorter
+++ DRIVERS=ORACLEDRIVER
+++ ORACLEDRIVER_DRIVER_NAME=oracle
+++ ORACLEDRIVER_DRIVER_MODULE=com.oracle.db
+++ ORACLEDRIVER_DRIVER_CLASS=oracle.jdbc.xa.client.OracleXADataSource
+++ ORACLEDRIVER_DRIVER_XA=true
+++ RESOURCE_ADAPTERS=QSEXCEL,QSFILE,QSWS,TESTRA
+++ QSEXCEL_ID=fileQSExcel
+++ QSEXCEL_MODULE_SLOT=main
+++ QSEXCEL_MODULE_ID=org.jboss.teiid.resource-adapter.file
+++ QSEXCEL_CONNECTION_CLASS=org.teiid.resource.adapter.file.FileManagedConnectionFactory
+++ QSEXCEL_CONNECTION_JNDI=java:/excel-file
+++ QSEXCEL_PROPERTY_ParentDirectory=/opt/eap/teiidfiles/excel-files/
+++ QSEXCEL_PROPERTY_AllowParentPaths=true
+++ QSFILE_ID=fileQS
+++ QSFILE_MODULE_SLOT=main
+++ QSFILE_MODULE_ID=org.jboss.teiid.resource-adapter.file
+++ QSFILE_CONNECTION_CLASS=org.teiid.resource.adapter.file.FileManagedConnectionFactory
+++ QSFILE_CONNECTION_JNDI=java:/marketdata-file
+++ QSFILE_PROPERTY_ParentDirectory=/opt/eap/teiidfiles/data
+++ QSFILE_PROPERTY_AllowParentPaths=true
+++ QSWS_ID=wsQS
+++ QSWS_MODULE_SLOT=main
+++ QSWS_MODULE_ID=org.jboss.teiid.resource-adapter.webservice
+++ QSWS_CONNECTION_CLASS=org.teiid.resource.adapter.ws.WSManagedConnectionFactory
+++ QSWS_CONNECTION_JNDI=java:/CustomerRESTWebSvcSource
+++ QSWS_PROPERTY_EndPoint=http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList
+++ TESTRA_ID=testra
+++ TESTRA_MODULE_SLOT=main
+++ TESTRA_MODULE_ID=org.jboss.teiid.resource-adapter.file
+++ TESTRA_CONNECTION_CLASS=org.teiid.resource.adapter.file.FileManagedConnectionFactory
+++ TESTRA_CONNECTION_JNDI=java:/test-file
+++ TESTRA_PROPERTY_ParentDirectory=/opt/eap/teiidfiles/data/
+++ TESTRA_PROPERTY_AllowParentPaths=true
+++ TRANSLATORS=TESTTRANSLATOR
+++ TESTTRANSLATOR_NAME=testtranslator
+++ TESTTRANSLATOR_MODULE=org.jboss.teiid.translator.jdbc
++ . /opt/eap/bin/launch/messaging.sh
+++ HORNETQ_SUBSYSTEM_FILE=/opt/eap/bin/launch/hornetq-subsystem.xml
+++ . /opt/eap/bin/launch/launch-common.sh
++++ set -x
++ inject_brokers
++ IFS=,
++ read -a brokers
++ AMQ=false
++ '[' 0 -eq 0 ']'
++ ras=
++ sed -i 's|<!-- ##MESSAGING_RESOURCE_ADAPTERS## -->||' /opt/eap/standalone/configuration/standalone-openshift.xml
++ configure_hornetq
++ '[' true '!=' false ']'
++ configure_hornetq_cluster_password
++ '[' -n csmCRrAQ ']'
++ JBOSS_MESSAGING_ARGS=' -Djboss.messaging.cluster.password=csmCRrAQ'
+++ configure_hornetq_destinations
+++ IFS=,
+++ read -a queues
+++ IFS=,
+++ read -a topics
+++ destinations=
+++ '[' 0 -ne 0 -o 0 -ne 0 ']'
+++ echo ''
++ destinations=
+++ sed -e 's|##DESTINATIONS##||'
+++ sed ':a;N;$!ba;s|\n|\\n|g'
++ hornetq_subsystem='        <subsystem xmlns="urn:jboss:domain:messaging:1.4">\n            <hornetq-server>\n                <cluster-password>${jboss.messaging.cluster.password:CHANGE ME!!}</cluster-password>\n                <persistence-enabled>true</persistence-enabled>\n                <journal-type>NIO</journal-type>\n                <journal-min-files>2</journal-min-files>\n                <connectors>\n                    <netty-connector name="netty" socket-binding="messaging"/>\n                    <netty-connector name="netty-throughput" socket-binding="messaging-throughput">\n                        <param key="batch-delay" value="50"/>\n                    </netty-connector>\n                    <in-vm-connector name="in-vm" server-id="0"/>\n                </connectors>\n                <acceptors>\n                    <netty-acceptor name="netty" socket-binding="messaging"/>\n                    <netty-acceptor name="netty-throughput" socket-binding="messaging-throughput">\n                        <param key="batch-delay" value="50"/>\n                        <param key="direct-deliver" value="false"/>\n                    </netty-acceptor>\n                    <in-vm-acceptor name="in-vm" server-id="0"/>\n                </acceptors>\n                <broadcast-groups>\n                    <broadcast-group name="bg-group1">\n                        <jgroups-stack>tcp</jgroups-stack>\n                        <jgroups-channel>hornetq-channel</jgroups-channel>\n                        <broadcast-period>5000</broadcast-period>\n                        <connector-ref>netty</connector-ref>\n                    </broadcast-group>\n                </broadcast-groups>\n                <discovery-groups>\n                    <discovery-group name="dg-group1">\n                        <jgroups-stack>tcp</jgroups-stack>\n                        <jgroups-channel>hornetq-channel</jgroups-channel>\n                        <refresh-timeout>10000</refresh-timeout>\n                    </discovery-group>\n                </discovery-groups>\n                <cluster-connections>\n                    <cluster-connection name="my-cluster">\n                        <address>jms</address>\n                        <connector-ref>netty</connector-ref>\n                        <discovery-group-ref discovery-group-name="dg-group1"/>\n                    </cluster-connection>\n                </cluster-connections>\n                <security-settings>\n                    <security-setting match="#">\n                        <permission type="send" roles="guest"/>\n                        <permission type="consume" roles="guest"/>\n                        <permission type="createNonDurableQueue" roles="guest"/>\n                        <permission type="deleteNonDurableQueue" roles="guest"/>\n                    </security-setting>\n                </security-settings>\n                <address-settings>\n                    <!--default for catch all-->\n                    <address-setting match="#">\n                        <dead-letter-address>jms.queue.DLQ</dead-letter-address>\n                        <expiry-address>jms.queue.ExpiryQueue</expiry-address>\n                        <redelivery-delay>0</redelivery-delay>\n                        <redistribution-delay>1000</redistribution-delay>\n                        <max-size-bytes>10485760</max-size-bytes>\n                        <address-full-policy>PAGE</address-full-policy>\n                        <page-size-bytes>2097152</page-size-bytes>\n                        <message-counter-history-day-limit>10</message-counter-history-day-limit>\n                    </address-setting>\n                </address-settings>\n                <jms-connection-factories>\n                    <connection-factory name="InVmConnectionFactory">\n                        <connectors>\n                            <connector-ref connector-name="in-vm"/>\n                        </connectors>\n                        <entries>\n                            <entry name="java:/ConnectionFactory"/>\n                        </entries>\n                    </connection-factory>\n                    <connection-factory name="RemoteConnectionFactory">\n                        <connectors>\n                            <connector-ref connector-name="netty"/>\n                        </connectors>\n                        <entries>\n                            <entry name="java:jboss/exported/jms/RemoteConnectionFactory"/>\n                        </entries>\n                        <ha>true</ha>\n                        <block-on-acknowledge>true</block-on-acknowledge>\n                        <retry-interval>1000</retry-interval>\n                        <retry-interval-multiplier>1.0</retry-interval-multiplier>\n                        <reconnect-attempts>-1</reconnect-attempts>\n                    </connection-factory>\n                    <pooled-connection-factory name="hornetq-ra">\n                        <transaction mode="xa"/>\n                        <connectors>\n                            <connector-ref connector-name="in-vm"/>\n                        </connectors>\n                        <entries>\n                            <entry name="java:/JmsXA"/>\n                        </entries>\n                    </pooled-connection-factory>\n                </jms-connection-factories>\n                <jms-destinations>\n                    <jms-queue name="ExpiryQueue">\n                        <entry name="java:/jms/queue/ExpiryQueue"/>\n                    </jms-queue>\n                    <jms-queue name="DLQ">\n                        <entry name="java:/jms/queue/DLQ"/>\n                    </jms-queue>\n                    \n                </jms-destinations>\n            </hornetq-server>\n        </subsystem>'
++ sed -i 's|<!-- ##MESSAGING_EXTENSION## -->|<extension module="org.jboss.as.messaging"/>|' /opt/eap/standalone/configuration/standalone-openshift.xml
++ sed -i 's|<!-- ##MESSAGING_SUBSYSTEM## -->|        <subsystem xmlns="urn:jboss:domain:messaging:1.4">\n            <hornetq-server>\n                <cluster-password>${jboss.messaging.cluster.password:CHANGE ME!!}</cluster-password>\n                <persistence-enabled>true</persistence-enabled>\n                <journal-type>NIO</journal-type>\n                <journal-min-files>2</journal-min-files>\n                <connectors>\n                    <netty-connector name="netty" socket-binding="messaging"/>\n                    <netty-connector name="netty-throughput" socket-binding="messaging-throughput">\n                        <param key="batch-delay" value="50"/>\n                    </netty-connector>\n                    <in-vm-connector name="in-vm" server-id="0"/>\n                </connectors>\n                <acceptors>\n                    <netty-acceptor name="netty" socket-binding="messaging"/>\n                    <netty-acceptor name="netty-throughput" socket-binding="messaging-throughput">\n                        <param key="batch-delay" value="50"/>\n                        <param key="direct-deliver" value="false"/>\n                    </netty-acceptor>\n                    <in-vm-acceptor name="in-vm" server-id="0"/>\n                </acceptors>\n                <broadcast-groups>\n                    <broadcast-group name="bg-group1">\n                        <jgroups-stack>tcp</jgroups-stack>\n                        <jgroups-channel>hornetq-channel</jgroups-channel>\n                        <broadcast-period>5000</broadcast-period>\n                        <connector-ref>netty</connector-ref>\n                    </broadcast-group>\n                </broadcast-groups>\n                <discovery-groups>\n                    <discovery-group name="dg-group1">\n                        <jgroups-stack>tcp</jgroups-stack>\n                        <jgroups-channel>hornetq-channel</jgroups-channel>\n                        <refresh-timeout>10000</refresh-timeout>\n                    </discovery-group>\n                </discovery-groups>\n                <cluster-connections>\n                    <cluster-connection name="my-cluster">\n                        <address>jms</address>\n                        <connector-ref>netty</connector-ref>\n                        <discovery-group-ref discovery-group-name="dg-group1"/>\n                    </cluster-connection>\n                </cluster-connections>\n                <security-settings>\n                    <security-setting match="#">\n                        <permission type="send" roles="guest"/>\n                        <permission type="consume" roles="guest"/>\n                        <permission type="createNonDurableQueue" roles="guest"/>\n                        <permission type="deleteNonDurableQueue" roles="guest"/>\n                    </security-setting>\n                </security-settings>\n                <address-settings>\n                    <!--default for catch all-->\n                    <address-setting match="#">\n                        <dead-letter-address>jms.queue.DLQ</dead-letter-address>\n                        <expiry-address>jms.queue.ExpiryQueue</expiry-address>\n                        <redelivery-delay>0</redelivery-delay>\n                        <redistribution-delay>1000</redistribution-delay>\n                        <max-size-bytes>10485760</max-size-bytes>\n                        <address-full-policy>PAGE</address-full-policy>\n                        <page-size-bytes>2097152</page-size-bytes>\n                        <message-counter-history-day-limit>10</message-counter-history-day-limit>\n                    </address-setting>\n                </address-settings>\n                <jms-connection-factories>\n                    <connection-factory name="InVmConnectionFactory">\n                        <connectors>\n                            <connector-ref connector-name="in-vm"/>\n                        </connectors>\n                        <entries>\n                            <entry name="java:/ConnectionFactory"/>\n                        </entries>\n                    </connection-factory>\n                    <connection-factory name="RemoteConnectionFactory">\n                        <connectors>\n                            <connector-ref connector-name="netty"/>\n                        </connectors>\n                        <entries>\n                            <entry name="java:jboss/exported/jms/RemoteConnectionFactory"/>\n                        </entries>\n                        <ha>true</ha>\n                        <block-on-acknowledge>true</block-on-acknowledge>\n                        <retry-interval>1000</retry-interval>\n                        <retry-interval-multiplier>1.0</retry-interval-multiplier>\n                        <reconnect-attempts>-1</reconnect-attempts>\n                    </connection-factory>\n                    <pooled-connection-factory name="hornetq-ra">\n                        <transaction mode="xa"/>\n                        <connectors>\n                            <connector-ref connector-name="in-vm"/>\n                        </connectors>\n                        <entries>\n                            <entry name="java:/JmsXA"/>\n                        </entries>\n                    </pooled-connection-factory>\n                </jms-connection-factories>\n                <jms-destinations>\n                    <jms-queue name="ExpiryQueue">\n                        <entry name="java:/jms/queue/ExpiryQueue"/>\n                    </jms-queue>\n                    <jms-queue name="DLQ">\n                        <entry name="java:/jms/queue/DLQ"/>\n                    </jms-queue>\n                    \n                </jms-destinations>\n            </hornetq-server>\n        </subsystem>|' /opt/eap/standalone/configuration/standalone-openshift.xml
++ sed -i 's|<!-- ##MESSAGING_PORTS## -->|<socket-binding name="messaging" port="5445"/><socket-binding name="messaging-throughput" port="5455"/>|' /opt/eap/standalone/configuration/standalone-openshift.xml
++ . /opt/eap/bin/launch/datasource.sh
+++ set -x
+++ . /opt/eap/bin/launch/launch-common.sh
++++ set -x
+++ . /opt/eap/bin/launch/tx-datasource.sh
++++ . /opt/eap/bin/launch/launch-common.sh
+++++ set -x
++ inject_datasources
++ '[' -z '' ']'
++ inject_timer_service default-file-store
++ timerservice='            <timer-service thread-pool-name="default" default-data-store="default-file-store">                <data-stores>                    <file-data-store name="default-file-store" path="timer-service-data" relative-to="jboss.server.data.dir"/>                    <!-- ##DATASTORES## -->                </data-stores>            </timer-service>'
++ sed -i 's|<!-- ##TIMER_SERVICE## -->|            <timer-service thread-pool-name="default" default-data-store="default-file-store">                <data-stores>                    <file-data-store name="default-file-store" path="timer-service-data" relative-to="jboss.server.data.dir"/>                    <!-- ##DATASTORES## -->                </data-stores>            </timer-service>|' /opt/eap/standalone/configuration/standalone-openshift.xml
++ datasources=
+++ echo
+++ sed 's/,/ /g'
+++ inject_tx_datasource
+++ tx_backend=
+++ '[' -n '' ']'
++ datasources=
++ db=EXTERNAL
++ '[' -n ACCOUNT,ORACLE ']'
+++ echo ACCOUNT,ORACLE
+++ sed 's/,/ /g'
++ for datasource_prefix in '$(echo $DATASOURCES | sed "s/,/ /g")'
++ inject_datasource ACCOUNT ACCOUNT
++ prefix=ACCOUNT
++ service=ACCOUNT
+++ find_env ACCOUNT_SERVICE_HOST
++++ printenv ACCOUNT_SERVICE_HOST
+++ var=
+++ envname=ACCOUNT_SERVICE_HOST
+++ '[' -n '' ']'
+++ var=mem
+++ '[' -n mem ']'
+++ echo mem
++ host=mem
+++ find_env ACCOUNT_SERVICE_PORT
++++ printenv ACCOUNT_SERVICE_PORT
+++ var=
+++ envname=ACCOUNT_SERVICE_PORT
+++ '[' -n '' ']'
+++ var=9092
+++ '[' -n 9092 ']'
+++ echo 9092
++ port=9092
++ '[' -z mem ']'
++ '[' -z 9092 ']'
+++ get_jndi_name ACCOUNT ACCOUNT
+++ prefix=ACCOUNT
++++ find_env ACCOUNT_JNDI java:jboss/datasources/account
+++++ printenv ACCOUNT_JNDI
++++ var=
++++ envname=ACCOUNT_JNDI
++++ '[' -n '' ']'
++++ var=java:/accounts-ds
++++ '[' -n java:/accounts-ds ']'
++++ echo java:/accounts-ds
+++ echo java:/accounts-ds
++ jndi=java:/accounts-ds
+++ find_env ACCOUNT_USERNAME
++++ printenv ACCOUNT_USERNAME
+++ var=
+++ envname=ACCOUNT_USERNAME
+++ '[' -n '' ']'
+++ var=sa
+++ '[' -n sa ']'
+++ echo sa
++ username=sa
+++ find_env ACCOUNT_PASSWORD
++++ printenv ACCOUNT_PASSWORD
+++ var=
+++ envname=ACCOUNT_PASSWORD
+++ '[' -n '' ']'
+++ var=sa
+++ '[' -n sa ']'
+++ echo sa
++ password=sa
+++ find_env ACCOUNT_DATABASE
++++ printenv ACCOUNT_DATABASE
+++ var=
+++ envname=ACCOUNT_DATABASE
+++ '[' -n '' ']'
+++ var='accounts;INIT\=RUNSCRIPT\ FROM\ '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;'
+++ '[' -n 'accounts;INIT\=RUNSCRIPT\ FROM\ '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;' ']'
+++ echo 'accounts;INIT\=RUNSCRIPT\ FROM\ '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;'
++ database='accounts;INIT\=RUNSCRIPT\ FROM\ '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;'
++ '[' -z java:/accounts-ds ']'
++ '[' -z sa ']'
++ '[' -z sa ']'
++ '[' -z 'accounts;INIT\=RUNSCRIPT\' 'FROM\' ''\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;' ']'
+/opt/eap/bin/launch/datasource.sh: line 335: [: too many arguments
+++ find_env ACCOUNT_TX_ISOLATION
++++ printenv ACCOUNT_TX_ISOLATION
+++ var=
+++ envname=ACCOUNT_TX_ISOLATION
+++ '[' -n '' ']'
+++ var=
+++ '[' -n '' ']'
+++ echo
++ tx_isolation=
+++ find_env ACCOUNT_MIN_POOL_SIZE
++++ printenv ACCOUNT_MIN_POOL_SIZE
+++ var=
+++ envname=ACCOUNT_MIN_POOL_SIZE
+++ '[' -n '' ']'
+++ var=
+++ '[' -n '' ']'
+++ echo
++ min_pool_size=
+++ find_env ACCOUNT_MAX_POOL_SIZE
++++ printenv ACCOUNT_MAX_POOL_SIZE
+++ var=
+++ envname=ACCOUNT_MAX_POOL_SIZE
+++ '[' -n '' ']'
+++ var=
+++ '[' -n '' ']'
+++ echo
++ max_pool_size=
+++ find_env ACCOUNT_JTA true
++++ printenv ACCOUNT_JTA
+++ var=
+++ envname=ACCOUNT_JTA
+++ '[' -n '' ']'
+++ var=
+++ '[' -n '' ']'
+++ echo true
++ jta=true
+++ find_env ACCOUNT_NONXA false
++++ printenv ACCOUNT_NONXA
+++ var=
+++ envname=ACCOUNT_NONXA
+++ '[' -n '' ']'
+++ var=true
+++ '[' -n true ']'
+++ echo true
++ NON_XA_DATASOURCE=true
+++ find_env ACCOUNT_PROTOCOL
++++ printenv ACCOUNT_PROTOCOL
+++ var=
+++ envname=ACCOUNT_PROTOCOL
+++ '[' -n '' ']'
+++ var=jdbc:h2
+++ '[' -n jdbc:h2 ']'
+++ echo jdbc:h2
++ protocol=jdbc:h2
++ case "$db" in
+++ find_env ACCOUNT_DRIVER true
++++ printenv ACCOUNT_DRIVER
+++ var=
+++ envname=ACCOUNT_DRIVER
+++ '[' -n '' ']'
+++ var=h2
+++ '[' -n h2 ']'
+++ echo h2
++ driver=h2
+++ find_env ACCOUNT_CONNECTION_CHECKER
++++ printenv ACCOUNT_CONNECTION_CHECKER
+++ var=
+++ envname=ACCOUNT_CONNECTION_CHECKER
+++ '[' -n '' ']'
+++ var=
+++ '[' -n '' ']'
+++ echo
++ checker=
+++ find_env ACCOUNT_EXCEPTION_SORTER
++++ printenv ACCOUNT_EXCEPTION_SORTER
+++ var=
+++ envname=ACCOUNT_EXCEPTION_SORTER
+++ '[' -n '' ']'
+++ var=
+++ '[' -n '' ']'
+++ echo
++ sorter=
++ '[' -n '' ']'
++ validate=false
++ checker=CHECKER
++ sorter=SORTER
++ service_name=ACCOUNT
+++ generate_datasource account-ACCOUNT java:/accounts-ds sa sa mem 9092 'accounts;INIT\=RUNSCRIPT\' 'FROM\' ''\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;' CHECKER SORTER h2 ACCOUNT true false jdbc:h2
+++ pool_name=account-ACCOUNT
+++ jndi_name=java:/accounts-ds
+++ driver=CHECKER
+++ service_name=SORTER
+++ validate=ACCOUNT
+++ protocol=true
+++ case "${10}" in
+++ '[' -n CHECKER ']'
+++ '[' -n true ']'
+++ '[' true = true ']'
+++ '[' CHECKER == h2 ']'
+++ ds=' <datasource jndi-name="java:/accounts-ds" pool-name="account-ACCOUNT" enabled="true" use-java-context="true">
+                    <connection-url>true://mem:9092/accounts;INIT\=RUNSCRIPT\</connection-url>
+                    <driver>CHECKER</driver>'
+++ '[' -n '' ']'
+++ '[' -n '' ']'
+++ '[' -n '' ']'
+++ ds=' <datasource jndi-name="java:/accounts-ds" pool-name="account-ACCOUNT" enabled="true" use-java-context="true">
+                    <connection-url>true://mem:9092/accounts;INIT\=RUNSCRIPT\</connection-url>
+                    <driver>CHECKER</driver>
+                    <security>
+                        <user-name>sa</user-name>
+                        <password>sa</password>
+                    </security>'
+++ '[' ACCOUNT == true ']'
+++ '[' -n true ']'
+++ '[' true = true ']'
+++ ds=' <datasource jndi-name="java:/accounts-ds" pool-name="account-ACCOUNT" enabled="true" use-java-context="true">
+                    <connection-url>true://mem:9092/accounts;INIT\=RUNSCRIPT\</connection-url>
+                    <driver>CHECKER</driver>
+                    <security>
+                        <user-name>sa</user-name>
+                        <password>sa</password>
+                    </security>
+                  </datasource>'
+++ '[' -n '' -a '' = SORTER ']'
+++ echo '<datasource' 'jndi-name="java:/accounts-ds"' 'pool-name="account-ACCOUNT"' 'enabled="true"' 'use-java-context="true">' '<connection-url>true://mem:9092/accounts;INIT\=RUNSCRIPT\</connection-url>' '<driver>CHECKER</driver>' '<security>' '<user-name>sa</user-name>' '<password>sa</password>' '</security>' '</datasource>'
+++ sed ':a;N;$!ba;s|\n|\\n|g'
++ datasources='<datasource jndi-name="java:/accounts-ds" pool-name="account-ACCOUNT" enabled="true" use-java-context="true"> <connection-url>true://mem:9092/accounts;INIT\=RUNSCRIPT\</connection-url> <driver>CHECKER</driver> <security> <user-name>sa</user-name> <password>sa</password> </security> </datasource>\n'
++ for datasource_prefix in '$(echo $DATASOURCES | sed "s/,/ /g")'
++ inject_datasource ORACLE ORACLE
++ prefix=ORACLE
++ service=ORACLE
+++ find_env ORACLE_SERVICE_HOST
++++ printenv ORACLE_SERVICE_HOST
+++ var=
+++ envname=ORACLE_SERVICE_HOST
+++ '[' -n '' ']'
+++ var=ose3x-master.example.com
+++ '[' -n ose3x-master.example.com ']'
+++ echo ose3x-master.example.com
++ host=ose3x-master.example.com
+++ find_env ORACLE_SERVICE_PORT
++++ printenv ORACLE_SERVICE_PORT
+++ var=
+++ envname=ORACLE_SERVICE_PORT
+++ '[' -n '' ']'
+++ var=1521
+++ '[' -n 1521 ']'
+++ echo 1521
++ port=1521
++ '[' -z ose3x-master.example.com ']'
++ '[' -z 1521 ']'
+++ get_jndi_name ORACLE ORACLE
+++ prefix=ORACLE
++++ find_env ORACLE_JNDI java:jboss/datasources/oracle
+++++ printenv ORACLE_JNDI
++++ var=
++++ envname=ORACLE_JNDI
++++ '[' -n '' ']'
++++ var=java:/oracle-ds
++++ '[' -n java:/oracle-ds ']'
++++ echo java:/oracle-ds
+++ echo java:/oracle-ds
++ jndi=java:/oracle-ds
+++ find_env ORACLE_USERNAME
++++ printenv ORACLE_USERNAME
+++ var=
+++ envname=ORACLE_USERNAME
+++ '[' -n '' ']'
+++ var=oracleuser
+++ '[' -n oracleuser ']'
+++ echo oracleuser
++ username=oracleuser
+++ find_env ORACLE_PASSWORD
++++ printenv ORACLE_PASSWORD
+++ var=
+++ envname=ORACLE_PASSWORD
+++ '[' -n '' ']'
+++ var=oraclepass
+++ '[' -n oraclepass ']'
+++ echo oraclepass
++ password=oraclepass
+++ find_env ORACLE_DATABASE
++++ printenv ORACLE_DATABASE
+++ var=
+++ envname=ORACLE_DATABASE
+++ '[' -n '' ']'
+++ var=oracledb
+++ '[' -n oracledb ']'
+++ echo oracledb
++ database=oracledb
++ '[' -z java:/oracle-ds ']'
++ '[' -z oracleuser ']'
++ '[' -z oraclepass ']'
++ '[' -z oracledb ']'
+++ find_env ORACLE_TX_ISOLATION
++++ printenv ORACLE_TX_ISOLATION
+++ var=
+++ envname=ORACLE_TX_ISOLATION
+++ '[' -n '' ']'
+++ var=TRANSACTION_READ_UNCOMMITTED
+++ '[' -n TRANSACTION_READ_UNCOMMITTED ']'
+++ echo TRANSACTION_READ_UNCOMMITTED
++ tx_isolation=TRANSACTION_READ_UNCOMMITTED
+++ find_env ORACLE_MIN_POOL_SIZE
++++ printenv ORACLE_MIN_POOL_SIZE
+++ var=
+++ envname=ORACLE_MIN_POOL_SIZE
+++ '[' -n '' ']'
+++ var=5
+++ '[' -n 5 ']'
+++ echo 5
++ min_pool_size=5
+++ find_env ORACLE_MAX_POOL_SIZE
++++ printenv ORACLE_MAX_POOL_SIZE
+++ var=
+++ envname=ORACLE_MAX_POOL_SIZE
+++ '[' -n '' ']'
+++ var=20
+++ '[' -n 20 ']'
+++ echo 20
++ max_pool_size=20
+++ find_env ORACLE_JTA true
++++ printenv ORACLE_JTA
+++ var=
+++ envname=ORACLE_JTA
+++ '[' -n '' ']'
+++ var=true
+++ '[' -n true ']'
+++ echo true
++ jta=true
+++ find_env ORACLE_NONXA false
++++ printenv ORACLE_NONXA
+++ var=
+++ envname=ORACLE_NONXA
+++ '[' -n '' ']'
+++ var=false
+++ '[' -n false ']'
+++ echo false
++ NON_XA_DATASOURCE=false
+++ find_env ORACLE_PROTOCOL
++++ printenv ORACLE_PROTOCOL
+++ var=
+++ envname=ORACLE_PROTOCOL
+++ '[' -n '' ']'
+++ var=jdbc:oracle:thin
+++ '[' -n jdbc:oracle:thin ']'
+++ echo jdbc:oracle:thin
++ protocol=jdbc:oracle:thin
++ case "$db" in
+++ find_env ORACLE_DRIVER true
++++ printenv ORACLE_DRIVER
+++ var=
+++ envname=ORACLE_DRIVER
+++ '[' -n '' ']'
+++ var=oracle
+++ '[' -n oracle ']'
+++ echo oracle
++ driver=oracle
+++ find_env ORACLE_CONNECTION_CHECKER
++++ printenv ORACLE_CONNECTION_CHECKER
+++ var=
+++ envname=ORACLE_CONNECTION_CHECKER
+++ '[' -n '' ']'
+++ var=org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker
+++ '[' -n org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker ']'
+++ echo org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker
++ checker=org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker
+++ find_env ORACLE_EXCEPTION_SORTER
++++ printenv ORACLE_EXCEPTION_SORTER
+++ var=
+++ envname=ORACLE_EXCEPTION_SORTER
+++ '[' -n '' ']'
+++ var=org.jboss.jca.adapters.jdbc.extensions.oracle.OracleExceptionSorter
+++ '[' -n org.jboss.jca.adapters.jdbc.extensions.oracle.OracleExceptionSorter ']'
+++ echo org.jboss.jca.adapters.jdbc.extensions.oracle.OracleExceptionSorter
++ sorter=org.jboss.jca.adapters.jdbc.extensions.oracle.OracleExceptionSorter
++ '[' -n org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker ']'
++ '[' -n org.jboss.jca.adapters.jdbc.extensions.oracle.OracleExceptionSorter ']'
++ validate=true
++ service_name=ORACLE
+++ generate_datasource oracle-ORACLE java:/oracle-ds oracleuser oraclepass ose3x-master.example.com 1521 oracledb org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker org.jboss.jca.adapters.jdbc.extensions.oracle.OracleExceptionSorter oracle ORACLE true true jdbc:oracle:thin
+++ pool_name=oracle-ORACLE
+++ jndi_name=java:/oracle-ds
+++ driver=oracle
+++ service_name=ORACLE
+++ validate=true
+++ protocol=jdbc:oracle:thin
+++ case "${10}" in
+++ '[' -n oracle ']'
+++ '[' -n false ']'
+++ '[' false = true ']'
+++ ds=' <xa-datasource jndi-name="java:/oracle-ds" pool-name="oracle-ORACLE" use-java-context="true" enabled="true">
+                    <xa-datasource-property name="ServerName">ose3x-master.example.com</xa-datasource-property>
+                    <xa-datasource-property name="PortNumber">1521</xa-datasource-property>
+                    <xa-datasource-property name="DatabaseName">oracledb</xa-datasource-property>
+                    <driver>oracle</driver>'
+++ '[' -n TRANSACTION_READ_UNCOMMITTED ']'
+++ ds=' <xa-datasource jndi-name="java:/oracle-ds" pool-name="oracle-ORACLE" use-java-context="true" enabled="true">
+                    <xa-datasource-property name="ServerName">ose3x-master.example.com</xa-datasource-property>
+                    <xa-datasource-property name="PortNumber">1521</xa-datasource-property>
+                    <xa-datasource-property name="DatabaseName">oracledb</xa-datasource-property>
+                    <driver>oracle</driver> 
+                      <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation>'
+++ '[' -n 5 ']'
+++ '[' -n false ']'
+++ '[' false = true ']'
+++ ds=' <xa-datasource jndi-name="java:/oracle-ds" pool-name="oracle-ORACLE" use-java-context="true" enabled="true">
+                    <xa-datasource-property name="ServerName">ose3x-master.example.com</xa-datasource-property>
+                    <xa-datasource-property name="PortNumber">1521</xa-datasource-property>
+                    <xa-datasource-property name="DatabaseName">oracledb</xa-datasource-property>
+                    <driver>oracle</driver> 
+                      <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation>
+                        <xa-pool>'
+++ '[' -n 5 ']'
+++ ds=' <xa-datasource jndi-name="java:/oracle-ds" pool-name="oracle-ORACLE" use-java-context="true" enabled="true">
+                    <xa-datasource-property name="ServerName">ose3x-master.example.com</xa-datasource-property>
+                    <xa-datasource-property name="PortNumber">1521</xa-datasource-property>
+                    <xa-datasource-property name="DatabaseName">oracledb</xa-datasource-property>
+                    <driver>oracle</driver> 
+                      <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation>
+                        <xa-pool>
+                          <min-pool-size>5</min-pool-size>'
+++ '[' -n 20 ']'
+++ ds=' <xa-datasource jndi-name="java:/oracle-ds" pool-name="oracle-ORACLE" use-java-context="true" enabled="true">
+                    <xa-datasource-property name="ServerName">ose3x-master.example.com</xa-datasource-property>
+                    <xa-datasource-property name="PortNumber">1521</xa-datasource-property>
+                    <xa-datasource-property name="DatabaseName">oracledb</xa-datasource-property>
+                    <driver>oracle</driver> 
+                      <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation>
+                        <xa-pool>
+                          <min-pool-size>5</min-pool-size>
+                          <max-pool-size>20</max-pool-size>'
+++ '[' -n false ']'
+++ '[' false = true ']'
+++ ds=' <xa-datasource jndi-name="java:/oracle-ds" pool-name="oracle-ORACLE" use-java-context="true" enabled="true">
+                    <xa-datasource-property name="ServerName">ose3x-master.example.com</xa-datasource-property>
+                    <xa-datasource-property name="PortNumber">1521</xa-datasource-property>
+                    <xa-datasource-property name="DatabaseName">oracledb</xa-datasource-property>
+                    <driver>oracle</driver> 
+                      <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation>
+                        <xa-pool>
+                          <min-pool-size>5</min-pool-size>
+                          <max-pool-size>20</max-pool-size>
+                        </xa-pool>'
+++ ds=' <xa-datasource jndi-name="java:/oracle-ds" pool-name="oracle-ORACLE" use-java-context="true" enabled="true">
+                    <xa-datasource-property name="ServerName">ose3x-master.example.com</xa-datasource-property>
+                    <xa-datasource-property name="PortNumber">1521</xa-datasource-property>
+                    <xa-datasource-property name="DatabaseName">oracledb</xa-datasource-property>
+                    <driver>oracle</driver> 
+                      <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation>
+                        <xa-pool>
+                          <min-pool-size>5</min-pool-size>
+                          <max-pool-size>20</max-pool-size>
+                        </xa-pool>
+                    <security>
+                        <user-name>oracleuser</user-name>
+                        <password>oraclepass</password>
+                    </security>'
+++ '[' true == true ']'
+++ ds=' <xa-datasource jndi-name="java:/oracle-ds" pool-name="oracle-ORACLE" use-java-context="true" enabled="true">
+                    <xa-datasource-property name="ServerName">ose3x-master.example.com</xa-datasource-property>
+                    <xa-datasource-property name="PortNumber">1521</xa-datasource-property>
+                    <xa-datasource-property name="DatabaseName">oracledb</xa-datasource-property>
+                    <driver>oracle</driver> 
+                      <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation>
+                        <xa-pool>
+                          <min-pool-size>5</min-pool-size>
+                          <max-pool-size>20</max-pool-size>
+                        </xa-pool>
+                    <security>
+                        <user-name>oracleuser</user-name>
+                        <password>oraclepass</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>true</validate-on-match>
+                        <valid-connection-checker class-name="org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker"></valid-connection-checker>
+                        <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.oracle.OracleExceptionSorter"></exception-sorter>
+                    </validation>'
+++ '[' -n false ']'
+++ '[' false = true ']'
+++ ds=' <xa-datasource jndi-name="java:/oracle-ds" pool-name="oracle-ORACLE" use-java-context="true" enabled="true">
+                    <xa-datasource-property name="ServerName">ose3x-master.example.com</xa-datasource-property>
+                    <xa-datasource-property name="PortNumber">1521</xa-datasource-property>
+                    <xa-datasource-property name="DatabaseName">oracledb</xa-datasource-property>
+                    <driver>oracle</driver> 
+                      <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation>
+                        <xa-pool>
+                          <min-pool-size>5</min-pool-size>
+                          <max-pool-size>20</max-pool-size>
+                        </xa-pool>
+                    <security>
+                        <user-name>oracleuser</user-name>
+                        <password>oraclepass</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>true</validate-on-match>
+                        <valid-connection-checker class-name="org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker"></valid-connection-checker>
+                        <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.oracle.OracleExceptionSorter"></exception-sorter>
+                    </validation>
+                  </xa-datasource>'
+++ '[' -n '' -a '' = ORACLE ']'
+++ echo '<xa-datasource' 'jndi-name="java:/oracle-ds"' 'pool-name="oracle-ORACLE"' 'use-java-context="true"' 'enabled="true">' '<xa-datasource-property' 'name="ServerName">ose3x-master.example.com</xa-datasource-property>' '<xa-datasource-property' 'name="PortNumber">1521</xa-datasource-property>' '<xa-datasource-property' 'name="DatabaseName">oracledb</xa-datasource-property>' '<driver>oracle</driver>' '<transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation>' '<xa-pool>' '<min-pool-size>5</min-pool-size>' '<max-pool-size>20</max-pool-size>' '</xa-pool>' '<security>' '<user-name>oracleuser</user-name>' '<password>oraclepass</password>' '</security>' '<validation>' '<validate-on-match>true</validate-on-match>' '<valid-connection-checker' 'class-name="org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker"></valid-connection-checker>' '<exception-sorter' 'class-name="org.jboss.jca.adapters.jdbc.extensions.oracle.OracleExceptionSorter"></exception-sorter>' '</validation>' '</xa-datasource>'
+++ sed ':a;N;$!ba;s|\n|\\n|g'
++ datasources='<datasource jndi-name="java:/accounts-ds" pool-name="account-ACCOUNT" enabled="true" use-java-context="true"> <connection-url>true://mem:9092/accounts;INIT\=RUNSCRIPT\</connection-url> <driver>CHECKER</driver> <security> <user-name>sa</user-name> <password>sa</password> </security> </datasource>\n<xa-datasource jndi-name="java:/oracle-ds" pool-name="oracle-ORACLE" use-java-context="true" enabled="true"> <xa-datasource-property name="ServerName">ose3x-master.example.com</xa-datasource-property> <xa-datasource-property name="PortNumber">1521</xa-datasource-property> <xa-datasource-property name="DatabaseName">oracledb</xa-datasource-property> <driver>oracle</driver> <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation> <xa-pool> <min-pool-size>5</min-pool-size> <max-pool-size>20</max-pool-size> </xa-pool> <security> <user-name>oracleuser</user-name> <password>oraclepass</password> </security> <validation> <validate-on-match>true</validate-on-match> <valid-connection-checker class-name="org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker"></valid-connection-checker> <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.oracle.OracleExceptionSorter"></exception-sorter> </validation> </xa-datasource>\n'
++ sed -i 's|<!-- ##DATASOURCES## -->|<datasource jndi-name="java:/accounts-ds" pool-name="account-ACCOUNT" enabled="true" use-java-context="true"> <connection-url>true://mem:9092/accounts;INIT\=RUNSCRIPT\</connection-url> <driver>CHECKER</driver> <security> <user-name>sa</user-name> <password>sa</password> </security> </datasource>\n<xa-datasource jndi-name="java:/oracle-ds" pool-name="oracle-ORACLE" use-java-context="true" enabled="true"> <xa-datasource-property name="ServerName">ose3x-master.example.com</xa-datasource-property> <xa-datasource-property name="PortNumber">1521</xa-datasource-property> <xa-datasource-property name="DatabaseName">oracledb</xa-datasource-property> <driver>oracle</driver> <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation> <xa-pool> <min-pool-size>5</min-pool-size> <max-pool-size>20</max-pool-size> </xa-pool> <security> <user-name>oracleuser</user-name> <password>oraclepass</password> </security> <validation> <validate-on-match>true</validate-on-match> <valid-connection-checker class-name="org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker"></valid-connection-checker> <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.oracle.OracleExceptionSorter"></exception-sorter> </validation> </xa-datasource>\n|' /opt/eap/standalone/configuration/standalone-openshift.xml
++ inject_drivers
++ drivers=
++ '[' -n ORACLEDRIVER ']'
+++ echo ORACLEDRIVER
+++ sed 's/,/ /g'
++ for driver_prefix in '$(echo $DRIVERS | sed "s/,/ /g")'
+++ find_env ORACLEDRIVER_DRIVER_XA
++++ printenv ORACLEDRIVER_DRIVER_XA
+++ var=
+++ envname=ORACLEDRIVER_DRIVER_XA
+++ '[' -n '' ']'
+++ var=true
+++ '[' -n true ']'
+++ echo true
++ is_xa=true
+++ find_env ORACLEDRIVER_DRIVER_MODULE
++++ printenv ORACLEDRIVER_DRIVER_MODULE
+++ var=
+++ envname=ORACLEDRIVER_DRIVER_MODULE
+++ '[' -n '' ']'
+++ var=com.oracle.db
+++ '[' -n com.oracle.db ']'
+++ echo com.oracle.db
++ driver_module=com.oracle.db
+++ find_env ORACLEDRIVER_DRIVER_CLASS
++++ printenv ORACLEDRIVER_DRIVER_CLASS
+++ var=
+++ envname=ORACLEDRIVER_DRIVER_CLASS
+++ '[' -n '' ']'
+++ var=oracle.jdbc.xa.client.OracleXADataSource
+++ '[' -n oracle.jdbc.xa.client.OracleXADataSource ']'
+++ echo oracle.jdbc.xa.client.OracleXADataSource
++ driver_class=oracle.jdbc.xa.client.OracleXADataSource
+++ find_env ORACLEDRIVER_DRIVER_NAME
++++ printenv ORACLEDRIVER_DRIVER_NAME
+++ var=
+++ envname=ORACLEDRIVER_DRIVER_NAME
+++ '[' -n '' ']'
+++ var=oracle
+++ '[' -n oracle ']'
+++ echo oracle
++ driver_name=oracle
++ '[' true == true ']'
++ drivers=' <driver name="oracle" module="com.oracle.db"><xa-datasource-class>oracle.jdbc.xa.client.OracleXADataSource</xa-datasource-class></driver>'
++ sed -i 's|<!-- ##DRIVERS## -->| <driver name="oracle" module="com.oracle.db"><xa-datasource-class>oracle.jdbc.xa.client.OracleXADataSource</xa-datasource-class></driver>|' /opt/eap/standalone/configuration/standalone-openshift.xml
++ . /opt/eap/bin/launch/resource-adapters.sh
+++ set -x
+++ . /opt/eap/bin/launch/launch-common.sh
++++ set -x
++ inject_resource_adapters
+++ hostname
++ hostname=datavirt-1-h4p4o
++ resource_adapters=
++ '[' -n QSEXCEL,QSFILE,QSWS,TESTRA ']'
+++ echo QSEXCEL,QSFILE,QSWS,TESTRA
+++ sed 's/,/ /g'
++ for ra_prefix in '$(echo $RESOURCE_ADAPTERS | sed "s/,/ /g")'
+++ find_env QSEXCEL_ID
++++ printenv QSEXCEL_ID
+++ var=
+++ envname=QSEXCEL_ID
+++ '[' -n '' ']'
+++ var=fileQSExcel
+++ '[' -n fileQSExcel ']'
+++ echo fileQSExcel
++ ra_id=fileQSExcel
+++ find_env QSEXCEL_MODULE_SLOT
++++ printenv QSEXCEL_MODULE_SLOT
+++ var=
+++ envname=QSEXCEL_MODULE_SLOT
+++ '[' -n '' ']'
+++ var=main
+++ '[' -n main ']'
+++ echo main
++ ra_module_slot=main
+++ find_env QSEXCEL_MODULE_ID
++++ printenv QSEXCEL_MODULE_ID
+++ var=
+++ envname=QSEXCEL_MODULE_ID
+++ '[' -n '' ']'
+++ var=org.jboss.teiid.resource-adapter.file
+++ '[' -n org.jboss.teiid.resource-adapter.file ']'
+++ echo org.jboss.teiid.resource-adapter.file
++ ra_module_id=org.jboss.teiid.resource-adapter.file
+++ find_env QSEXCEL_CONNECTION_CLASS
++++ printenv QSEXCEL_CONNECTION_CLASS
+++ var=
+++ envname=QSEXCEL_CONNECTION_CLASS
+++ '[' -n '' ']'
+++ var=org.teiid.resource.adapter.file.FileManagedConnectionFactory
+++ '[' -n org.teiid.resource.adapter.file.FileManagedConnectionFactory ']'
+++ echo org.teiid.resource.adapter.file.FileManagedConnectionFactory
++ ra_class=org.teiid.resource.adapter.file.FileManagedConnectionFactory
+++ find_env QSEXCEL_CONNECTION_JNDI
++++ printenv QSEXCEL_CONNECTION_JNDI
+++ var=
+++ envname=QSEXCEL_CONNECTION_JNDI
+++ '[' -n '' ']'
+++ var=java:/excel-file
+++ '[' -n java:/excel-file ']'
+++ echo java:/excel-file
++ ra_jndi=java:/excel-file
++ resource_adapter='<resource-adapter id="fileQSExcel"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/excel-file" enabled="true" use-java-context="true">'
+++ compgen -v
+++ grep -s QSEXCEL_PROPERTY_
++ ra_props='QSEXCEL_PROPERTY_AllowParentPaths
+QSEXCEL_PROPERTY_ParentDirectory'
+++ echo QSEXCEL_PROPERTY_AllowParentPaths QSEXCEL_PROPERTY_ParentDirectory
++ for ra_prop in '$(echo $ra_props)'
+++ echo QSEXCEL_PROPERTY_AllowParentPaths
+++ awk -F _ '{ print $3 }'
++ prop_name=AllowParentPaths
+++ find_env QSEXCEL_PROPERTY_AllowParentPaths
++++ printenv QSEXCEL_PROPERTY_AllowParentPaths
+++ var=
+++ envname=QSEXCEL_PROPERTY_AllowParentPaths
+++ '[' -n '' ']'
+++ var=true
+++ '[' -n true ']'
+++ echo true
++ prop_val=true
++ resource_adapter='<resource-adapter id="fileQSExcel"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/excel-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property>'
++ for ra_prop in '$(echo $ra_props)'
+++ echo QSEXCEL_PROPERTY_ParentDirectory
+++ awk -F _ '{ print $3 }'
++ prop_name=ParentDirectory
+++ find_env QSEXCEL_PROPERTY_ParentDirectory
++++ printenv QSEXCEL_PROPERTY_ParentDirectory
+++ var=
+++ envname=QSEXCEL_PROPERTY_ParentDirectory
+++ '[' -n '' ']'
+++ var=/opt/eap/teiidfiles/excel-files/
+++ '[' -n /opt/eap/teiidfiles/excel-files/ ']'
+++ echo /opt/eap/teiidfiles/excel-files/
++ prop_val=/opt/eap/teiidfiles/excel-files/
++ resource_adapter='<resource-adapter id="fileQSExcel"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/excel-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/opt/eap/teiidfiles/excel-files/</config-property>'
++ resource_adapter='<resource-adapter id="fileQSExcel"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/excel-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/opt/eap/teiidfiles/excel-files/</config-property></connection-definition></connection-definitions></resource-adapter>'
+++ echo '<resource-adapter' 'id="fileQSExcel"><module' 'slot="main"' 'id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition' 'class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory"' 'jndi-name="java:/excel-file"' 'enabled="true"' 'use-java-context="true"><config-property' 'name="AllowParentPaths">true</config-property><config-property' 'name="ParentDirectory">/opt/eap/teiidfiles/excel-files/</config-property></connection-definition></connection-definitions></resource-adapter>'
+++ sed 's|localhost|datavirt-1-h4p4o|g'
++ resource_adapter='<resource-adapter id="fileQSExcel"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/excel-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/opt/eap/teiidfiles/excel-files/</config-property></connection-definition></connection-definitions></resource-adapter>'
++ resource_adapters='<resource-adapter id="fileQSExcel"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/excel-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/opt/eap/teiidfiles/excel-files/</config-property></connection-definition></connection-definitions></resource-adapter>'
++ for ra_prefix in '$(echo $RESOURCE_ADAPTERS | sed "s/,/ /g")'
+++ find_env QSFILE_ID
++++ printenv QSFILE_ID
+++ var=
+++ envname=QSFILE_ID
+++ '[' -n '' ']'
+++ var=fileQS
+++ '[' -n fileQS ']'
+++ echo fileQS
++ ra_id=fileQS
+++ find_env QSFILE_MODULE_SLOT
++++ printenv QSFILE_MODULE_SLOT
+++ var=
+++ envname=QSFILE_MODULE_SLOT
+++ '[' -n '' ']'
+++ var=main
+++ '[' -n main ']'
+++ echo main
++ ra_module_slot=main
+++ find_env QSFILE_MODULE_ID
++++ printenv QSFILE_MODULE_ID
+++ var=
+++ envname=QSFILE_MODULE_ID
+++ '[' -n '' ']'
+++ var=org.jboss.teiid.resource-adapter.file
+++ '[' -n org.jboss.teiid.resource-adapter.file ']'
+++ echo org.jboss.teiid.resource-adapter.file
++ ra_module_id=org.jboss.teiid.resource-adapter.file
+++ find_env QSFILE_CONNECTION_CLASS
++++ printenv QSFILE_CONNECTION_CLASS
+++ var=
+++ envname=QSFILE_CONNECTION_CLASS
+++ '[' -n '' ']'
+++ var=org.teiid.resource.adapter.file.FileManagedConnectionFactory
+++ '[' -n org.teiid.resource.adapter.file.FileManagedConnectionFactory ']'
+++ echo org.teiid.resource.adapter.file.FileManagedConnectionFactory
++ ra_class=org.teiid.resource.adapter.file.FileManagedConnectionFactory
+++ find_env QSFILE_CONNECTION_JNDI
++++ printenv QSFILE_CONNECTION_JNDI
+++ var=
+++ envname=QSFILE_CONNECTION_JNDI
+++ '[' -n '' ']'
+++ var=java:/marketdata-file
+++ '[' -n java:/marketdata-file ']'
+++ echo java:/marketdata-file
++ ra_jndi=java:/marketdata-file
++ resource_adapter='<resource-adapter id="fileQS"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/marketdata-file" enabled="true" use-java-context="true">'
+++ compgen -v
+++ grep -s QSFILE_PROPERTY_
++ ra_props='QSFILE_PROPERTY_AllowParentPaths
+QSFILE_PROPERTY_ParentDirectory'
+++ echo QSFILE_PROPERTY_AllowParentPaths QSFILE_PROPERTY_ParentDirectory
++ for ra_prop in '$(echo $ra_props)'
+++ echo QSFILE_PROPERTY_AllowParentPaths
+++ awk -F _ '{ print $3 }'
++ prop_name=AllowParentPaths
+++ find_env QSFILE_PROPERTY_AllowParentPaths
++++ printenv QSFILE_PROPERTY_AllowParentPaths
+++ var=
+++ envname=QSFILE_PROPERTY_AllowParentPaths
+++ '[' -n '' ']'
+++ var=true
+++ '[' -n true ']'
+++ echo true
++ prop_val=true
++ resource_adapter='<resource-adapter id="fileQS"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/marketdata-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property>'
++ for ra_prop in '$(echo $ra_props)'
+++ echo QSFILE_PROPERTY_ParentDirectory
+++ awk -F _ '{ print $3 }'
++ prop_name=ParentDirectory
+++ find_env QSFILE_PROPERTY_ParentDirectory
++++ printenv QSFILE_PROPERTY_ParentDirectory
+++ var=
+++ envname=QSFILE_PROPERTY_ParentDirectory
+++ '[' -n '' ']'
+++ var=/opt/eap/teiidfiles/data
+++ '[' -n /opt/eap/teiidfiles/data ']'
+++ echo /opt/eap/teiidfiles/data
++ prop_val=/opt/eap/teiidfiles/data
++ resource_adapter='<resource-adapter id="fileQS"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/marketdata-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/opt/eap/teiidfiles/data</config-property>'
++ resource_adapter='<resource-adapter id="fileQS"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/marketdata-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/opt/eap/teiidfiles/data</config-property></connection-definition></connection-definitions></resource-adapter>'
+++ echo '<resource-adapter' 'id="fileQS"><module' 'slot="main"' 'id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition' 'class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory"' 'jndi-name="java:/marketdata-file"' 'enabled="true"' 'use-java-context="true"><config-property' 'name="AllowParentPaths">true</config-property><config-property' 'name="ParentDirectory">/opt/eap/teiidfiles/data</config-property></connection-definition></connection-definitions></resource-adapter>'
+++ sed 's|localhost|datavirt-1-h4p4o|g'
++ resource_adapter='<resource-adapter id="fileQS"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/marketdata-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/opt/eap/teiidfiles/data</config-property></connection-definition></connection-definitions></resource-adapter>'
++ resource_adapters='<resource-adapter id="fileQSExcel"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/excel-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/opt/eap/teiidfiles/excel-files/</config-property></connection-definition></connection-definitions></resource-adapter><resource-adapter id="fileQS"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/marketdata-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/opt/eap/teiidfiles/data</config-property></connection-definition></connection-definitions></resource-adapter>'
++ for ra_prefix in '$(echo $RESOURCE_ADAPTERS | sed "s/,/ /g")'
+++ find_env QSWS_ID
++++ printenv QSWS_ID
+++ var=
+++ envname=QSWS_ID
+++ '[' -n '' ']'
+++ var=wsQS
+++ '[' -n wsQS ']'
+++ echo wsQS
++ ra_id=wsQS
+++ find_env QSWS_MODULE_SLOT
++++ printenv QSWS_MODULE_SLOT
+++ var=
+++ envname=QSWS_MODULE_SLOT
+++ '[' -n '' ']'
+++ var=main
+++ '[' -n main ']'
+++ echo main
++ ra_module_slot=main
+++ find_env QSWS_MODULE_ID
++++ printenv QSWS_MODULE_ID
+++ var=
+++ envname=QSWS_MODULE_ID
+++ '[' -n '' ']'
+++ var=org.jboss.teiid.resource-adapter.webservice
+++ '[' -n org.jboss.teiid.resource-adapter.webservice ']'
+++ echo org.jboss.teiid.resource-adapter.webservice
++ ra_module_id=org.jboss.teiid.resource-adapter.webservice
+++ find_env QSWS_CONNECTION_CLASS
++++ printenv QSWS_CONNECTION_CLASS
+++ var=
+++ envname=QSWS_CONNECTION_CLASS
+++ '[' -n '' ']'
+++ var=org.teiid.resource.adapter.ws.WSManagedConnectionFactory
+++ '[' -n org.teiid.resource.adapter.ws.WSManagedConnectionFactory ']'
+++ echo org.teiid.resource.adapter.ws.WSManagedConnectionFactory
++ ra_class=org.teiid.resource.adapter.ws.WSManagedConnectionFactory
+++ find_env QSWS_CONNECTION_JNDI
++++ printenv QSWS_CONNECTION_JNDI
+++ var=
+++ envname=QSWS_CONNECTION_JNDI
+++ '[' -n '' ']'
+++ var=java:/CustomerRESTWebSvcSource
+++ '[' -n java:/CustomerRESTWebSvcSource ']'
+++ echo java:/CustomerRESTWebSvcSource
++ ra_jndi=java:/CustomerRESTWebSvcSource
++ resource_adapter='<resource-adapter id="wsQS"><module slot="main" id="org.jboss.teiid.resource-adapter.webservice"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.ws.WSManagedConnectionFactory" jndi-name="java:/CustomerRESTWebSvcSource" enabled="true" use-java-context="true">'
+++ compgen -v
+++ grep -s QSWS_PROPERTY_
++ ra_props=QSWS_PROPERTY_EndPoint
+++ echo QSWS_PROPERTY_EndPoint
++ for ra_prop in '$(echo $ra_props)'
+++ echo QSWS_PROPERTY_EndPoint
+++ awk -F _ '{ print $3 }'
++ prop_name=EndPoint
+++ find_env QSWS_PROPERTY_EndPoint
++++ printenv QSWS_PROPERTY_EndPoint
+++ var=
+++ envname=QSWS_PROPERTY_EndPoint
+++ '[' -n '' ']'
+++ var=http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList
+++ '[' -n http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList ']'
+++ echo http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList
++ prop_val=http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList
++ resource_adapter='<resource-adapter id="wsQS"><module slot="main" id="org.jboss.teiid.resource-adapter.webservice"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.ws.WSManagedConnectionFactory" jndi-name="java:/CustomerRESTWebSvcSource" enabled="true" use-java-context="true"><config-property name="EndPoint">http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList</config-property>'
++ resource_adapter='<resource-adapter id="wsQS"><module slot="main" id="org.jboss.teiid.resource-adapter.webservice"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.ws.WSManagedConnectionFactory" jndi-name="java:/CustomerRESTWebSvcSource" enabled="true" use-java-context="true"><config-property name="EndPoint">http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList</config-property></connection-definition></connection-definitions></resource-adapter>'
+++ echo '<resource-adapter' 'id="wsQS"><module' 'slot="main"' 'id="org.jboss.teiid.resource-adapter.webservice"></module><connection-definitions><connection-definition' 'class-name="org.teiid.resource.adapter.ws.WSManagedConnectionFactory"' 'jndi-name="java:/CustomerRESTWebSvcSource"' 'enabled="true"' 'use-java-context="true"><config-property' 'name="EndPoint">http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList</config-property></connection-definition></connection-definitions></resource-adapter>'
+++ sed 's|localhost|datavirt-1-h4p4o|g'
++ resource_adapter='<resource-adapter id="wsQS"><module slot="main" id="org.jboss.teiid.resource-adapter.webservice"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.ws.WSManagedConnectionFactory" jndi-name="java:/CustomerRESTWebSvcSource" enabled="true" use-java-context="true"><config-property name="EndPoint">http://datavirt-1-h4p4o:8080/CustomerRESTWebSvc/MyRESTApplication/customerList</config-property></connection-definition></connection-definitions></resource-adapter>'
++ resource_adapters='<resource-adapter id="fileQSExcel"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/excel-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/opt/eap/teiidfiles/excel-files/</config-property></connection-definition></connection-definitions></resource-adapter><resource-adapter id="fileQS"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/marketdata-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/opt/eap/teiidfiles/data</config-property></connection-definition></connection-definitions></resource-adapter><resource-adapter id="wsQS"><module slot="main" id="org.jboss.teiid.resource-adapter.webservice"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.ws.WSManagedConnectionFactory" jndi-name="java:/CustomerRESTWebSvcSource" enabled="true" use-java-context="true"><config-property name="EndPoint">http://datavirt-1-h4p4o:8080/CustomerRESTWebSvc/MyRESTApplication/customerList</config-property></connection-definition></connection-definitions></resource-adapter>'
++ for ra_prefix in '$(echo $RESOURCE_ADAPTERS | sed "s/,/ /g")'
+++ find_env TESTRA_ID
++++ printenv TESTRA_ID
+++ var=
+++ envname=TESTRA_ID
+++ '[' -n '' ']'
+++ var=testra
+++ '[' -n testra ']'
+++ echo testra
++ ra_id=testra
+++ find_env TESTRA_MODULE_SLOT
++++ printenv TESTRA_MODULE_SLOT
+++ var=
+++ envname=TESTRA_MODULE_SLOT
+++ '[' -n '' ']'
+++ var=main
+++ '[' -n main ']'
+++ echo main
++ ra_module_slot=main
+++ find_env TESTRA_MODULE_ID
++++ printenv TESTRA_MODULE_ID
+++ var=
+++ envname=TESTRA_MODULE_ID
+++ '[' -n '' ']'
+++ var=org.jboss.teiid.resource-adapter.file
+++ '[' -n org.jboss.teiid.resource-adapter.file ']'
+++ echo org.jboss.teiid.resource-adapter.file
++ ra_module_id=org.jboss.teiid.resource-adapter.file
+++ find_env TESTRA_CONNECTION_CLASS
++++ printenv TESTRA_CONNECTION_CLASS
+++ var=
+++ envname=TESTRA_CONNECTION_CLASS
+++ '[' -n '' ']'
+++ var=org.teiid.resource.adapter.file.FileManagedConnectionFactory
+++ '[' -n org.teiid.resource.adapter.file.FileManagedConnectionFactory ']'
+++ echo org.teiid.resource.adapter.file.FileManagedConnectionFactory
++ ra_class=org.teiid.resource.adapter.file.FileManagedConnectionFactory
+++ find_env TESTRA_CONNECTION_JNDI
++++ printenv TESTRA_CONNECTION_JNDI
+++ var=
+++ envname=TESTRA_CONNECTION_JNDI
+++ '[' -n '' ']'
+++ var=java:/test-file
+++ '[' -n java:/test-file ']'
+++ echo java:/test-file
++ ra_jndi=java:/test-file
++ resource_adapter='<resource-adapter id="testra"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/test-file" enabled="true" use-java-context="true">'
+++ compgen -v
+++ grep -s TESTRA_PROPERTY_
++ ra_props='TESTRA_PROPERTY_AllowParentPaths
+TESTRA_PROPERTY_ParentDirectory'
+++ echo TESTRA_PROPERTY_AllowParentPaths TESTRA_PROPERTY_ParentDirectory
++ for ra_prop in '$(echo $ra_props)'
+++ echo TESTRA_PROPERTY_AllowParentPaths
+++ awk -F _ '{ print $3 }'
++ prop_name=AllowParentPaths
+++ find_env TESTRA_PROPERTY_AllowParentPaths
++++ printenv TESTRA_PROPERTY_AllowParentPaths
+++ var=
+++ envname=TESTRA_PROPERTY_AllowParentPaths
+++ '[' -n '' ']'
+++ var=true
+++ '[' -n true ']'
+++ echo true
++ prop_val=true
++ resource_adapter='<resource-adapter id="testra"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/test-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property>'
++ for ra_prop in '$(echo $ra_props)'
+++ echo TESTRA_PROPERTY_ParentDirectory
+++ awk -F _ '{ print $3 }'
++ prop_name=ParentDirectory
+++ find_env TESTRA_PROPERTY_ParentDirectory
++++ printenv TESTRA_PROPERTY_ParentDirectory
+++ var=
+++ envname=TESTRA_PROPERTY_ParentDirectory
+++ '[' -n '' ']'
+++ var=/opt/eap/teiidfiles/data/
+++ '[' -n /opt/eap/teiidfiles/data/ ']'
+++ echo /opt/eap/teiidfiles/data/
++ prop_val=/opt/eap/teiidfiles/data/
++ resource_adapter='<resource-adapter id="testra"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/test-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/opt/eap/teiidfiles/data/</config-property>'
++ resource_adapter='<resource-adapter id="testra"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/test-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/opt/eap/teiidfiles/data/</config-property></connection-definition></connection-definitions></resource-adapter>'
+++ echo '<resource-adapter' 'id="testra"><module' 'slot="main"' 'id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition' 'class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory"' 'jndi-name="java:/test-file"' 'enabled="true"' 'use-java-context="true"><config-property' 'name="AllowParentPaths">true</config-property><config-property' 'name="ParentDirectory">/opt/eap/teiidfiles/data/</config-property></connection-definition></connection-definitions></resource-adapter>'
+++ sed 's|localhost|datavirt-1-h4p4o|g'
++ resource_adapter='<resource-adapter id="testra"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/test-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/opt/eap/teiidfiles/data/</config-property></connection-definition></connection-definitions></resource-adapter>'
++ resource_adapters='<resource-adapter id="fileQSExcel"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/excel-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/opt/eap/teiidfiles/excel-files/</config-property></connection-definition></connection-definitions></resource-adapter><resource-adapter id="fileQS"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/marketdata-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/opt/eap/teiidfiles/data</config-property></connection-definition></connection-definitions></resource-adapter><resource-adapter id="wsQS"><module slot="main" id="org.jboss.teiid.resource-adapter.webservice"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.ws.WSManagedConnectionFactory" jndi-name="java:/CustomerRESTWebSvcSource" enabled="true" use-java-context="true"><config-property name="EndPoint">http://datavirt-1-h4p4o:8080/CustomerRESTWebSvc/MyRESTApplication/customerList</config-property></connection-definition></connection-definitions></resource-adapter><resource-adapter id="testra"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/test-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/opt/eap/teiidfiles/data/</config-property></connection-definition></connection-definitions></resource-adapter>'
++ sed -i 's|<!-- ##RESOURCE_ADAPTERS## -->|<resource-adapter id="fileQSExcel"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/excel-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/opt/eap/teiidfiles/excel-files/</config-property></connection-definition></connection-definitions></resource-adapter><resource-adapter id="fileQS"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/marketdata-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/opt/eap/teiidfiles/data</config-property></connection-definition></connection-definitions></resource-adapter><resource-adapter id="wsQS"><module slot="main" id="org.jboss.teiid.resource-adapter.webservice"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.ws.WSManagedConnectionFactory" jndi-name="java:/CustomerRESTWebSvcSource" enabled="true" use-java-context="true"><config-property name="EndPoint">http://datavirt-1-h4p4o:8080/CustomerRESTWebSvc/MyRESTApplication/customerList</config-property></connection-definition></connection-definitions></resource-adapter><resource-adapter id="testra"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/test-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/opt/eap/teiidfiles/data/</config-property></connection-definition></connection-definitions></resource-adapter>|' /opt/eap/standalone/configuration/standalone-openshift.xml
++ . /opt/eap/bin/launch/admin.sh
++ configure_administration
++ '[' -n '' ']'
++ . /opt/eap/bin/launch/ha.sh
++ check_view_pods_permission
++ '[' -n _ ']'
++ pods_url=https://172.30.0.1:443/api/v1/namespaces/demo/pods
++ '[' -n application=datavirt ']'
++ pods_labels=labels=application=datavirt
+++ cat /var/run/secrets/kubernetes.io/serviceaccount/token
++ pods_auth='Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZW1vIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImRlZmF1bHQtdG9rZW4tZHBoNHYiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGVmYXVsdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjVkZmJmZjNhLTE5NTctMTFlNi1hZTEzLTUyNTQwMGFiM2IwZCIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZW1vOmRlZmF1bHQifQ.K8D_ebo8YraGR3HtbtYlyZZcL5INjvt4RRNB1s_KaSXGEsuBkMVYf8cW6GSWRVWSA193DeArm4XysTifih7uli5Eja0sBxUzSt1uBJjPOijJwDU6EllhTRzMsP7feKHVH66Pk2XCM5gyWBvhbJbe8XQNgKi86FmrbL9w9IaF13Lv5pEVCX-Eo5l8udzTPKeutLzLU8F7Am9Kx_M4X_gCF3SJPFloZIcxhWNvcpk9QhfPGQHxvLEJzQJQ8STnbAcuCdMnf0aLhqC41hqDIewjRd1wXF_3ev13zY6EQAjYwmxkDkxJKmySQ1pGNq31onRV4JnTIQ0LQ17Mxym9rVcywQ'
+++ curl -s -o /dev/null -w '%{http_code}' -G --data-urlencode labels=application=datavirt -k -H 'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZW1vIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImRlZmF1bHQtdG9rZW4tZHBoNHYiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGVmYXVsdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjVkZmJmZjNhLTE5NTctMTFlNi1hZTEzLTUyNTQwMGFiM2IwZCIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZW1vOmRlZmF1bHQifQ.K8D_ebo8YraGR3HtbtYlyZZcL5INjvt4RRNB1s_KaSXGEsuBkMVYf8cW6GSWRVWSA193DeArm4XysTifih7uli5Eja0sBxUzSt1uBJjPOijJwDU6EllhTRzMsP7feKHVH66Pk2XCM5gyWBvhbJbe8XQNgKi86FmrbL9w9IaF13Lv5pEVCX-Eo5l8udzTPKeutLzLU8F7Am9Kx_M4X_gCF3SJPFloZIcxhWNvcpk9QhfPGQHxvLEJzQJQ8STnbAcuCdMnf0aLhqC41hqDIewjRd1wXF_3ev13zY6EQAjYwmxkDkxJKmySQ1pGNq31onRV4JnTIQ0LQ17Mxym9rVcywQ' https://172.30.0.1:443/api/v1/namespaces/demo/pods
++ pods_code=200
++ '[' 200 = 200 ']'
++ echo 'Service account has sufficient permissions to view pods in kubernetes (HTTP 200). Clustering will be available.'
+Service account has sufficient permissions to view pods in kubernetes (HTTP 200). Clustering will be available.
++ configure_ha
+++ hostname -i
++ IP_ADDR=10.1.0.2
++ JBOSS_HA_ARGS='-b 10.1.0.2'
++ '[' -n '' ']'
++ '[' -n '' ']'
++ '[' -n datavirt-1-h4p4o ']'
++ JBOSS_NODE_NAME=datavirt-1-h4p4o
++ '[' -n datavirt-1-h4p4o ']'
++ '[' 16 -gt 23 ']'
++ JBOSS_HA_ARGS='-b 10.1.0.2 -Djboss.node.name=datavirt-1-h4p4o'
++ '[' -z 5DBFpisS ']'
++ JGROUPS_AUTH='\n                <protocol type="AUTH">\n                    <property name="auth_class">org.jgroups.auth.MD5Token</property>\n                    <property name="token_hash">SHA</property>\n                    <property name="auth_value">5DBFpisS</property>\n                </protocol>\n'
++ sed -i 's|<!-- ##JGROUPS_AUTH## -->|\n                <protocol type="AUTH">\n                    <property name="auth_class">org.jgroups.auth.MD5Token</property>\n                    <property name="token_hash">SHA</property>\n                    <property name="auth_value">5DBFpisS</property>\n                </protocol>\n|g' /opt/eap/standalone/configuration/standalone-openshift.xml
++ configure_jgroups_encryption
++ jgroups_encrypt=
++ '[' -n '' ']'
++ sed -i 's|<!-- ##JGROUPS_ENCRYPT## -->||g' /opt/eap/standalone/configuration/standalone-openshift.xml
++ . /opt/eap/bin/launch/https.sh
++ configure_https
++ https='<!-- No HTTPS configuration discovered -->'
++ '[' -n '' -a -n '' -a -n '' -a -n '' ']'
++ '[' -n '' -o -n '' -o -n '' -o -n '' ']'
++ sed -i 's|<!-- ##HTTPS## -->|<!-- No HTTPS configuration discovered -->|' /opt/eap/standalone/configuration/standalone-openshift.xml
++ . /opt/eap/bin/launch/json_logging.sh
++ configure_json_logging
++ sed -i 's|^.*\.module=org\.jboss\.logmanager\.ext$||' /opt/eap/standalone/configuration/logging.properties
++ . /opt/eap/bin/launch/security-domains.sh
++ configure_security_domains
++ domains='<!-- no additional security domains configured -->'
++ '[' -n '' ']'
++ sed -i 's|<!-- ##ADDITIONAL_SECURITY_DOMAINS## -->|<!-- no additional security domains configured -->|' /opt/eap/standalone/configuration/standalone-openshift.xml
++ . /opt/eap/bin/launch/keycloak.sh
+++ KEYCLOAK_REALM_SUBSYSTEM_FILE=/opt/eap/bin/launch/keycloak-realm-subsystem
+++ KEYCLOAK_SAML_REALM_SUBSYSTEM_FILE=/opt/eap/bin/launch/keycloak-saml-realm-subsystem
+++ KEYCLOAK_DEPLOYMENT_SUBSYSTEM_FILE=/opt/eap/bin/launch/keycloak-deployment-subsystem
+++ KEYCLOAK_SAML_DEPLOYMENT_SUBSYSTEM_FILE=/opt/eap/bin/launch/keycloak-saml-deployment-subsystem
+++ KEYCLOAK_SAML_SP_SUBSYSTEM_FILE=/opt/eap/bin/launch/keycloak-saml-sp-subsystem
+++ KEYCLOAK_SECURITY_DOMAIN_FILE=/opt/eap/bin/launch/keycloak-security-domain
+++ OPENIDCONNECT=KEYCLOAK
+++ SAML=KEYCLOAK-SAML
+++ SECURE_DEPLOYMENTS=/opt/eap/standalone/configuration/secure-deployments
+++ SECURE_SAML_DEPLOYMENTS=/opt/eap/standalone/configuration/secure-saml-deployments
+++ CURL='curl -s'
+++ '[' -n '' ']'
++ configure_keycloak
++ '[' -f /opt/eap/standalone/configuration/secure-deployments ']'
+Missing SSO_URL. Unable to properly configure SSO-enabled applications
++ '[' -f /opt/eap/standalone/configuration/secure-saml-deployments ']'
++ '[' -n '' ']'
++ echo 'Missing SSO_URL. Unable to properly configure SSO-enabled applications'
++ . /opt/eap/bin/launch/teiid.sh
+++ set -x
+++ . /opt/eap/bin/launch/launch-common.sh
++++ set -x
++++ hostname
+++ hostname=datavirt-1-h4p4o
++ configure_teiid
++ import_sql_files
++ IFS=,
++ read -a db_backends
++ configure_translators
++ teiid_translators=
++ '[' -n TESTTRANSLATOR ']'
+++ echo TESTTRANSLATOR
+++ sed 's/,/ /g'
++ for t_prefix in '$(echo $TRANSLATORS | sed "s/,/ /g")'
+++ find_env TESTTRANSLATOR_NAME
++++ printenv TESTTRANSLATOR_NAME
+++ var=
+++ envname=TESTTRANSLATOR_NAME
+++ '[' -n '' ']'
+++ var=testtranslator
+++ '[' -n testtranslator ']'
+++ echo testtranslator
++ t_name=testtranslator
+++ find_env TESTTRANSLATOR_MODULE
++++ printenv TESTTRANSLATOR_MODULE
+++ var=
+++ envname=TESTTRANSLATOR_MODULE
+++ '[' -n '' ']'
+++ var=org.jboss.teiid.translator.jdbc
+++ '[' -n org.jboss.teiid.translator.jdbc ']'
+++ echo org.jboss.teiid.translator.jdbc
++ t_module=org.jboss.teiid.translator.jdbc
++ teiid_translators=' <translator name="testtranslator" module="org.jboss.teiid.translator.jdbc"/>'
++ sed -i 's|<!-- ##TEIID_TRANSLATORS## -->| <translator name="testtranslator" module="org.jboss.teiid.translator.jdbc"/>|' /opt/eap/standalone/configuration/standalone-openshift.xml
+Running jboss-datavirt-6/datavirt63-openshift image, version 1.4-dev
++ echo 'Running jboss-datavirt-6/datavirt63-openshift image, version 1.4-dev'
++ exec /opt/eap/bin/standalone.sh -c standalone-openshift.xml -bmanagement 127.0.0.1 -b 10.1.0.2 -Djboss.node.name=datavirt-1-h4p4o -Djboss.messaging.cluster.password=csmCRrAQ
+=========================================================================
+
+  JBoss Bootstrap Environment
+
+  JBOSS_HOME: /opt/eap
+
+  JAVA: /usr/lib/jvm/java-1.8.0/bin/java
+
+  JAVA_OPTS:  -server -XX:+UseCompressedOops -verbose:gc -Xloggc:"/opt/eap/standalone/log/gc.log" -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=3M -XX:-TraceClassUnloading -Xms1303m -Xmx1303m  -Djava.net.preferIPv4Stack=true -Djboss.modules.system.pkgs=org.jboss.logmanager -Djava.awt.headless=true -Djboss.modules.policy-permissions=true -Xbootclasspath/p:/opt/eap/jboss-modules.jar:/opt/eap/modules/system/layers/base/org/jboss/logmanager/main/jboss-logmanager-1.5.4.Final-redhat-1.jar:/opt/eap/modules/system/layers/base/org/jboss/logmanager/ext/main/javax.json-1.0.4.jar:/opt/eap/modules/system/layers/base/org/jboss/logmanager/ext/main/jboss-logmanager-ext-1.0.0.Alpha2-redhat-1.jar -Djava.util.logging.manager=org.jboss.logmanager.LogManager -javaagent:/opt/eap/jolokia.jar=port=8778,protocol=https,caCert=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt,clientPrincipal=cn=system:master-proxy,useSslClientAuthentication=true,extraClientCheck=true,host=0.0.0.0,discoveryEnabled=false -Djava.security.egd=file:/dev/./urandom 
+
+=========================================================================
+
+Picked up JAVA_TOOL_OPTIONS: -Duser.home=/home/jboss -Duser.name=jboss
+I> No access restrictor found, access to all MBean is allowed
+Jolokia: Agent started with URL https://10.1.0.2:8778/jolokia/
+[0m16:11:00,676 INFO  [org.jboss.modules] (main) JBoss Modules version 1.3.7.Final-redhat-1
+[0m[0m16:11:00,924 INFO  [org.jboss.msc] (main) JBoss MSC version 1.1.5.Final-redhat-1
+[0m[0m16:11:00,998 INFO  [org.jboss.as] (MSC service thread 1-8) JBAS015899: JBoss Red Hat JBoss Data Virtualization 6.3.0 (AS 7.5.4.Final-redhat-4) starting
+[0m[32m16:11:01,003 DEBUG [org.jboss.as.config] (MSC service thread 1-8) Configured system properties:
+	[Standalone] = 
+	awt.toolkit = sun.awt.X11.XToolkit
+	file.encoding = ANSI_X3.4-1968
+	file.encoding.pkg = sun.io
+	file.separator = /
+	java.awt.graphicsenv = sun.awt.X11GraphicsEnvironment
+	java.awt.headless = true
+	java.awt.printerjob = sun.print.PSPrinterJob
+	java.class.path = /opt/eap/jboss-modules.jar:/opt/eap/jolokia.jar
+	java.class.version = 52.0
+	java.endorsed.dirs = /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.101-3.b13.el7_2.x86_64/jre/lib/endorsed
+	java.ext.dirs = /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.101-3.b13.el7_2.x86_64/jre/lib/ext:/usr/java/packages/lib/ext
+	java.home = /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.101-3.b13.el7_2.x86_64/jre
+	java.io.tmpdir = /tmp
+	java.library.path = /usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib
+	java.net.preferIPv4Stack = true
+	java.runtime.name = OpenJDK Runtime Environment
+	java.runtime.version = 1.8.0_101-b13
+	java.security.egd = file:/dev/./urandom
+	java.specification.name = Java Platform API Specification
+	java.specification.vendor = Oracle Corporation
+	java.specification.version = 1.8
+	java.util.logging.manager = org.jboss.logmanager.LogManager
+	java.vendor = Oracle Corporation
+	java.vendor.url = http://java.oracle.com/
+	java.vendor.url.bug = http://bugreport.sun.com/bugreport/
+	java.version = 1.8.0_101
+	java.vm.info = mixed mode
+	java.vm.name = OpenJDK 64-Bit Server VM
+	java.vm.specification.name = Java Virtual Machine Specification
+	java.vm.specification.vendor = Oracle Corporation
+	java.vm.specification.version = 1.8
+	java.vm.vendor = Oracle Corporation
+	java.vm.version = 25.101-b13
+	javax.management.builder.initial = org.jboss.as.jmx.PluggableMBeanServerBuilder
+	javax.xml.datatype.DatatypeFactory = __redirected.__DatatypeFactory
+	javax.xml.parsers.DocumentBuilderFactory = __redirected.__DocumentBuilderFactory
+	javax.xml.parsers.SAXParserFactory = __redirected.__SAXParserFactory
+	javax.xml.stream.XMLEventFactory = __redirected.__XMLEventFactory
+	javax.xml.stream.XMLInputFactory = __redirected.__XMLInputFactory
+	javax.xml.stream.XMLOutputFactory = __redirected.__XMLOutputFactory
+	javax.xml.transform.TransformerFactory = __redirected.__TransformerFactory
+	javax.xml.validation.SchemaFactory:http://www.w3.org/2001/XMLSchema = __redirected.__SchemaFactory
+	javax.xml.xpath.XPathFactory:http://java.sun.com/jaxp/xpath/dom = __redirected.__XPathFactory
+	jboss.bind.address = 10.1.0.2
+	jboss.bind.address.management = 127.0.0.1
+	jboss.home.dir = /opt/eap
+	jboss.host.name = datavirt-1-h4p4o
+	jboss.messaging.cluster.password = <redacted>
+	jboss.modules.dir = /opt/eap/modules
+	jboss.modules.policy-permissions = true
+	jboss.modules.system.pkgs = org.jboss.logmanager
+	jboss.node.name = datavirt-1-h4p4o
+	jboss.qualified.host.name = datavirt-1-h4p4o
+	jboss.server.base.dir = /opt/eap/standalone
+	jboss.server.config.dir = /opt/eap/standalone/configuration
+	jboss.server.data.dir = /opt/eap/standalone/data
+	jboss.server.deploy.dir = /opt/eap/standalone/data/content
+	jboss.server.log.dir = /opt/eap/standalone/log
+	jboss.server.name = datavirt-1-h4p4o
+	jboss.server.persist.config = true
+	jboss.server.temp.dir = /opt/eap/standalone/tmp
+	jolokia.agent = https://10.1.0.2:8778/jolokia/
+	line.separator = 
+
+	logging.configuration = file:/opt/eap/standalone/configuration/logging.properties
+	module.path = /opt/eap/modules
+	org.jboss.boot.log.file = /opt/eap/standalone/log/server.log
+	org.jboss.resolver.warning = true
+	org.xml.sax.driver = __redirected.__XMLReaderFactory
+	os.arch = amd64
+	os.name = Linux
+	os.version = 3.10.0-327.28.2.el7.x86_64
+	path.separator = :
+	sun.arch.data.model = 64
+	sun.boot.class.path = /opt/eap/jboss-modules.jar:/opt/eap/modules/system/layers/base/org/jboss/logmanager/main/jboss-logmanager-1.5.4.Final-redhat-1.jar:/opt/eap/modules/system/layers/base/org/jboss/logmanager/ext/main/javax.json-1.0.4.jar:/opt/eap/modules/system/layers/base/org/jboss/logmanager/ext/main/jboss-logmanager-ext-1.0.0.Alpha2-redhat-1.jar:/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.101-3.b13.el7_2.x86_64/jre/lib/resources.jar:/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.101-3.b13.el7_2.x86_64/jre/lib/rt.jar:/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.101-3.b13.el7_2.x86_64/jre/lib/sunrsasign.jar:/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.101-3.b13.el7_2.x86_64/jre/lib/jsse.jar:/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.101-3.b13.el7_2.x86_64/jre/lib/jce.jar:/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.101-3.b13.el7_2.x86_64/jre/lib/charsets.jar:/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.101-3.b13.el7_2.x86_64/jre/lib/jfr.jar:/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.101-3.b13.el7_2.x86_64/jre/classes
+	sun.boot.library.path = /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.101-3.b13.el7_2.x86_64/jre/lib/amd64
+	sun.cpu.endian = little
+	sun.cpu.isalist = 
+	sun.io.unicode.encoding = UnicodeLittle
+	sun.java.command = /opt/eap/jboss-modules.jar -mp /opt/eap/modules -jaxpmodule javax.xml.jaxp-provider org.jboss.as.standalone -Djboss.home.dir=/opt/eap -Djboss.server.base.dir=/opt/eap/standalone -c standalone-openshift.xml -bmanagement 127.0.0.1 -b 10.1.0.2 -Djboss.node.name=datavirt-1-h4p4o -Djboss.messaging.cluster.password=csmCRrAQ
+	sun.java.launcher = SUN_STANDARD
+	sun.jnu.encoding = ANSI_X3.4-1968
+	sun.management.compiler = HotSpot 64-Bit Tiered Compilers
+	sun.os.patch.level = unknown
+	user.country = US
+	user.dir = /home/jboss
+	user.home = /home/jboss
+	user.language = en
+	user.name = jboss
+	user.timezone = America/New_York
+[0m[32m16:11:01,004 DEBUG [org.jboss.as.config] (MSC service thread 1-8) VM Arguments: -Duser.home=/home/jboss -Duser.name=jboss -D[Standalone] -XX:+UseCompressedOops -verbose:gc -Xloggc:/opt/eap/standalone/log/gc.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=3M -XX:-TraceClassUnloading -Xms1303m -Xmx1303m -Djava.net.preferIPv4Stack=true -Djboss.modules.system.pkgs=org.jboss.logmanager -Djava.awt.headless=true -Djboss.modules.policy-permissions=true -Xbootclasspath/p:/opt/eap/jboss-modules.jar:/opt/eap/modules/system/layers/base/org/jboss/logmanager/main/jboss-logmanager-1.5.4.Final-redhat-1.jar:/opt/eap/modules/system/layers/base/org/jboss/logmanager/ext/main/javax.json-1.0.4.jar:/opt/eap/modules/system/layers/base/org/jboss/logmanager/ext/main/jboss-logmanager-ext-1.0.0.Alpha2-redhat-1.jar -Djava.util.logging.manager=org.jboss.logmanager.LogManager -javaagent:/opt/eap/jolokia.jar=port=8778,protocol=https,caCert=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt,clientPrincipal=cn=system:master-proxy,useSslClientAuthentication=true,extraClientCheck=true,host=0.0.0.0,discoveryEnabled=false -Djava.security.egd=file:/dev/./urandom -Dorg.jboss.boot.log.file=/opt/eap/standalone/log/server.log -Dlogging.configuration=file:/opt/eap/standalone/configuration/logging.properties 
+[0m[0m16:11:03,154 INFO  [org.jboss.as.server.deployment.scanner] (DeploymentScanner-threads - 1) JBAS015003: Found integration-platform-console.war in deployment directory. To trigger deployment create a file called integration-platform-console.war.dodeploy
+[0m[0m16:11:03,245 INFO  [org.jboss.as.repository] (ServerService Thread Pool -- 28) JBAS014900: Content added at location /opt/eap/standalone/data/content/fd/c7b127aecb9161f1f674f7581a89c56620694a/content
+[0m[0m16:11:03,290 INFO  [org.jboss.as.repository] (ServerService Thread Pool -- 28) JBAS014900: Content added at location /opt/eap/standalone/data/content/62/0dbdd88f84e855f4635e9cd2ccd89f09cbd676/content
+[0m[0m16:11:03,403 INFO  [org.jboss.as.repository] (ServerService Thread Pool -- 28) JBAS014900: Content added at location /opt/eap/standalone/data/content/59/687c42f4045d778d7322b335028316764f35e8/content
+[0m[0m16:11:03,502 INFO  [org.jboss.security] (Controller Boot Thread) PBOX000361: Default Security Vault Implementation Initialized and Ready
+[0m[0m16:11:03,513 INFO  [org.xnio] (MSC service thread 1-3) XNIO Version 3.0.14.GA-redhat-1
+[0m[0m16:11:03,519 INFO  [org.jboss.as.server] (Controller Boot Thread) JBAS015888: Creating http management service using socket-binding (management-http)
+[0m[0m16:11:03,522 INFO  [org.xnio.nio] (MSC service thread 1-3) XNIO NIO Implementation Version 3.0.14.GA-redhat-1
+[0m[0m16:11:03,539 INFO  [org.jboss.remoting] (MSC service thread 1-3) JBoss Remoting version 3.3.5.Final-redhat-1
+[0m[0m16:11:03,600 INFO  [org.jboss.as.clustering.infinispan] (ServerService Thread Pool -- 35) JBAS010280: Activating Infinispan subsystem.
+[0m[0m16:11:03,623 INFO  [org.jboss.as.clustering.jgroups] (ServerService Thread Pool -- 39) JBAS010260: Activating JGroups subsystem.
+[0m[0m16:11:03,678 INFO  [org.jboss.as.connector.logging] (MSC service thread 1-1) JBAS010408: Starting JCA Subsystem (IronJacamar 1.0.32.Final-redhat-1)
+[0m[0m16:11:03,716 INFO  [org.jboss.as.jsf] (ServerService Thread Pool -- 42) JBAS012615: Activated the following JSF Implementations: [main, 1.2]
+[0m[0m16:11:03,718 INFO  [org.jboss.as.security] (ServerService Thread Pool -- 50) JBAS013371: Activating Security Subsystem
+[0m[0m16:11:03,751 INFO  [org.jboss.as.naming] (ServerService Thread Pool -- 45) JBAS011800: Activating Naming Subsystem
+[0m[0m16:11:03,784 INFO  [org.jboss.as.security] (MSC service thread 1-6) JBAS013370: Current PicketBox version=4.1.1.Final-redhat-1
+[0m[0m16:11:03,843 INFO  [org.jboss.as.webservices] (ServerService Thread Pool -- 54) JBAS015537: Activating WebServices Extension
+[0m[0m16:11:03,866 INFO  [org.jboss.as.connector.subsystems.datasources] (ServerService Thread Pool -- 31) JBAS010403: Deploying JDBC-compliant driver class org.h2.Driver (version 1.3)
+[0m[0m16:11:03,928 INFO  [org.jboss.as.naming] (MSC service thread 1-4) JBAS011802: Starting Naming Service
+[0m[0m16:11:03,951 INFO  [org.jboss.as.mail.extension] (MSC service thread 1-7) JBAS015400: Bound mail session [java:jboss/mail/Default]
+[0m[0m16:11:03,992 INFO  [org.jboss.as.connector.subsystems.datasources] (ServerService Thread Pool -- 31) JBAS010404: Deploying non-JDBC-compliant driver class com.mysql.jdbc.Driver (version 5.1)
+[0m[0m16:11:04,001 INFO  [org.jboss.as.connector.subsystems.datasources] (ServerService Thread Pool -- 31) JBAS010404: Deploying non-JDBC-compliant driver class org.postgresql.Driver (version 9.2)
+[0m[0m16:11:04,041 INFO  [org.modeshape.common.logging.LogFactory] (ServerService Thread Pool -- 56) SLF4J implementation located in the classpath. It will be used by ModeShape for logging.
+[0m[0m16:11:04,074 INFO  [org.jboss.as.connector.subsystems.datasources] (ServerService Thread Pool -- 31) JBAS010404: Deploying non-JDBC-compliant driver class org.modeshape.jdbc.LocalJcrDriver (version 3.8)
+[0m[0m16:11:04,093 INFO  [org.jboss.as.connector.subsystems.datasources] (ServerService Thread Pool -- 31) JBAS010404: Deploying non-JDBC-compliant driver class org.teiid.jdbc.TeiidDriver (version 8.12)
+[0m[0m16:11:04,093 INFO  [org.jboss.as.connector.subsystems.datasources] (ServerService Thread Pool -- 31) JBAS010404: Deploying non-JDBC-compliant driver class org.teiid.jdbc.TeiidDriver (version 8.12)
+[0m[0m16:11:04,327 INFO  [org.jboss.as.connector.subsystems.datasources] (ServerService Thread Pool -- 31) JBAS010403: Deploying JDBC-compliant driver class oracle.jdbc.OracleDriver (version 11.2)
+[0m[0m16:11:04,387 INFO  [org.apache.coyote.http11.Http11Protocol] (MSC service thread 1-5) JBWEB003001: Coyote HTTP/1.1 initializing on : http-/10.1.0.2:8080
+[0m[0m16:11:04,459 INFO  [org.apache.coyote.http11.Http11Protocol] (MSC service thread 1-5) JBWEB003000: Coyote HTTP/1.1 starting on: http-/10.1.0.2:8080
+[0m[0m16:11:04,655 INFO  [org.jgroups.protocols.openshift.KUBE_PING] (MSC service thread 1-6) namespace [demo] set; clustering enabled
+[0m[0m16:11:04,668 INFO  [org.infinispan.configuration.cache.EvictionConfigurationBuilder] (ServerService Thread Pool -- 35) ISPN000152: Passivation configured without an eviction policy being selected. Only manually evicted entities will be passivated.
+[0m[0m16:11:04,674 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-2) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/ldap/main/
+[0m[0m16:11:04,674 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-3) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/google/main/
+[0m[0m16:11:04,675 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-4) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/file/main/
+[0m[0m16:11:04,675 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-7) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/file/main/
+[0m[0m16:11:04,676 INFO  [org.infinispan.configuration.cache.EvictionConfigurationBuilder] (ServerService Thread Pool -- 35) ISPN000152: Passivation configured without an eviction policy being selected. Only manually evicted entities will be passivated.
+[0m[0m16:11:04,755 INFO  [org.jboss.ws.common.management] (MSC service thread 1-1) JBWS022052: Starting JBoss Web Services - Stack CXF Server 4.3.5.Final-redhat-3
+[0m[0m16:11:04,768 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-3) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/file/main/
+[0m[0m16:11:04,769 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-3) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/file/main/
+[0m[0m16:11:04,771 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-4) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/webservice/main/
+[0m[0m16:11:04,775 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-2) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/salesforce/main/
+[0m[0m16:11:04,789 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-7) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/google/main/
+[0m[0m16:11:04,791 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-1) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/file/main/
+[0m[0m16:11:04,807 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-7) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/google/main/
+[0m[0m16:11:04,810 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-7) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/file/main/
+[0m[0m16:11:04,823 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-2) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/file/main/
+[0m[0m16:11:04,824 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-2) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/file/main/
+[0m[0m16:11:04,826 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-2) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/file/main/
+[0m[0m16:11:04,832 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-8) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/ldap/main/
+[0m[0m16:11:04,832 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-8) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/ldap/main/
+[0m[0m16:11:04,845 INFO  [org.jboss.as.connector.deployment] (MSC service thread 1-7) JBAS010406: Registered connection factory java:/test-file
+[0m[0m16:11:04,852 INFO  [org.jboss.as.connector.deployment] (MSC service thread 1-1) JBAS010406: Registered connection factory java:/marketdata-file
+[0m[0m16:11:04,852 INFO  [org.jboss.as.connector.deployment] (MSC service thread 1-2) JBAS010406: Registered connection factory java:/excel-file
+[0m[0m16:11:04,861 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-1) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/file/main/
+[0m[0m16:11:04,863 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-1) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/webservice/main/
+[0m[0m16:11:04,863 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-7) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/file/main/
+[0m[0m16:11:04,864 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-7) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/mongodb/main/
+[0m[0m16:11:04,870 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-5) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/accumulo/main/
+[0m[0m16:11:04,870 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-3) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/salesforce/main/
+[0m[0m16:11:05,168 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-3) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/salesforce/main/
+[0m[0m16:11:05,175 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-2) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/file/main/
+[0m[0m16:11:05,189 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-3) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/webservice/main/
+[0m[0m16:11:05,201 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-2) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/webservice/main/
+[0m[0m16:11:05,202 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-2) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/webservice/main/
+[0m[0m16:11:05,208 INFO  [org.jboss.as.connector.subsystems.datasources] (MSC service thread 1-8) JBAS010400: Bound data source [java:jboss/datasources/DashboardDS]
+[0m[0m16:11:05,208 INFO  [org.jboss.as.connector.subsystems.datasources] (MSC service thread 1-8) JBAS010400: Bound data source [java:/oracle-ds]
+[0m[0m16:11:05,215 INFO  [org.jboss.as.connector.subsystems.datasources] (MSC service thread 1-2) JBAS010400: Bound data source [java:/datasources/ModeShapeDS]
+[0m[0m16:11:05,219 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-8) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/mongodb/main/
+[0m[0m16:11:05,220 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-8) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/mongodb/main/
+[0m[0m16:11:05,222 INFO  [org.jboss.as.connector.deployment] (MSC service thread 1-3) JBAS010406: Registered connection factory java:/CustomerRESTWebSvcSource
+[0m[0m16:11:05,223 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-3) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/webservice/main/
+[0m[0m16:11:05,226 INFO  [org.jboss.as.connector.deployment] (MSC service thread 1-5) JBAS010401: Bound JCA ConnectionFactory [java:/test-file]
+[0m[0m16:11:05,227 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-5) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/accumulo/main/
+[0m[0m16:11:05,228 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-5) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/accumulo/main/
+[0m[0m16:11:05,238 INFO  [org.jboss.as.connector.deployment] (MSC service thread 1-7) JBAS010401: Bound JCA ConnectionFactory [java:/excel-file]
+[0m[0m16:11:05,247 INFO  [org.jboss.as.connector.deployment] (MSC service thread 1-6) JBAS010401: Bound JCA ConnectionFactory [java:/marketdata-file]
+[0m[0m16:11:05,257 INFO  [org.jboss.as.connector.deployment] (MSC service thread 1-2) JBAS010401: Bound JCA ConnectionFactory [java:/CustomerRESTWebSvcSource]
+[0m[0m16:11:05,405 INFO  [org.modeshape.jcr.JcrRepository] (MSC service thread 1-4) ModeShape version 3.8.4.GA-redhat-10
+[0m[0m16:11:05,460 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 58) HQ221000: live server is starting with configuration HornetQ Configuration (clustered=true,backup=false,sharedStore=true,journalDirectory=/opt/eap/standalone/data/messagingjournal,bindingsDirectory=/opt/eap/standalone/data/messagingbindings,largeMessagesDirectory=/opt/eap/standalone/data/messaginglargemessages,pagingDirectory=/opt/eap/standalone/data/messagingpaging)
+[0m[0m16:11:05,467 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 58) HQ221006: Waiting to obtain live lock
+[0m[0m16:11:05,560 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 58) HQ221013: Using NIO Journal
+[0m[0m16:11:05,773 INFO  [org.infinispan.factories.GlobalComponentRegistry] (ServerService Thread Pool -- 59) ISPN000128: Infinispan version: Infinispan 'Delirium' 5.2.15.Final
+[0m[0m16:11:05,778 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 58) HQ221034: Waiting to obtain live lock
+[0m[0m16:11:05,779 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 58) HQ221035: Live Server Obtained live lock
+[0m[0m16:11:05,880 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "jdbc-simple" added.
+[0m[0m16:11:05,900 INFO  [org.infinispan.factories.TransactionManagerFactory] (ServerService Thread Pool -- 60) ISPN000161: Using a batchMode transaction manager
+[0m[0m16:11:05,904 INFO  [org.infinispan.factories.TransactionManagerFactory] (ServerService Thread Pool -- 59) ISPN000161: Using a batchMode transaction manager
+[0m[0m16:11:05,905 INFO  [org.infinispan.factories.TransactionManagerFactory] (ServerService Thread Pool -- 62) ISPN000161: Using a batchMode transaction manager
+[0m[0m16:11:05,907 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "jdbc-ansi" added.
+[0m[0m16:11:05,923 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "access" added.
+[0m[0m16:11:05,943 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "db2" added.
+[0m[0m16:11:05,964 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "derby" added.
+[0m[0m16:11:06,069 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "h2" added.
+[0m[0m16:11:06,121 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "hsql" added.
+[0m[0m16:11:06,137 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "informix" added.
+[0m[0m16:11:06,164 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "metamatrix" added.
+[0m[0m16:11:06,207 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "mysql" added.
+[0m[0m16:11:06,228 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "mysql5" added.
+[0m[0m16:11:06,265 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "oracle" added.
+[0m[0m16:11:06,286 INFO  [org.infinispan.jmx.CacheJmxRegistration] (ServerService Thread Pool -- 60) ISPN000031: MBeans were successfully registered to the platform MBean server.
+[0m[0m16:11:06,290 INFO  [org.infinispan.jmx.CacheJmxRegistration] (ServerService Thread Pool -- 62) ISPN000031: MBeans were successfully registered to the platform MBean server.
+[0m[0m16:11:06,291 INFO  [org.jboss.as.clustering.infinispan] (ServerService Thread Pool -- 60) JBAS010281: Started preparedplan cache from teiid-cache container
+[0m[0m16:11:06,292 INFO  [org.infinispan.jmx.CacheJmxRegistration] (ServerService Thread Pool -- 59) ISPN000031: MBeans were successfully registered to the platform MBean server.
+[0m[0m16:11:06,292 INFO  [org.jboss.as.clustering.infinispan] (ServerService Thread Pool -- 59) JBAS010281: Started resultset cache from teiid-cache container
+[0m[0m16:11:06,297 INFO  [org.jboss.as.clustering.infinispan] (ServerService Thread Pool -- 62) JBAS010281: Started resultset-repl cache from teiid-cache container
+[0m[0m16:11:06,316 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "postgresql" added.
+[0m[0m16:11:06,359 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "greenplum" added.
+[0m[0m16:11:06,384 INFO  [org.teiid.RUNTIME] (MSC service thread 1-8) TEIID50001 Teiid Engine 8.12.5.redhat-8 Started = Mon Aug 22 16:11:06 EDT 2016
+[0m[0m16:11:06,392 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "sqlserver" added.
+[0m[0m16:11:06,403 INFO  [org.teiid.RUNTIME] (MSC service thread 1-8) TEIID50038 Teiid Embedded transport enabled. Bound to: teiid/queryengine/embedded
+[0m[0m16:11:06,404 INFO  [org.teiid.RUNTIME] (MSC service thread 1-1) TEIID50038 Teiid Embedded transport enabled. Bound to: teiid/queryengine/odata
+[0m[0m16:11:06,427 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "sybase" added.
+[0m[0m16:11:06,486 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "teiid" added.
+[0m[0m16:11:06,510 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "teradata" added.
+[0m[0m16:11:06,518 INFO  [org.teiid.RUNTIME] (MSC service thread 1-6) TEIID50012 Teiid JDBC - Name = jdbc, Host = datavirt-1-h4p4o,  Port = 31000, SSL = OFF, security-domains = teiid-security
+[0m[0m16:11:06,525 INFO  [org.teiid.RUNTIME] (MSC service thread 1-4) TEIID50037 Teiid ODBC - Name = odbc, Host = datavirt-1-h4p4o,  Port = 35432, SSL = OFF, security-domains = teiid-security
+[0m[0m16:11:06,535 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "modeshape" added.
+[0m[0m16:11:06,545 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "ingres" added.
+[0m[0m16:11:06,552 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "ingres93" added.
+[0m[0m16:11:06,563 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "intersystems-cache" added.
+[0m[0m16:11:06,576 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "netezza" added.
+[0m[0m16:11:06,611 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "file" added.
+[0m[0m16:11:06,661 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "ldap" added.
+[0m[0m16:11:06,673 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "loopback" added.
+[0m[0m16:11:06,681 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "olap" added.
+[0m[0m16:11:06,702 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 58) HQ221020: Started Netty Acceptor version 3.6.10.Final-266dbdf 10.1.0.2:5445 for CORE protocol
+[0m[0m16:11:06,708 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 58) HQ221020: Started Netty Acceptor version 3.6.10.Final-266dbdf 10.1.0.2:5455 for CORE protocol
+[0m[0m16:11:06,717 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "ws" added.
+[0m[0m16:11:06,738 INFO  [org.jgroups.protocols.openshift.KUBE_PING] (ServerService Thread Pool -- 58) Starting JBossServer on port 8888 for channel address: datavirt-1-h4p4o/hornetq-channel
+[0m[0m16:11:06,745 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "salesforce" added.
+[0m[0m16:11:06,761 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "hive" added.
+[0m[0m16:11:06,762 INFO  [org.jgroups.protocols.openshift.KUBE_PING] (ServerService Thread Pool -- 58) JBossServer started.
+[0m[0m16:11:06,770 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "google-spreadsheet" added.
+[0m[0m16:11:06,782 INFO  [stdout] (ServerService Thread Pool -- 58) 
+[0m[0m16:11:06,782 INFO  [stdout] (ServerService Thread Pool -- 58) -------------------------------------------------------------------
+[0m[0m16:11:06,782 INFO  [stdout] (ServerService Thread Pool -- 58) GMS: address=datavirt-1-h4p4o/hornetq-channel, cluster=hornetq-channel, physical address=10.1.0.2:7600
+[0m[0m16:11:06,782 INFO  [stdout] (ServerService Thread Pool -- 58) -------------------------------------------------------------------
+[0m[0m16:11:06,793 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "odata" added.
+[0m[0m16:11:06,796 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "sap-nw-gateway" added.
+[0m[0m16:11:06,869 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "mongodb" added.
+[0m[0m16:11:06,894 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "cassandra" added.
+[0m[0m16:11:06,923 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "accumulo" added.
+[0m[0m16:11:06,936 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "solr" added.
+[0m[0m16:11:06,991 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "excel" added.
+[0m[0m16:11:06,997 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "impala" added.
+[0m[0m16:11:07,018 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "hbase" added.
+[0m[0m16:11:07,024 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "hana" added.
+[0m[0m16:11:07,057 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "infinispan-cache-dsl" added.
+[0m[0m16:11:07,217 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "infinispan-cache" added.
+[0m[31m16:11:07,270 ERROR [org.jboss.as.controller.management-operation] (ServerService Thread Pool -- 57) JBAS014612: Operation ("add") failed - address: ([
+    ("subsystem" => "teiid"),
+    ("translator" => "testtranslator")
+]) - failure description: "TEIID50009 Translator \"testtranslator\" not found in the module \"org.jboss.teiid.translator.jdbc\" "
+[0m[0m16:11:07,356 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-3) JBAS015876: Starting deployment of "webservice-vdb.xml" (runtime-name: "webservice-vdb.xml")
+[0m[0m16:11:07,359 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-3) JBAS015876: Starting deployment of "teiid-olingo-odata4.war" (runtime-name: "teiid-olingo-odata4.war")
+[0m[0m16:11:07,359 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-3) JBAS015876: Starting deployment of "teiid-dashboard-builder.war" (runtime-name: "teiid-dashboard-builder.war")
+[0m[0m16:11:07,360 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-3) JBAS015876: Starting deployment of "modeshape-rest.war" (runtime-name: "modeshape-rest.war")
+[0m[0m16:11:07,360 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-3) JBAS015876: Starting deployment of "hibernate-portfolio-vdb.xml" (runtime-name: "hibernate-portfolio-vdb.xml")
+[0m[0m16:11:07,360 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-3) JBAS015876: Starting deployment of "CustomerRESTWebSvc.war" (runtime-name: "CustomerRESTWebSvc.war")
+[0m[0m16:11:07,360 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-3) JBAS015876: Starting deployment of "portfolio-vdb.xml" (runtime-name: "portfolio-vdb.xml")
+[0m[0m16:11:07,360 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-3) JBAS015876: Starting deployment of "teiid-odata.war" (runtime-name: "teiid-odata.war")
+[0m[0m16:11:07,362 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-1) JBAS015876: Starting deployment of "hibernate-on-top-of-teiid.war" (runtime-name: "hibernate-on-top-of-teiid.war")
+[0m[0m16:11:07,362 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-1) JBAS015876: Starting deployment of "modeshape-webdav.war" (runtime-name: "modeshape-webdav.war")
+[0m[0m16:11:07,362 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-1) JBAS015876: Starting deployment of "integration-platform-console.war" (runtime-name: "integration-platform-console.war")
+[0m[0m16:11:07,363 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-1) JBAS015876: Starting deployment of "ModeShape.vdb" (runtime-name: "ModeShape.vdb")
+[0m[0m16:11:07,379 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-2) JBAS015876: Starting deployment of "modeshape-cmis.war" (runtime-name: "modeshape-cmis.war")
+[0m[0m16:11:07,449 INFO  [org.jboss.as.server.deployment.scanner] (MSC service thread 1-3) JBAS015012: Started FileSystemDeploymentService for directory /opt/eap/standalone/deployments
+[0m[0m16:11:08,511 INFO  [org.jboss.as.jpa] (MSC service thread 1-4) JBAS011401: Read persistence.xml for teiidHibQS
+[0m[0m16:11:08,581 INFO  [org.jboss.as.remoting] (MSC service thread 1-1) JBAS017100: Listening on 127.0.0.1:9999
+[0m[0m16:11:08,586 INFO  [org.jboss.as.remoting] (MSC service thread 1-3) JBAS017100: Listening on 10.1.0.2:4447
+[0m[33m16:11:08,700 WARN  [org.jboss.as.connector.logging] (MSC service thread 1-4) JBAS010489: -ds.xml file deployments are deprecated. Support may be removed in a future version.
+[0m[33m16:11:08,819 WARN  [org.jboss.as.dependency.unsupported] (MSC service thread 1-1) JBAS015868: Deployment "deployment.teiid-odata.war" is using an unsupported module ("org.joda.time:main") which may be changed or removed in future versions without notice.
+[0m[31m16:11:08,824 ERROR [stderr] (MSC service thread 1-2) ScriptEngineManager providers.next(): javax.script.ScriptEngineFactory: Provider jdk.nashorn.api.scripting.NashornScriptEngineFactory not found
+[0m[31m16:11:08,828 ERROR [stderr] (MSC service thread 1-2) ScriptEngineManager providers.next(): javax.script.ScriptEngineFactory: Provider jdk.nashorn.api.scripting.NashornScriptEngineFactory not found
+[0m[31m16:11:08,883 ERROR [stderr] (MSC service thread 1-5) ScriptEngineManager providers.next(): javax.script.ScriptEngineFactory: Provider jdk.nashorn.api.scripting.NashornScriptEngineFactory not found
+[0m[31m16:11:08,884 ERROR [stderr] (MSC service thread 1-1) ScriptEngineManager providers.next(): javax.script.ScriptEngineFactory: Provider jdk.nashorn.api.scripting.NashornScriptEngineFactory not found
+[0m[31m16:11:08,884 ERROR [stderr] (MSC service thread 1-5) ScriptEngineManager providers.next(): javax.script.ScriptEngineFactory: Provider jdk.nashorn.api.scripting.NashornScriptEngineFactory not found
+[0m[31m16:11:08,884 ERROR [stderr] (MSC service thread 1-1) ScriptEngineManager providers.next(): javax.script.ScriptEngineFactory: Provider jdk.nashorn.api.scripting.NashornScriptEngineFactory not found
+[0m[31m16:11:08,885 ERROR [stderr] (MSC service thread 1-7) ScriptEngineManager providers.next(): javax.script.ScriptEngineFactory: Provider jdk.nashorn.api.scripting.NashornScriptEngineFactory not found
+[0m[31m16:11:08,885 ERROR [stderr] (MSC service thread 1-7) ScriptEngineManager providers.next(): javax.script.ScriptEngineFactory: Provider jdk.nashorn.api.scripting.NashornScriptEngineFactory not found
+[0m[33m16:11:08,966 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-8) JBAS015960: Class Path entry jaxws-api.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m16:11:08,966 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-8) JBAS015960: Class Path entry jsr181-api.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m16:11:08,966 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-8) JBAS015960: Class Path entry jsr250-api.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m16:11:08,967 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-8) JBAS015960: Class Path entry saaj-api.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m16:11:08,967 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-8) JBAS015960: Class Path entry saaj-impl.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m16:11:08,967 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-8) JBAS015960: Class Path entry jsr173_api.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m16:11:08,967 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-8) JBAS015960: Class Path entry sjsxp.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m16:11:08,967 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-8) JBAS015960: Class Path entry woodstox.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m16:11:08,968 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-8) JBAS015960: Class Path entry resolver.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m16:11:08,968 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-8) JBAS015960: Class Path entry jaxb-api.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m16:11:08,968 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-8) JBAS015960: Class Path entry jaxb-impl.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m16:11:08,968 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-8) JBAS015960: Class Path entry activation.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m16:11:08,968 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-8) JBAS015960: Class Path entry stax-ex.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m16:11:08,969 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-8) JBAS015960: Class Path entry streambuffer.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m16:11:08,969 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-8) JBAS015960: Class Path entry stax-utils.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[0m16:11:09,551 INFO  [org.teiid.RUNTIME.VDBLifeCycleListener] (MSC service thread 1-4) TEIID40118 VDB Portfolio.1 added to the repository
+[0m[0m16:11:09,604 INFO  [org.teiid.RUNTIME] (MSC service thread 1-4) TEIID50029 VDB Portfolio.1 model "MarketData" metadata is currently being loaded. Start Time: 8/22/16 4:11 PM
+[0m[0m16:11:09,620 INFO  [org.teiid.RUNTIME.VDBLifeCycleListener] (MSC service thread 1-1) TEIID40118 VDB ModeShape.1 added to the repository
+[0m[0m16:11:09,642 INFO  [org.teiid.RUNTIME] (MSC service thread 1-1) TEIID50029 VDB ModeShape.1 model "VDB_Lineage" metadata is currently being loaded. Start Time: 8/22/16 4:11 PM
+[0m[0m16:11:09,630 INFO  [org.teiid.RUNTIME.VDBLifeCycleListener] (MSC service thread 1-5) TEIID40118 VDB webservice.1 added to the repository
+[0m[0m16:11:09,642 INFO  [org.teiid.RUNTIME] (MSC service thread 1-5) TEIID50029 VDB webservice.1 model "CustomerSource" metadata is currently being loaded. Start Time: 8/22/16 4:11 PM
+[0m[0m16:11:09,647 INFO  [org.teiid.RUNTIME] (MSC service thread 1-4) TEIID50029 VDB Portfolio.1 model "Accounts" metadata is currently being loaded. Start Time: 8/22/16 4:11 PM
+[0m[0m16:11:09,647 INFO  [org.teiid.RUNTIME] (MSC service thread 1-1) TEIID50029 VDB ModeShape.1 model "Relational_Model_View" metadata is currently being loaded. Start Time: 8/22/16 4:11 PM
+[0m[0m16:11:09,696 INFO  [org.teiid.RUNTIME] (MSC service thread 1-1) TEIID50029 VDB ModeShape.1 model "ModeShape" metadata is currently being loaded. Start Time: 8/22/16 4:11 PM
+[0m[0m16:11:09,700 INFO  [org.teiid.RUNTIME] (MSC service thread 1-5) TEIID50029 VDB webservice.1 model "Customers" metadata is currently being loaded. Start Time: 8/22/16 4:11 PM
+[0m[33m16:11:09,701 WARN  [org.teiid.RUNTIME] (teiid-async-threads - 4) TEIID50036 VDB Portfolio.1 model "Accounts" metadata failed to load. Reason:TEIID31097 Metadata load requires a connection factory: TEIID30481 Failed to find the Connection Factory with JNDI name java:/accounts-ds. Please check the name or deploy the Connection Factory with specified name.: org.teiid.translator.TranslatorException: TEIID31097 Metadata load requires a connection factory
+	at org.teiid.query.metadata.NativeMetadataRepository.loadMetadata(NativeMetadataRepository.java:57)
+	at org.teiid.query.metadata.ChainingMetadataRepository.loadMetadata(ChainingMetadataRepository.java:55)
+	at org.teiid.jboss.VDBService$6.run(VDBService.java:395)
+	at org.teiid.jboss.VDBService$7.run(VDBService.java:446)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142) [rt.jar:1.8.0_101]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617) [rt.jar:1.8.0_101]
+	at java.lang.Thread.run(Thread.java:745) [rt.jar:1.8.0_101]
+	at org.jboss.threads.JBossThread.run(JBossThread.java:122)
+
+[0m[0m16:11:09,702 INFO  [org.teiid.RUNTIME] (MSC service thread 1-4) TEIID50029 VDB Portfolio.1 model "PersonalValuations" metadata is currently being loaded. Start Time: 8/22/16 4:11 PM
+[0m[0m16:11:09,710 INFO  [org.teiid.RUNTIME] (MSC service thread 1-4) TEIID50029 VDB Portfolio.1 model "Stocks" metadata is currently being loaded. Start Time: 8/22/16 4:11 PM
+[0m[0m16:11:09,713 INFO  [org.teiid.RUNTIME] (MSC service thread 1-4) TEIID50029 VDB Portfolio.1 model "OtherHoldings" metadata is currently being loaded. Start Time: 8/22/16 4:11 PM
+[0m[0m16:11:09,727 INFO  [org.teiid.RUNTIME] (MSC service thread 1-4) TEIID50029 VDB Portfolio.1 model "StocksMatModel" metadata is currently being loaded. Start Time: 8/22/16 4:11 PM
+[0m[0m16:11:09,782 INFO  [org.jboss.weld.deployer] (MSC service thread 1-8) JBAS016002: Processing weld deployment hibernate-on-top-of-teiid.war
+[0m[0m16:11:09,828 INFO  [org.jboss.as.connector.subsystems.datasources] (MSC service thread 1-7) JBAS010400: Bound data source [java:/jboss/datasources/Hibernate4TeiidQuickstartDS]
+[0m[0m16:11:09,845 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 3) TEIID50030 VDB webservice.1 model "CustomerSource" metadata loaded. End Time: 8/22/16 4:11 PM
+[0m[0m16:11:09,839 INFO  [org.jboss.as.ejb3.deployment.processors.EjbJndiBindingsDeploymentUnitProcessor] (MSC service thread 1-8) JNDI bindings for session bean named ProductRegistration in deployment unit deployment "hibernate-on-top-of-teiid.war" are as follows:
+
+	java:global/hibernate-on-top-of-teiid/ProductRegistration!com.client.quickstart.hibernate4.controller.ProductRegistration
+	java:app/hibernate-on-top-of-teiid/ProductRegistration!com.client.quickstart.hibernate4.controller.ProductRegistration
+	java:module/ProductRegistration!com.client.quickstart.hibernate4.controller.ProductRegistration
+	java:global/hibernate-on-top-of-teiid/ProductRegistration
+	java:app/hibernate-on-top-of-teiid/ProductRegistration
+	java:module/ProductRegistration
+
+[0m[0m16:11:09,857 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 1) TEIID50030 VDB Portfolio.1 model "MarketData" metadata loaded. End Time: 8/22/16 4:11 PM
+[0m[0m16:11:09,874 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 1) TEIID50030 VDB webservice.1 model "Customers" metadata loaded. End Time: 8/22/16 4:11 PM
+[0m[33m16:11:09,965 WARN  [org.jboss.as.dependency.private] (MSC service thread 1-1) JBAS015867: Deployment "deployment.modeshape-cmis.war" is using a private module ("com.sun.xml.messaging.saaj:main") which may be changed or removed in future versions without notice.
+[0m[33m16:11:09,966 WARN  [org.jboss.as.dependency.private] (MSC service thread 1-1) JBAS015867: Deployment "deployment.modeshape-cmis.war" is using a private module ("com.sun.xml.messaging.saaj:main") which may be changed or removed in future versions without notice.
+[0m[0m16:11:09,995 INFO  [org.jboss.web] (ServerService Thread Pool -- 60) JBAS018210: Register web context: 
+[0m[0m16:11:10,002 INFO  [org.jboss.web] (ServerService Thread Pool -- 71) JBAS018210: Register web context: /odata
+[0m[0m16:11:09,995 INFO  [org.jboss.web] (ServerService Thread Pool -- 64) JBAS018210: Register web context: /modeshape-rest
+[0m[0m16:11:10,002 INFO  [org.jboss.web] (ServerService Thread Pool -- 70) JBAS018210: Register web context: /CustomerRESTWebSvc
+[0m[0m16:11:09,995 INFO  [org.jboss.web] (ServerService Thread Pool -- 72) JBAS018210: Register web context: /odata4
+[0m[0m16:11:10,002 INFO  [org.jboss.web] (ServerService Thread Pool -- 63) JBAS018210: Register web context: /modeshape-webdav
+[0m[0m16:11:10,224 INFO  [org.jboss.web] (ServerService Thread Pool -- 69) JBAS018210: Register web context: /modeshape-cmis
+[0m[0m16:11:10,318 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 2) TEIID50030 VDB ModeShape.1 model "VDB_Lineage" metadata loaded. End Time: 8/22/16 4:11 PM
+[0m[0m16:11:10,351 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 58) HQ221007: Server is now live
+[0m[0m16:11:10,351 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 58) HQ221001: HornetQ Server version 2.3.25.SP3 (2.3.x, 123) [8e630ce7-68a4-11e6-8710-05e4702dcfa8] 
+[0m[0m16:11:10,356 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 3) TEIID50030 VDB ModeShape.1 model "ModeShape" metadata loaded. End Time: 8/22/16 4:11 PM
+[0m[0m16:11:10,357 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 4) TEIID50030 VDB ModeShape.1 model "Relational_Model_View" metadata loaded. End Time: 8/22/16 4:11 PM
+[0m[0m16:11:10,376 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 58) HQ221003: trying to deploy queue jms.queue.ExpiryQueue
+[0m[0m16:11:10,478 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 2) TEIID50030 VDB Portfolio.1 model "PersonalValuations" metadata loaded. End Time: 8/22/16 4:11 PM
+[0m[0m16:11:10,482 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 2) TEIID50030 VDB Portfolio.1 model "Stocks" metadata loaded. End Time: 8/22/16 4:11 PM
+[0m[0m16:11:10,516 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 2) TEIID50030 VDB Portfolio.1 model "OtherHoldings" metadata loaded. End Time: 8/22/16 4:11 PM
+[0m[0m16:11:10,528 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 2) TEIID50030 VDB Portfolio.1 model "StocksMatModel" metadata loaded. End Time: 8/22/16 4:11 PM
+[0m[0m16:11:10,592 INFO  [org.jboss.weld.deployer] (MSC service thread 1-8) JBAS016005: Starting Services for CDI deployment: hibernate-on-top-of-teiid.war
+[0m[33m16:11:10,681 WARN  [org.jboss.as.dependency.unsupported] (MSC service thread 1-6) JBAS015868: Deployment "deployment.teiid-dashboard-builder.war" is using an unsupported module ("org.dom4j:main") which may be changed or removed in future versions without notice.
+[0m[33m16:11:10,682 WARN  [org.jboss.as.dependency.unsupported] (MSC service thread 1-6) JBAS015868: Deployment "deployment.teiid-dashboard-builder.war" is using an unsupported module ("org.dom4j:main") which may be changed or removed in future versions without notice.
+[0m[33m16:11:10,682 WARN  [org.jboss.as.dependency.unsupported] (MSC service thread 1-6) JBAS015868: Deployment "deployment.teiid-dashboard-builder.war" is using an unsupported module ("org.jdom:main") which may be changed or removed in future versions without notice.
+[0m[33m16:11:10,682 WARN  [org.jboss.as.dependency.unsupported] (MSC service thread 1-6) JBAS015868: Deployment "deployment.teiid-dashboard-builder.war" is using an unsupported module ("org.jdom:main") which may be changed or removed in future versions without notice.
+[0m[33m16:11:10,682 WARN  [org.jboss.as.dependency.private] (MSC service thread 1-6) JBAS015867: Deployment "deployment.teiid-dashboard-builder.war" is using a private module ("org.apache.commons.lang:main") which may be changed or removed in future versions without notice.
+[0m[33m16:11:10,682 WARN  [org.jboss.as.dependency.private] (MSC service thread 1-6) JBAS015867: Deployment "deployment.teiid-dashboard-builder.war" is using a private module ("org.apache.commons.lang:main") which may be changed or removed in future versions without notice.
+[0m[33m16:11:10,682 WARN  [org.jboss.as.dependency.private] (MSC service thread 1-6) JBAS015867: Deployment "deployment.teiid-dashboard-builder.war" is using a private module ("org.apache.commons.io:main") which may be changed or removed in future versions without notice.
+[0m[33m16:11:10,682 WARN  [org.jboss.as.dependency.private] (MSC service thread 1-6) JBAS015867: Deployment "deployment.teiid-dashboard-builder.war" is using a private module ("org.apache.commons.io:main") which may be changed or removed in future versions without notice.
+[0m[33m16:11:10,682 WARN  [org.jboss.as.dependency.private] (MSC service thread 1-6) JBAS015867: Deployment "deployment.teiid-dashboard-builder.war" is using a private module ("org.apache.commons.collections:main") which may be changed or removed in future versions without notice.
+[0m[33m16:11:10,682 WARN  [org.jboss.as.dependency.private] (MSC service thread 1-6) JBAS015867: Deployment "deployment.teiid-dashboard-builder.war" is using a private module ("org.apache.commons.collections:main") which may be changed or removed in future versions without notice.
+[0m[33m16:11:10,682 WARN  [org.jboss.as.dependency.private] (MSC service thread 1-6) JBAS015867: Deployment "deployment.teiid-dashboard-builder.war" is using a private module ("org.apache.commons.codec:main") which may be changed or removed in future versions without notice.
+[0m[33m16:11:10,682 WARN  [org.jboss.as.dependency.private] (MSC service thread 1-6) JBAS015867: Deployment "deployment.teiid-dashboard-builder.war" is using a private module ("org.apache.commons.codec:main") which may be changed or removed in future versions without notice.
+[0m[33m16:11:10,682 WARN  [org.jboss.as.dependency.private] (MSC service thread 1-6) JBAS015867: Deployment "deployment.teiid-dashboard-builder.war" is using a private module ("org.jboss.ironjacamar.jdbcadapters:main") which may be changed or removed in future versions without notice.
+[0m[33m16:11:10,682 WARN  [org.jboss.as.dependency.private] (MSC service thread 1-6) JBAS015867: Deployment "deployment.teiid-dashboard-builder.war" is using a private module ("org.jboss.ironjacamar.jdbcadapters:main") which may be changed or removed in future versions without notice.
+[0m[0m16:11:10,723 INFO  [org.jboss.as.connector.deployment] (MSC service thread 1-5) JBAS010406: Registered connection factory java:/JmsXA
+[0m[0m16:11:10,785 INFO  [org.jboss.as.messaging] (ServerService Thread Pool -- 58) JBAS011601: Bound messaging object to jndi name java:/jms/queue/ExpiryQueue
+[0m[0m16:11:10,828 INFO  [org.jboss.as.messaging] (ServerService Thread Pool -- 68) JBAS011601: Bound messaging object to jndi name java:/ConnectionFactory
+[0m[0m16:11:10,851 INFO  [org.jboss.as.messaging] (ServerService Thread Pool -- 62) JBAS011601: Bound messaging object to jndi name java:jboss/exported/jms/RemoteConnectionFactory
+[0m[0m16:11:10,851 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 61) HQ221003: trying to deploy queue jms.queue.DLQ
+[0m[0m16:11:10,881 INFO  [org.jboss.as.messaging] (ServerService Thread Pool -- 61) JBAS011601: Bound messaging object to jndi name java:/jms/queue/DLQ
+[0m[0m16:11:10,943 INFO  [org.hibernate.validator.internal.util.Version] (ServerService Thread Pool -- 70) HV000001: Hibernate Validator 4.3.2.Final-redhat-2
+[0m[0m16:11:11,018 INFO  [org.jboss.weld.deployer] (MSC service thread 1-6) JBAS016002: Processing weld deployment teiid-dashboard-builder.war
+[0m[0m16:11:11,028 INFO  [org.teiid.RUNTIME.VDBLifeCycleListener] (teiid-async-threads - 3) TEIID40003 VDB ModeShape.1 is set to ACTIVE
+[0m[0m16:11:11,059 INFO  [org.hornetq.ra] (MSC service thread 1-5) HornetQ resource adaptor started
+[0m[0m16:11:11,059 INFO  [org.jboss.as.connector.services.resourceadapters.ResourceAdapterActivatorService$ResourceAdapterActivator] (MSC service thread 1-5) IJ020002: Deployed: file://RaActivatorhornetq-ra
+[0m[0m16:11:11,060 INFO  [org.jboss.as.connector.deployment] (MSC service thread 1-5) JBAS010401: Bound JCA ConnectionFactory [java:/JmsXA]
+[0m[0m16:11:11,123 INFO  [org.jboss.weld.deployer] (MSC service thread 1-6) JBAS016005: Starting Services for CDI deployment: teiid-dashboard-builder.war
+[0m[0m16:11:11,131 INFO  [org.apache.chemistry.opencmis.jcr.JcrTypeManager] (ServerService Thread Pool -- 69) Added type 'cmis:folder'.
+[0m[0m16:11:11,146 INFO  [org.apache.chemistry.opencmis.jcr.JcrTypeManager] (ServerService Thread Pool -- 69) Added type 'cmis:document'.
+[0m[0m16:11:11,149 INFO  [org.apache.chemistry.opencmis.jcr.JcrTypeManager] (ServerService Thread Pool -- 69) Added type 'cmis:unversioned-document'.
+[0m[0m16:11:11,162 INFO  [org.jboss.weld.Version] (MSC service thread 1-8) WELD-000900 1.1.31 (redhat)
+[0m[0m16:11:11,180 INFO  [org.jboss.weld.deployer] (MSC service thread 1-7) JBAS016008: Starting weld service for deployment teiid-dashboard-builder.war
+[0m[0m16:11:11,183 INFO  [stdout] (ServerService Thread Pool -- 69) --- loaded repository dv
+[0m[0m16:11:11,201 INFO  [javax.enterprise.resource.webservices.jaxws.server.http] (ServerService Thread Pool -- 69) WSSERVLET12: JAX-WS context listener initializing
+[0m[0m16:11:11,207 INFO  [org.jboss.weld.deployer] (MSC service thread 1-5) JBAS016008: Starting weld service for deployment hibernate-on-top-of-teiid.war
+[0m[0m16:11:11,210 INFO  [org.jboss.as.jpa] (ServerService Thread Pool -- 61) JBAS011402: Starting Persistence Unit Service 'hibernate-on-top-of-teiid.war#teiidHibQS'
+[0m[0m16:11:11,425 INFO  [org.teiid.RUNTIME.VDBLifeCycleListener] (teiid-async-threads - 1) TEIID40003 VDB webservice.1 is set to ACTIVE
+[0m[0m16:11:11,896 INFO  [org.jboss.resteasy.resteasy_jaxrs.i18n] (ServerService Thread Pool -- 71) RESTEASY000320: Deploying javax.ws.rs.core.Application: class org.teiid.odata.TeiidODataApplication
+[0m[0m16:11:11,898 INFO  [org.jboss.resteasy.resteasy_jaxrs.i18n] (ServerService Thread Pool -- 64) RESTEASY000320: Deploying javax.ws.rs.core.Application: class org.modeshape.web.jcr.rest.JcrApplication
+[0m[0m16:11:11,909 INFO  [org.jboss.resteasy.resteasy_jaxrs.i18n] (ServerService Thread Pool -- 70) RESTEASY000320: Deploying javax.ws.rs.core.Application: class org.jboss.samples.rs.webservices.MyRESTApplication
+[0m[0m16:11:11,915 INFO  [org.jboss.resteasy.resteasy_jaxrs.i18n] (ServerService Thread Pool -- 70) RESTEASY000315: Adding singleton resource org.jboss.samples.rs.webservices.CustomersResource from Application javax.ws.rs.core.Application
+[0m[0m16:11:12,002 INFO  [org.hibernate.annotations.common.Version] (ServerService Thread Pool -- 61) HCANN000001: Hibernate Commons Annotations {4.0.2.Final-redhat-1}
+[0m[0m16:11:12,049 INFO  [org.hibernate.Version] (ServerService Thread Pool -- 61) HHH000412: Hibernate Core {4.2.20.Final-redhat-1}
+[0m[0m16:11:12,060 INFO  [org.hibernate.cfg.Environment] (ServerService Thread Pool -- 61) HHH000206: hibernate.properties not found
+[0m[0m16:11:12,062 INFO  [org.hibernate.cfg.Environment] (ServerService Thread Pool -- 61) HHH000021: Bytecode provider name : javassist
+[0m[0m16:11:12,118 INFO  [org.hibernate.ejb.Ejb3Configuration] (ServerService Thread Pool -- 61) HHH000204: Processing PersistenceUnitInfo [
+	name: teiidHibQS
+	...]
+[0m[0m16:11:12,379 INFO  [org.hibernate.service.jdbc.connections.internal.ConnectionProviderInitiator] (ServerService Thread Pool -- 61) HHH000130: Instantiating explicit connection provider: org.hibernate.ejb.connection.InjectedDataSourceConnectionProvider
+[0m[33m16:11:12,590 WARN  [org.jboss.jca.core.connectionmanager.pool.strategy.OnePool] (ServerService Thread Pool -- 61) IJ000604: Throwable while attempting to get a new connection: null: javax.resource.ResourceException: Could not create connection
+	at org.jboss.jca.adapters.jdbc.local.LocalManagedConnectionFactory.getLocalManagedConnection(LocalManagedConnectionFactory.java:351)
+	at org.jboss.jca.adapters.jdbc.local.LocalManagedConnectionFactory.createManagedConnection(LocalManagedConnectionFactory.java:299)
+	at org.jboss.jca.core.connectionmanager.pool.mcp.SemaphoreArrayListManagedConnectionPool.createConnectionEventListener(SemaphoreArrayListManagedConnectionPool.java:873)
+	at org.jboss.jca.core.connectionmanager.pool.mcp.SemaphoreArrayListManagedConnectionPool.getConnection(SemaphoreArrayListManagedConnectionPool.java:418)
+	at org.jboss.jca.core.connectionmanager.pool.AbstractPool.getSimpleConnection(AbstractPool.java:467)
+	at org.jboss.jca.core.connectionmanager.pool.AbstractPool.getConnection(AbstractPool.java:439)
+	at org.jboss.jca.core.connectionmanager.AbstractConnectionManager.getManagedConnection(AbstractConnectionManager.java:354)
+	at org.jboss.jca.core.connectionmanager.tx.TxConnectionManagerImpl.getManagedConnection(TxConnectionManagerImpl.java:368)
+	at org.jboss.jca.core.connectionmanager.AbstractConnectionManager.allocateConnection(AbstractConnectionManager.java:510)
+	at org.jboss.jca.adapters.jdbc.WrapperDataSource.getConnection(WrapperDataSource.java:143)
+	at org.hibernate.ejb.connection.InjectedDataSourceConnectionProvider.getConnection(InjectedDataSourceConnectionProvider.java:70)
+	at org.hibernate.engine.jdbc.internal.JdbcServicesImpl$ConnectionProviderJdbcConnectionAccess.obtainConnection(JdbcServicesImpl.java:242)
+	at org.hibernate.engine.jdbc.internal.JdbcServicesImpl.configure(JdbcServicesImpl.java:117)
+	at org.hibernate.service.internal.StandardServiceRegistryImpl.configureService(StandardServiceRegistryImpl.java:85)
+	at org.hibernate.service.internal.AbstractServiceRegistryImpl.initializeService(AbstractServiceRegistryImpl.java:184)
+	at org.hibernate.service.internal.AbstractServiceRegistryImpl.getService(AbstractServiceRegistryImpl.java:156)
+	at org.hibernate.cfg.Configuration.buildTypeRegistrations(Configuration.java:1827)
+	at org.hibernate.cfg.Configuration.buildSessionFactory(Configuration.java:1785)
+	at org.hibernate.ejb.EntityManagerFactoryImpl.<init>(EntityManagerFactoryImpl.java:96)
+	at org.hibernate.ejb.Ejb3Configuration.buildEntityManagerFactory(Ejb3Configuration.java:915)
+	at org.hibernate.ejb.Ejb3Configuration.buildEntityManagerFactory(Ejb3Configuration.java:900)
+	at org.hibernate.ejb.HibernatePersistence.createContainerEntityManagerFactory(HibernatePersistence.java:76)
+	at org.jboss.as.jpa.service.PersistenceUnitServiceImpl.createContainerEntityManagerFactory(PersistenceUnitServiceImpl.java:200)
+	at org.jboss.as.jpa.service.PersistenceUnitServiceImpl.access$600(PersistenceUnitServiceImpl.java:57)
+	at org.jboss.as.jpa.service.PersistenceUnitServiceImpl$1.run(PersistenceUnitServiceImpl.java:99)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142) [rt.jar:1.8.0_101]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617) [rt.jar:1.8.0_101]
+	at java.lang.Thread.run(Thread.java:745) [rt.jar:1.8.0_101]
+	at org.jboss.threads.JBossThread.run(JBossThread.java:122)
+Caused by: org.teiid.jdbc.TeiidSQLException: TEIID40046 org.teiid.core.TeiidException: TEIID40046 org.teiid.net.ConnectionException: TEIID40046 VDB "Hibernate_Portfolio" version "latest" does not exist.
+	at org.teiid.jdbc.TeiidSQLException.create(TeiidSQLException.java:135)
+	at org.teiid.jdbc.TeiidSQLException.create(TeiidSQLException.java:71)
+	at org.teiid.jdbc.EmbeddedProfile.connect(EmbeddedProfile.java:55)
+	at org.teiid.jdbc.TeiidDriver.connect(TeiidDriver.java:105)
+	at org.teiid.jdbc.TeiidDriver.connect(TeiidDriver.java:55)
+	at org.jboss.jca.adapters.jdbc.local.LocalManagedConnectionFactory.getLocalManagedConnection(LocalManagedConnectionFactory.java:323)
+	... 28 more
+Caused by: org.teiid.core.TeiidException: TEIID40046 org.teiid.core.TeiidException: TEIID40046 org.teiid.net.ConnectionException: TEIID40046 VDB "Hibernate_Portfolio" version "latest" does not exist.
+	at org.teiid.core.util.ReflectionHelper.create(ReflectionHelper.java:308)
+	at org.teiid.jdbc.ModuleHelper.createFromModule(ModuleHelper.java:53)
+	at org.teiid.jdbc.EmbeddedProfile.createServerConnection(EmbeddedProfile.java:60)
+	at org.teiid.jdbc.EmbeddedProfile.connect(EmbeddedProfile.java:50)
+	... 31 more
+Caused by: org.teiid.core.TeiidException: TEIID40046 org.teiid.net.ConnectionException: TEIID40046 VDB "Hibernate_Portfolio" version "latest" does not exist.
+	at org.teiid.core.util.ReflectionHelper.create(ReflectionHelper.java:345)
+	at org.teiid.core.util.ReflectionHelper.create(ReflectionHelper.java:306)
+	... 34 more
+Caused by: org.teiid.net.ConnectionException: TEIID40046 VDB "Hibernate_Portfolio" version "latest" does not exist.
+	at org.teiid.transport.LocalServerConnection.authenticate(LocalServerConnection.java:146)
+	at org.teiid.transport.LocalServerConnection.<init>(LocalServerConnection.java:106)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method) [rt.jar:1.8.0_101]
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62) [rt.jar:1.8.0_101]
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45) [rt.jar:1.8.0_101]
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423) [rt.jar:1.8.0_101]
+	at org.teiid.core.util.ReflectionHelper.create(ReflectionHelper.java:343)
+	... 35 more
+Caused by: org.teiid.client.security.LogonException: TEIID40046 VDB "Hibernate_Portfolio" version "latest" does not exist.
+	at org.teiid.services.SessionServiceImpl.getAuthenticationType(SessionServiceImpl.java:494)
+	at org.teiid.transport.LogonImpl.logon(LogonImpl.java:84)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) [rt.jar:1.8.0_101]
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) [rt.jar:1.8.0_101]
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) [rt.jar:1.8.0_101]
+	at java.lang.reflect.Method.invoke(Method.java:498) [rt.jar:1.8.0_101]
+	at org.teiid.transport.LocalServerConnection$1$1.call(LocalServerConnection.java:180)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [rt.jar:1.8.0_101]
+	at org.teiid.dqp.internal.process.DQPWorkContext.runInContext(DQPWorkContext.java:276)
+	at org.teiid.dqp.internal.process.DQPWorkContext.runInContext(DQPWorkContext.java:260)
+	at org.teiid.transport.LocalServerConnection$1.invoke(LocalServerConnection.java:178)
+	at com.sun.proxy.$Proxy98.logon(Unknown Source)
+	at org.teiid.transport.LocalServerConnection.authenticate(LocalServerConnection.java:142)
+	... 41 more
+Caused by: org.teiid.dqp.service.SessionServiceException: TEIID40046 VDB "Hibernate_Portfolio" version "latest" does not exist.
+	at org.teiid.services.SessionServiceImpl.getActiveVDB(SessionServiceImpl.java:278)
+	at org.teiid.services.SessionServiceImpl.getAuthenticationType(SessionServiceImpl.java:492)
+	... 53 more
+
+[0m[33m16:11:12,599 WARN  [org.hibernate.engine.jdbc.internal.JdbcServicesImpl] (ServerService Thread Pool -- 61) HHH000342: Could not obtain connection to query metadata : javax.resource.ResourceException: IJ000453: Unable to get managed connection for java:/jboss/datasources/Hibernate4TeiidQuickstartDS
+[0m[0m16:11:12,662 INFO  [org.hibernate.dialect.Dialect] (ServerService Thread Pool -- 61) HHH000400: Using dialect: org.teiid.dialect.TeiidDialect
+[0m[0m16:11:12,672 INFO  [org.hibernate.engine.jdbc.internal.LobCreatorBuilder] (ServerService Thread Pool -- 61) HHH000422: Disabling contextual LOB creation as connection was null
+[0m[0m16:11:12,920 INFO  [org.hibernate.engine.transaction.internal.TransactionFactoryInitiator] (ServerService Thread Pool -- 61) HHH000268: Transaction strategy: org.hibernate.engine.transaction.internal.jta.CMTTransactionFactory
+[0m[0m16:11:12,938 INFO  [org.hibernate.hql.internal.ast.ASTQueryTranslatorFactory] (ServerService Thread Pool -- 61) HHH000397: Using ASTQueryTranslatorFactory
+[0m[0m16:11:13,641 INFO  [org.hibernate.tool.hbm2ddl.SchemaValidator] (ServerService Thread Pool -- 61) HHH000229: Running schema validator
+[0m[0m16:11:13,642 INFO  [org.hibernate.tool.hbm2ddl.SchemaValidator] (ServerService Thread Pool -- 61) HHH000102: Fetching database metadata
+[0m[33m16:11:13,642 WARN  [org.jboss.jca.core.connectionmanager.pool.strategy.OnePool] (ServerService Thread Pool -- 61) IJ000604: Throwable while attempting to get a new connection: null: javax.resource.ResourceException: Could not create connection
+	at org.jboss.jca.adapters.jdbc.local.LocalManagedConnectionFactory.getLocalManagedConnection(LocalManagedConnectionFactory.java:351)
+	at org.jboss.jca.adapters.jdbc.local.LocalManagedConnectionFactory.createManagedConnection(LocalManagedConnectionFactory.java:299)
+	at org.jboss.jca.core.connectionmanager.pool.mcp.SemaphoreArrayListManagedConnectionPool.createConnectionEventListener(SemaphoreArrayListManagedConnectionPool.java:873)
+	at org.jboss.jca.core.connectionmanager.pool.mcp.SemaphoreArrayListManagedConnectionPool.getConnection(SemaphoreArrayListManagedConnectionPool.java:418)
+	at org.jboss.jca.core.connectionmanager.pool.AbstractPool.getSimpleConnection(AbstractPool.java:467)
+	at org.jboss.jca.core.connectionmanager.pool.AbstractPool.getConnection(AbstractPool.java:439)
+	at org.jboss.jca.core.connectionmanager.AbstractConnectionManager.getManagedConnection(AbstractConnectionManager.java:354)
+	at org.jboss.jca.core.connectionmanager.tx.TxConnectionManagerImpl.getManagedConnection(TxConnectionManagerImpl.java:368)
+	at org.jboss.jca.core.connectionmanager.AbstractConnectionManager.allocateConnection(AbstractConnectionManager.java:510)
+	at org.jboss.jca.adapters.jdbc.WrapperDataSource.getConnection(WrapperDataSource.java:143)
+	at org.hibernate.ejb.connection.InjectedDataSourceConnectionProvider.getConnection(InjectedDataSourceConnectionProvider.java:70)
+	at org.hibernate.tool.hbm2ddl.SuppliedConnectionProviderConnectionHelper.prepare(SuppliedConnectionProviderConnectionHelper.java:51)
+	at org.hibernate.tool.hbm2ddl.SchemaValidator.validate(SchemaValidator.java:166)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:512)
+	at org.hibernate.cfg.Configuration.buildSessionFactory(Configuration.java:1799)
+	at org.hibernate.ejb.EntityManagerFactoryImpl.<init>(EntityManagerFactoryImpl.java:96)
+	at org.hibernate.ejb.Ejb3Configuration.buildEntityManagerFactory(Ejb3Configuration.java:915)
+	at org.hibernate.ejb.Ejb3Configuration.buildEntityManagerFactory(Ejb3Configuration.java:900)
+	at org.hibernate.ejb.HibernatePersistence.createContainerEntityManagerFactory(HibernatePersistence.java:76)
+	at org.jboss.as.jpa.service.PersistenceUnitServiceImpl.createContainerEntityManagerFactory(PersistenceUnitServiceImpl.java:200)
+	at org.jboss.as.jpa.service.PersistenceUnitServiceImpl.access$600(PersistenceUnitServiceImpl.java:57)
+	at org.jboss.as.jpa.service.PersistenceUnitServiceImpl$1.run(PersistenceUnitServiceImpl.java:99)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142) [rt.jar:1.8.0_101]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617) [rt.jar:1.8.0_101]
+	at java.lang.Thread.run(Thread.java:745) [rt.jar:1.8.0_101]
+	at org.jboss.threads.JBossThread.run(JBossThread.java:122)
+Caused by: org.teiid.jdbc.TeiidSQLException: TEIID40046 org.teiid.core.TeiidException: TEIID40046 org.teiid.net.ConnectionException: TEIID40046 VDB "Hibernate_Portfolio" version "latest" does not exist.
+	at org.teiid.jdbc.TeiidSQLException.create(TeiidSQLException.java:135)
+	at org.teiid.jdbc.TeiidSQLException.create(TeiidSQLException.java:71)
+	at org.teiid.jdbc.EmbeddedProfile.connect(EmbeddedProfile.java:55)
+	at org.teiid.jdbc.TeiidDriver.connect(TeiidDriver.java:105)
+	at org.teiid.jdbc.TeiidDriver.connect(TeiidDriver.java:55)
+	at org.jboss.jca.adapters.jdbc.local.LocalManagedConnectionFactory.getLocalManagedConnection(LocalManagedConnectionFactory.java:323)
+	... 25 more
+Caused by: org.teiid.core.TeiidException: TEIID40046 org.teiid.core.TeiidException: TEIID40046 org.teiid.net.ConnectionException: TEIID40046 VDB "Hibernate_Portfolio" version "latest" does not exist.
+	at org.teiid.core.util.ReflectionHelper.create(ReflectionHelper.java:308)
+	at org.teiid.jdbc.ModuleHelper.createFromModule(ModuleHelper.java:53)
+	at org.teiid.jdbc.EmbeddedProfile.createServerConnection(EmbeddedProfile.java:60)
+	at org.teiid.jdbc.EmbeddedProfile.connect(EmbeddedProfile.java:50)
+	... 28 more
+Caused by: org.teiid.core.TeiidException: TEIID40046 org.teiid.net.ConnectionException: TEIID40046 VDB "Hibernate_Portfolio" version "latest" does not exist.
+	at org.teiid.core.util.ReflectionHelper.create(ReflectionHelper.java:345)
+	at org.teiid.core.util.ReflectionHelper.create(ReflectionHelper.java:306)
+	... 31 more
+Caused by: org.teiid.net.ConnectionException: TEIID40046 VDB "Hibernate_Portfolio" version "latest" does not exist.
+	at org.teiid.transport.LocalServerConnection.authenticate(LocalServerConnection.java:146)
+	at org.teiid.transport.LocalServerConnection.<init>(LocalServerConnection.java:106)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method) [rt.jar:1.8.0_101]
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62) [rt.jar:1.8.0_101]
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45) [rt.jar:1.8.0_101]
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423) [rt.jar:1.8.0_101]
+	at org.teiid.core.util.ReflectionHelper.create(ReflectionHelper.java:343)
+	... 32 more
+Caused by: org.teiid.client.security.LogonException: TEIID40046 VDB "Hibernate_Portfolio" version "latest" does not exist.
+	at org.teiid.services.SessionServiceImpl.getAuthenticationType(SessionServiceImpl.java:494)
+	at org.teiid.transport.LogonImpl.logon(LogonImpl.java:84)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) [rt.jar:1.8.0_101]
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) [rt.jar:1.8.0_101]
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) [rt.jar:1.8.0_101]
+	at java.lang.reflect.Method.invoke(Method.java:498) [rt.jar:1.8.0_101]
+	at org.teiid.transport.LocalServerConnection$1$1.call(LocalServerConnection.java:180)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [rt.jar:1.8.0_101]
+	at org.teiid.dqp.internal.process.DQPWorkContext.runInContext(DQPWorkContext.java:276)
+	at org.teiid.dqp.internal.process.DQPWorkContext.runInContext(DQPWorkContext.java:260)
+	at org.teiid.transport.LocalServerConnection$1.invoke(LocalServerConnection.java:178)
+	at com.sun.proxy.$Proxy98.logon(Unknown Source)
+	at org.teiid.transport.LocalServerConnection.authenticate(LocalServerConnection.java:142)
+	... 38 more
+Caused by: org.teiid.dqp.service.SessionServiceException: TEIID40046 VDB "Hibernate_Portfolio" version "latest" does not exist.
+	at org.teiid.services.SessionServiceImpl.getActiveVDB(SessionServiceImpl.java:278)
+	at org.teiid.services.SessionServiceImpl.getAuthenticationType(SessionServiceImpl.java:492)
+	... 50 more
+
+[0m[31m16:11:13,642 ERROR [org.hibernate.tool.hbm2ddl.SchemaValidator] (ServerService Thread Pool -- 61) HHH000319: Could not get database metadata: java.sql.SQLException: javax.resource.ResourceException: IJ000453: Unable to get managed connection for java:/jboss/datasources/Hibernate4TeiidQuickstartDS
+	at org.jboss.jca.adapters.jdbc.WrapperDataSource.getConnection(WrapperDataSource.java:151)
+	at org.hibernate.ejb.connection.InjectedDataSourceConnectionProvider.getConnection(InjectedDataSourceConnectionProvider.java:70)
+	at org.hibernate.tool.hbm2ddl.SuppliedConnectionProviderConnectionHelper.prepare(SuppliedConnectionProviderConnectionHelper.java:51)
+	at org.hibernate.tool.hbm2ddl.SchemaValidator.validate(SchemaValidator.java:166)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:512)
+	at org.hibernate.cfg.Configuration.buildSessionFactory(Configuration.java:1799)
+	at org.hibernate.ejb.EntityManagerFactoryImpl.<init>(EntityManagerFactoryImpl.java:96)
+	at org.hibernate.ejb.Ejb3Configuration.buildEntityManagerFactory(Ejb3Configuration.java:915)
+	at org.hibernate.ejb.Ejb3Configuration.buildEntityManagerFactory(Ejb3Configuration.java:900)
+	at org.hibernate.ejb.HibernatePersistence.createContainerEntityManagerFactory(HibernatePersistence.java:76)
+	at org.jboss.as.jpa.service.PersistenceUnitServiceImpl.createContainerEntityManagerFactory(PersistenceUnitServiceImpl.java:200)
+	at org.jboss.as.jpa.service.PersistenceUnitServiceImpl.access$600(PersistenceUnitServiceImpl.java:57)
+	at org.jboss.as.jpa.service.PersistenceUnitServiceImpl$1.run(PersistenceUnitServiceImpl.java:99)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142) [rt.jar:1.8.0_101]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617) [rt.jar:1.8.0_101]
+	at java.lang.Thread.run(Thread.java:745) [rt.jar:1.8.0_101]
+	at org.jboss.threads.JBossThread.run(JBossThread.java:122)
+Caused by: javax.resource.ResourceException: IJ000453: Unable to get managed connection for java:/jboss/datasources/Hibernate4TeiidQuickstartDS
+	at org.jboss.jca.core.connectionmanager.AbstractConnectionManager.getManagedConnection(AbstractConnectionManager.java:421)
+	at org.jboss.jca.core.connectionmanager.tx.TxConnectionManagerImpl.getManagedConnection(TxConnectionManagerImpl.java:368)
+	at org.jboss.jca.core.connectionmanager.AbstractConnectionManager.allocateConnection(AbstractConnectionManager.java:510)
+	at org.jboss.jca.adapters.jdbc.WrapperDataSource.getConnection(WrapperDataSource.java:143)
+	... 16 more
+Caused by: javax.resource.ResourceException: IJ000658: Unexpected throwable while trying to create a connection: null
+	at org.jboss.jca.core.connectionmanager.pool.mcp.SemaphoreArrayListManagedConnectionPool.getConnection(SemaphoreArrayListManagedConnectionPool.java:460)
+	at org.jboss.jca.core.connectionmanager.pool.AbstractPool.getSimpleConnection(AbstractPool.java:467)
+	at org.jboss.jca.core.connectionmanager.pool.AbstractPool.getConnection(AbstractPool.java:439)
+	at org.jboss.jca.core.connectionmanager.AbstractConnectionManager.getManagedConnection(AbstractConnectionManager.java:354)
+	... 19 more
+Caused by: javax.resource.ResourceException: Could not create connection
+	at org.jboss.jca.adapters.jdbc.local.LocalManagedConnectionFactory.getLocalManagedConnection(LocalManagedConnectionFactory.java:351)
+	at org.jboss.jca.adapters.jdbc.local.LocalManagedConnectionFactory.createManagedConnection(LocalManagedConnectionFactory.java:299)
+	at org.jboss.jca.core.connectionmanager.pool.mcp.SemaphoreArrayListManagedConnectionPool.createConnectionEventListener(SemaphoreArrayListManagedConnectionPool.java:873)
+	at org.jboss.jca.core.connectionmanager.pool.mcp.SemaphoreArrayListManagedConnectionPool.getConnection(SemaphoreArrayListManagedConnectionPool.java:418)
+	... 22 more
+Caused by: org.teiid.jdbc.TeiidSQLException: TEIID40046 org.teiid.core.TeiidException: TEIID40046 org.teiid.net.ConnectionException: TEIID40046 VDB "Hibernate_Portfolio" version "latest" does not exist.
+	at org.teiid.jdbc.TeiidSQLException.create(TeiidSQLException.java:135)
+	at org.teiid.jdbc.TeiidSQLException.create(TeiidSQLException.java:71)
+	at org.teiid.jdbc.EmbeddedProfile.connect(EmbeddedProfile.java:55)
+	at org.teiid.jdbc.TeiidDriver.connect(TeiidDriver.java:105)
+	at org.teiid.jdbc.TeiidDriver.connect(TeiidDriver.java:55)
+	at org.jboss.jca.adapters.jdbc.local.LocalManagedConnectionFactory.getLocalManagedConnection(LocalManagedConnectionFactory.java:323)
+	... 25 more
+Caused by: org.teiid.core.TeiidException: TEIID40046 org.teiid.core.TeiidException: TEIID40046 org.teiid.net.ConnectionException: TEIID40046 VDB "Hibernate_Portfolio" version "latest" does not exist.
+	at org.teiid.core.util.ReflectionHelper.create(ReflectionHelper.java:308)
+	at org.teiid.jdbc.ModuleHelper.createFromModule(ModuleHelper.java:53)
+	at org.teiid.jdbc.EmbeddedProfile.createServerConnection(EmbeddedProfile.java:60)
+	at org.teiid.jdbc.EmbeddedProfile.connect(EmbeddedProfile.java:50)
+	... 28 more
+Caused by: org.teiid.core.TeiidException: TEIID40046 org.teiid.net.ConnectionException: TEIID40046 VDB "Hibernate_Portfolio" version "latest" does not exist.
+	at org.teiid.core.util.ReflectionHelper.create(ReflectionHelper.java:345)
+	at org.teiid.core.util.ReflectionHelper.create(ReflectionHelper.java:306)
+	... 31 more
+Caused by: org.teiid.net.ConnectionException: TEIID40046 VDB "Hibernate_Portfolio" version "latest" does not exist.
+	at org.teiid.transport.LocalServerConnection.authenticate(LocalServerConnection.java:146)
+	at org.teiid.transport.LocalServerConnection.<init>(LocalServerConnection.java:106)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method) [rt.jar:1.8.0_101]
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62) [rt.jar:1.8.0_101]
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45) [rt.jar:1.8.0_101]
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423) [rt.jar:1.8.0_101]
+	at org.teiid.core.util.ReflectionHelper.create(ReflectionHelper.java:343)
+	... 32 more
+Caused by: org.teiid.client.security.LogonException: TEIID40046 VDB "Hibernate_Portfolio" version "latest" does not exist.
+	at org.teiid.services.SessionServiceImpl.getAuthenticationType(SessionServiceImpl.java:494)
+	at org.teiid.transport.LogonImpl.logon(LogonImpl.java:84)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) [rt.jar:1.8.0_101]
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) [rt.jar:1.8.0_101]
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) [rt.jar:1.8.0_101]
+	at java.lang.reflect.Method.invoke(Method.java:498) [rt.jar:1.8.0_101]
+	at org.teiid.transport.LocalServerConnection$1$1.call(LocalServerConnection.java:180)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [rt.jar:1.8.0_101]
+	at org.teiid.dqp.internal.process.DQPWorkContext.runInContext(DQPWorkContext.java:276)
+	at org.teiid.dqp.internal.process.DQPWorkContext.runInContext(DQPWorkContext.java:260)
+	at org.teiid.transport.LocalServerConnection$1.invoke(LocalServerConnection.java:178)
+	at com.sun.proxy.$Proxy98.logon(Unknown Source)
+	at org.teiid.transport.LocalServerConnection.authenticate(LocalServerConnection.java:142)
+	... 38 more
+Caused by: org.teiid.dqp.service.SessionServiceException: TEIID40046 VDB "Hibernate_Portfolio" version "latest" does not exist.
+	at org.teiid.services.SessionServiceImpl.getActiveVDB(SessionServiceImpl.java:278)
+	at org.teiid.services.SessionServiceImpl.getAuthenticationType(SessionServiceImpl.java:492)
+	... 50 more
+
+[0m[31m16:11:13,643 ERROR [org.hibernate.tool.hbm2ddl.SchemaValidator] (ServerService Thread Pool -- 61) HHH000300: Could not complete schema validation: java.sql.SQLException: javax.resource.ResourceException: IJ000453: Unable to get managed connection for java:/jboss/datasources/Hibernate4TeiidQuickstartDS
+	at org.jboss.jca.adapters.jdbc.WrapperDataSource.getConnection(WrapperDataSource.java:151)
+	at org.hibernate.ejb.connection.InjectedDataSourceConnectionProvider.getConnection(InjectedDataSourceConnectionProvider.java:70)
+	at org.hibernate.tool.hbm2ddl.SuppliedConnectionProviderConnectionHelper.prepare(SuppliedConnectionProviderConnectionHelper.java:51)
+	at org.hibernate.tool.hbm2ddl.SchemaValidator.validate(SchemaValidator.java:166)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:512)
+	at org.hibernate.cfg.Configuration.buildSessionFactory(Configuration.java:1799)
+	at org.hibernate.ejb.EntityManagerFactoryImpl.<init>(EntityManagerFactoryImpl.java:96)
+	at org.hibernate.ejb.Ejb3Configuration.buildEntityManagerFactory(Ejb3Configuration.java:915)
+	at org.hibernate.ejb.Ejb3Configuration.buildEntityManagerFactory(Ejb3Configuration.java:900)
+	at org.hibernate.ejb.HibernatePersistence.createContainerEntityManagerFactory(HibernatePersistence.java:76)
+	at org.jboss.as.jpa.service.PersistenceUnitServiceImpl.createContainerEntityManagerFactory(PersistenceUnitServiceImpl.java:200)
+	at org.jboss.as.jpa.service.PersistenceUnitServiceImpl.access$600(PersistenceUnitServiceImpl.java:57)
+	at org.jboss.as.jpa.service.PersistenceUnitServiceImpl$1.run(PersistenceUnitServiceImpl.java:99)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142) [rt.jar:1.8.0_101]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617) [rt.jar:1.8.0_101]
+	at java.lang.Thread.run(Thread.java:745) [rt.jar:1.8.0_101]
+	at org.jboss.threads.JBossThread.run(JBossThread.java:122)
+Caused by: javax.resource.ResourceException: IJ000453: Unable to get managed connection for java:/jboss/datasources/Hibernate4TeiidQuickstartDS
+	at org.jboss.jca.core.connectionmanager.AbstractConnectionManager.getManagedConnection(AbstractConnectionManager.java:421)
+	at org.jboss.jca.core.connectionmanager.tx.TxConnectionManagerImpl.getManagedConnection(TxConnectionManagerImpl.java:368)
+	at org.jboss.jca.core.connectionmanager.AbstractConnectionManager.allocateConnection(AbstractConnectionManager.java:510)
+	at org.jboss.jca.adapters.jdbc.WrapperDataSource.getConnection(WrapperDataSource.java:143)
+	... 16 more
+Caused by: javax.resource.ResourceException: IJ000658: Unexpected throwable while trying to create a connection: null
+	at org.jboss.jca.core.connectionmanager.pool.mcp.SemaphoreArrayListManagedConnectionPool.getConnection(SemaphoreArrayListManagedConnectionPool.java:460)
+	at org.jboss.jca.core.connectionmanager.pool.AbstractPool.getSimpleConnection(AbstractPool.java:467)
+	at org.jboss.jca.core.connectionmanager.pool.AbstractPool.getConnection(AbstractPool.java:439)
+	at org.jboss.jca.core.connectionmanager.AbstractConnectionManager.getManagedConnection(AbstractConnectionManager.java:354)
+	... 19 more
+Caused by: javax.resource.ResourceException: Could not create connection
+	at org.jboss.jca.adapters.jdbc.local.LocalManagedConnectionFactory.getLocalManagedConnection(LocalManagedConnectionFactory.java:351)
+	at org.jboss.jca.adapters.jdbc.local.LocalManagedConnectionFactory.createManagedConnection(LocalManagedConnectionFactory.java:299)
+	at org.jboss.jca.core.connectionmanager.pool.mcp.SemaphoreArrayListManagedConnectionPool.createConnectionEventListener(SemaphoreArrayListManagedConnectionPool.java:873)
+	at org.jboss.jca.core.connectionmanager.pool.mcp.SemaphoreArrayListManagedConnectionPool.getConnection(SemaphoreArrayListManagedConnectionPool.java:418)
+	... 22 more
+Caused by: org.teiid.jdbc.TeiidSQLException: TEIID40046 org.teiid.core.TeiidException: TEIID40046 org.teiid.net.ConnectionException: TEIID40046 VDB "Hibernate_Portfolio" version "latest" does not exist.
+	at org.teiid.jdbc.TeiidSQLException.create(TeiidSQLException.java:135)
+	at org.teiid.jdbc.TeiidSQLException.create(TeiidSQLException.java:71)
+	at org.teiid.jdbc.EmbeddedProfile.connect(EmbeddedProfile.java:55)
+	at org.teiid.jdbc.TeiidDriver.connect(TeiidDriver.java:105)
+	at org.teiid.jdbc.TeiidDriver.connect(TeiidDriver.java:55)
+	at org.jboss.jca.adapters.jdbc.local.LocalManagedConnectionFactory.getLocalManagedConnection(LocalManagedConnectionFactory.java:323)
+	... 25 more
+Caused by: org.teiid.core.TeiidException: TEIID40046 org.teiid.core.TeiidException: TEIID40046 org.teiid.net.ConnectionException: TEIID40046 VDB "Hibernate_Portfolio" version "latest" does not exist.
+	at org.teiid.core.util.ReflectionHelper.create(ReflectionHelper.java:308)
+	at org.teiid.jdbc.ModuleHelper.createFromModule(ModuleHelper.java:53)
+	at org.teiid.jdbc.EmbeddedProfile.createServerConnection(EmbeddedProfile.java:60)
+	at org.teiid.jdbc.EmbeddedProfile.connect(EmbeddedProfile.java:50)
+	... 28 more
+Caused by: org.teiid.core.TeiidException: TEIID40046 org.teiid.net.ConnectionException: TEIID40046 VDB "Hibernate_Portfolio" version "latest" does not exist.
+	at org.teiid.core.util.ReflectionHelper.create(ReflectionHelper.java:345)
+	at org.teiid.core.util.ReflectionHelper.create(ReflectionHelper.java:306)
+	... 31 more
+Caused by: org.teiid.net.ConnectionException: TEIID40046 VDB "Hibernate_Portfolio" version "latest" does not exist.
+	at org.teiid.transport.LocalServerConnection.authenticate(LocalServerConnection.java:146)
+	at org.teiid.transport.LocalServerConnection.<init>(LocalServerConnection.java:106)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method) [rt.jar:1.8.0_101]
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62) [rt.jar:1.8.0_101]
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45) [rt.jar:1.8.0_101]
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423) [rt.jar:1.8.0_101]
+	at org.teiid.core.util.ReflectionHelper.create(ReflectionHelper.java:343)
+	... 32 more
+Caused by: org.teiid.client.security.LogonException: TEIID40046 VDB "Hibernate_Portfolio" version "latest" does not exist.
+	at org.teiid.services.SessionServiceImpl.getAuthenticationType(SessionServiceImpl.java:494)
+	at org.teiid.transport.LogonImpl.logon(LogonImpl.java:84)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) [rt.jar:1.8.0_101]
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) [rt.jar:1.8.0_101]
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) [rt.jar:1.8.0_101]
+	at java.lang.reflect.Method.invoke(Method.java:498) [rt.jar:1.8.0_101]
+	at org.teiid.transport.LocalServerConnection$1$1.call(LocalServerConnection.java:180)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [rt.jar:1.8.0_101]
+	at org.teiid.dqp.internal.process.DQPWorkContext.runInContext(DQPWorkContext.java:276)
+	at org.teiid.dqp.internal.process.DQPWorkContext.runInContext(DQPWorkContext.java:260)
+	at org.teiid.transport.LocalServerConnection$1.invoke(LocalServerConnection.java:178)
+	at com.sun.proxy.$Proxy98.logon(Unknown Source)
+	at org.teiid.transport.LocalServerConnection.authenticate(LocalServerConnection.java:142)
+	... 38 more
+Caused by: org.teiid.dqp.service.SessionServiceException: TEIID40046 VDB "Hibernate_Portfolio" version "latest" does not exist.
+	at org.teiid.services.SessionServiceImpl.getActiveVDB(SessionServiceImpl.java:278)
+	at org.teiid.services.SessionServiceImpl.getAuthenticationType(SessionServiceImpl.java:492)
+	... 50 more
+
+[0m[0m16:11:14,091 INFO  [org.jboss.web] (ServerService Thread Pool -- 64) JBAS018210: Register web context: /hibernate-on-top-of-teiid
+[0m[0m16:11:14,114 INFO  [javax.enterprise.resource.webcontainer.jsf.config] (ServerService Thread Pool -- 64) Initializing Mojarra 2.1.28-jbossorg-8  for context '/hibernate-on-top-of-teiid'
+[0m[0m16:11:15,948 INFO  [org.jboss.web] (ServerService Thread Pool -- 77) JBAS018210: Register web context: /dashboard
+[0m[0m16:11:15,975 INFO  [org.jboss.dashboard.ui.controller.ControllerServlet] (ServerService Thread Pool -- 77) Application Directory: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war
+[0m[0m16:11:15,976 INFO  [org.jboss.dashboard.ui.controller.ControllerServlet] (ServerService Thread Pool -- 77) Application Config Directory: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc
+[0m[0m16:11:16,201 INFO  [org.hibernate.cfg.Configuration] (ServerService Thread Pool -- 77) HHH000042: Configuring from file: hibernate.cfg.xml
+[0m[0m16:11:16,260 INFO  [org.hibernate.cfg.Configuration] (ServerService Thread Pool -- 77) HHH000041: Configured SessionFactory: null
+[0m[0m16:11:16,280 INFO  [javax.enterprise.resource.webservices.jaxws.servlet.http] (ServerService Thread Pool -- 69) WSSERVLET14: JAX-WS servlet initializing
+[0m[0m16:11:16,688 INFO  [org.jboss.dashboard.database.hibernate.HibernateInitializer] (ServerService Thread Pool -- 77) The underlying database is: h2
+[0m[0m16:11:16,853 INFO  [org.hibernate.dialect.Dialect] (ServerService Thread Pool -- 77) HHH000400: Using dialect: org.hibernate.dialect.H2Dialect
+[0m[33m16:11:16,855 WARN  [org.hibernate.dialect.H2Dialect] (ServerService Thread Pool -- 77) HHH000431: Unable to determine H2 database version, certain features may not work
+[0m[0m16:11:16,897 INFO  [org.hibernate.engine.transaction.internal.TransactionFactoryInitiator] (ServerService Thread Pool -- 77) HHH000399: Using default transaction strategy (direct JDBC transactions)
+[0m[0m16:11:16,899 INFO  [org.hibernate.hql.internal.ast.ASTQueryTranslatorFactory] (ServerService Thread Pool -- 77) HHH000397: Using ASTQueryTranslatorFactory
+[0m[33m16:11:17,147 WARN  [org.jboss.dashboard.database.DatabaseAutoSynchronizer] (ServerService Thread Pool -- 77) Running file 1-create-h2.sql
+[0m[0m16:11:17,477 INFO  [org.jboss.dashboard.workspace.GraphicElementManagerImpl] (ServerService Thread Pool -- 77) Starting org.jboss.dashboard.workspace.SkinsManagerImpl
+[0m[0m16:11:17,485 INFO  [org.jboss.dashboard.workspace.GraphicElementManagerImpl] (ServerService Thread Pool -- 77) Deploying to database Skin /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/skins/Default_Skin.zip
+[0m[0m16:11:17,582 INFO  [org.jboss.dashboard.ui.resources.GraphicElement] (ServerService Thread Pool -- 77) Deploying files for org.jboss.dashboard.ui.resources.Skin Default_Skin
+[0m[0m16:11:17,594 INFO  [org.jboss.dashboard.cluster.ClusterNodesManager] (ServerService Thread Pool -- 77) Registering cluster node with ip address 10.1.0.2
+[0m[0m16:11:17,609 INFO  [org.jboss.dashboard.cluster.ClusterNodesManager] (ServerService Thread Pool -- 77) Successfully registered cluster node with ip address 10.1.0.2 and identifier 1001
+[0m[0m16:11:17,681 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 77) Loading panels. Scanning dir: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels
+[0m[0m16:11:17,681 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 77) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/dashboard/dashboardFilter/dashb_filter.panel
+[0m[0m16:11:17,692 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 77) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/dashboard/dataProviderManager/dashb_providermgr.panel
+[0m[0m16:11:17,700 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 77) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/dashboard/htmlEditor/dashb_html_editor.panel
+[0m[0m16:11:17,713 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 77) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/dashboard/kpi/dashb_kpi.panel
+[0m[0m16:11:17,722 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 77) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/navigation/breadCrumb/breadCrumb.panel
+[0m[0m16:11:17,732 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 77) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/navigation/logout/logout.panel
+[0m[0m16:11:17,740 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 77) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/navigation/tree/treeMenu.panel
+[0m[0m16:11:17,749 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 77) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/navigation/navigator_language_horiz.panel
+[0m[0m16:11:17,758 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 77) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/navigation/navigator_sections.panel
+[0m[0m16:11:17,760 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 77) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/navigation/navigator_sections_horiz.panel
+[0m[0m16:11:17,762 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 77) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/navigation/navigator_sections_vert.panel
+[0m[0m16:11:17,764 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 77) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/navigation/navigator_workspace.panel
+[0m[0m16:11:17,766 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 77) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/navigation/navigator_workspace_horiz.panel
+[0m[0m16:11:17,767 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 77) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/navigation/navigator_workspace_vert.panel
+[0m[0m16:11:17,769 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 77) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/system/dashboardExport/dashb_export.panel
+[0m[0m16:11:17,777 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 77) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/system/dashboardImport/dashb_import.panel
+[0m[0m16:11:17,780 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 77) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/system/dataSourceManagement/DataSourceManager.panel
+[0m[0m16:11:17,789 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 77) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/system/workspaceExport/workspaceImportexport.panel
+[0m[0m16:11:17,997 INFO  [org.jboss.dashboard.workspace.GraphicElementManagerImpl] (ServerService Thread Pool -- 77) Starting org.jboss.dashboard.workspace.EnvelopesManagerImpl
+[0m[0m16:11:18,003 INFO  [org.jboss.dashboard.workspace.GraphicElementManagerImpl] (ServerService Thread Pool -- 77) Deploying to database Envelope /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/envelopes/Default_Envelope.zip
+[0m[0m16:11:18,043 INFO  [org.jboss.dashboard.ui.resources.GraphicElement] (ServerService Thread Pool -- 77) Deploying files for org.jboss.dashboard.ui.resources.Envelope Default_Envelope
+[0m[0m16:11:18,075 INFO  [org.jboss.dashboard.workspace.GraphicElementManagerImpl] (ServerService Thread Pool -- 77) Starting org.jboss.dashboard.workspace.LayoutsManagerImpl
+[0m[0m16:11:18,079 INFO  [org.jboss.dashboard.workspace.GraphicElementManagerImpl] (ServerService Thread Pool -- 77) Deploying to database Layout /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/layouts/Default_Layout.zip
+[0m[0m16:11:18,097 INFO  [org.jboss.dashboard.workspace.GraphicElementManagerImpl] (ServerService Thread Pool -- 77) Deploying to database Layout /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/layouts/Default_template_with_sliding_menu.zip
+[0m[0m16:11:18,107 INFO  [org.jboss.dashboard.workspace.GraphicElementManagerImpl] (ServerService Thread Pool -- 77) Deploying to database Layout /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/layouts/Template_25-50-25.zip
+[0m[0m16:11:18,136 INFO  [org.jboss.dashboard.workspace.GraphicElementManagerImpl] (ServerService Thread Pool -- 77) Deploying to database Layout /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/layouts/Template_25-75.zip
+[0m[0m16:11:18,144 INFO  [org.jboss.dashboard.workspace.GraphicElementManagerImpl] (ServerService Thread Pool -- 77) Deploying to database Layout /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/layouts/Template_75-25.zip
+[0m[0m16:11:18,151 INFO  [org.jboss.dashboard.ui.resources.GraphicElement] (ServerService Thread Pool -- 77) Deploying files for org.jboss.dashboard.ui.resources.Layout Default_Layout
+[0m[0m16:11:18,152 INFO  [org.jboss.dashboard.ui.resources.GraphicElement] (ServerService Thread Pool -- 77) Deploying files for org.jboss.dashboard.ui.resources.Layout Default_template_with_sliding_menu
+[0m[0m16:11:18,155 INFO  [org.jboss.dashboard.ui.resources.GraphicElement] (ServerService Thread Pool -- 77) Deploying files for org.jboss.dashboard.ui.resources.Layout Template_25-50-25
+[0m[0m16:11:18,157 INFO  [org.jboss.dashboard.ui.resources.GraphicElement] (ServerService Thread Pool -- 77) Deploying files for org.jboss.dashboard.ui.resources.Layout Template_25-75
+[0m[0m16:11:18,159 INFO  [org.jboss.dashboard.ui.resources.GraphicElement] (ServerService Thread Pool -- 77) Deploying files for org.jboss.dashboard.ui.resources.Layout Template_75-25
+[0m[0m16:11:18,192 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 77) Parsing KPI's XML file: WEB-INF/etc/appdata/initialData/showcaseKPIs.xml
+[0m[0m16:11:18,718 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 77) BAM_00000 - Data provider created. dataprovider_63791223772073037, Expense reports demo.
+[0m[0m16:11:18,720 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 77) BAM_00000 - Data provider created. dataprovider_29881353499006573, Sales dashboard demo.
+[0m[0m16:11:18,720 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 77) BAM_00001 - Business indicator created. kpi_30101353505177974, Opportunities by country.
+[0m[0m16:11:18,720 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 77) BAM_00001 - Business indicator created. kpi_30801353685378049, By customer.
+[0m[0m16:11:18,720 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 77) BAM_00001 - Business indicator created. kpi_30331353506453066, By sales person.
+[0m[0m16:11:18,720 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 77) BAM_00001 - Business indicator created. kpi_30361353506582145, By status.
+[0m[0m16:11:18,720 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 77) BAM_00001 - Business indicator created. kpi_30651353683614640, By sales person.
+[0m[0m16:11:18,720 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 77) BAM_00001 - Business indicator created. kpi_30281353675541472, By country.
+[0m[0m16:11:18,720 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 77) BAM_00001 - Business indicator created. kpi_30461354643057084, Expenses by user.
+[0m[0m16:11:18,721 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 77) BAM_00001 - Business indicator created. kpi_30041353504912610, Opportunities by employee.
+[0m[0m16:11:18,721 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 77) BAM_00001 - Business indicator created. kpi_29761353668431694, Sales report table.
+[0m[0m16:11:18,721 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 77) BAM_00001 - Business indicator created. kpi_30771353684719633, - New indicator -.
+[0m[0m16:11:18,721 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 77) BAM_00001 - Business indicator created. kpi_63901223772516707, Expenses by office USD.
+[0m[0m16:11:18,721 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 77) BAM_00001 - Business indicator created. kpi_64011223773089901, Expense evolution.
+[0m[0m16:11:18,721 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 77) BAM_00001 - Business indicator created. kpi_30251353675275870, Pipeline status.
+[0m[0m16:11:18,721 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 77) BAM_00001 - Business indicator created. kpi_30441353507392054, Opportunities by closing date (USD).
+[0m[0m16:11:18,721 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 77) BAM_00001 - Business indicator created. kpi_63931223772633377, Expenses by department USD.
+[0m[0m16:11:18,721 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 77) BAM_00001 - Business indicator created. kpi_30861353687605533, Amount by probability (%).
+[0m[0m16:11:18,721 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 77) BAM_00001 - Business indicator created. kpi_21591363786594721, Amount by status .
+[0m[0m16:11:18,721 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 77) BAM_00001 - Business indicator created. kpi_30391353506887646, By product.
+[0m[0m16:11:18,721 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 77) BAM_00001 - Business indicator created. kpi_30301353506280659, Expected pipeline.
+[0m[0m16:11:18,721 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 77) BAM_00001 - Business indicator created. kpi_30011353503663716, Opportunities by status.
+[0m[0m16:11:18,721 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 77) BAM_00001 - Business indicator created. kpi_30831353686700387, By product.
+[0m[0m16:11:18,722 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 77) BAM_00001 - Business indicator created. kpi_30621353683547916, Sales evolution.
+[0m[0m16:11:18,722 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 77) BAM_00001 - Business indicator created. kpi_64061223773274641, Expense reports table.
+[0m[31m16:11:21,873 ERROR [org.jboss.as.controller.management-operation] (Controller Boot Thread) JBAS014612: Operation ("add") failed - address: ([
+    ("subsystem" => "datasources"),
+    ("data-source" => "account-ACCOUNT")
+]) - failure description: {"JBAS014771: Services with missing/unavailable dependencies" => [
+    "jboss.data-source.java:/accounts-ds is missing [jboss.jdbc-driver.CHECKER]",
+    "jboss.driver-demander.java:/accounts-ds is missing [jboss.jdbc-driver.CHECKER]"
+]}
+[0m[31m16:11:21,879 ERROR [org.jboss.as.controller.management-operation] (Controller Boot Thread) JBAS014612: Operation ("enable") failed - address: ([
+    ("subsystem" => "datasources"),
+    ("data-source" => "account-ACCOUNT")
+]) - failure description: {"JBAS014879: One or more services were unable to start due to one or more indirect dependencies not being available." => {
+    "Services that were unable to start:" => [
+        "jboss.data-source.reference-factory.account-ACCOUNT",
+        "jboss.naming.context.java.accounts-ds"
+    ],
+    "Services that may be the cause:" => ["jboss.jdbc-driver.CHECKER"]
+}}
+[0m[0m16:11:21,959 INFO  [org.jboss.as.server] (Controller Boot Thread) JBAS015859: Deployed "teiid-dashboard-builder.war" (runtime-name : "teiid-dashboard-builder.war")
+[0m[0m16:11:21,960 INFO  [org.jboss.as.server] (Controller Boot Thread) JBAS015859: Deployed "teiid-olingo-odata4.war" (runtime-name : "teiid-olingo-odata4.war")
+[0m[0m16:11:21,960 INFO  [org.jboss.as.server] (Controller Boot Thread) JBAS015859: Deployed "teiid-odata.war" (runtime-name : "teiid-odata.war")
+[0m[0m16:11:21,960 INFO  [org.jboss.as.server] (Controller Boot Thread) JBAS015859: Deployed "ModeShape.vdb" (runtime-name : "ModeShape.vdb")
+[0m[0m16:11:21,961 INFO  [org.jboss.as.server] (ServerService Thread Pool -- 32) JBAS015859: Deployed "webservice-vdb.xml" (runtime-name : "webservice-vdb.xml")
+[0m[0m16:11:21,961 INFO  [org.jboss.as.server] (ServerService Thread Pool -- 32) JBAS015859: Deployed "portfolio-vdb.xml" (runtime-name : "portfolio-vdb.xml")
+[0m[0m16:11:21,961 INFO  [org.jboss.as.server] (ServerService Thread Pool -- 32) JBAS015859: Deployed "hibernate-portfolio-vdb.xml" (runtime-name : "hibernate-portfolio-vdb.xml")
+[0m[0m16:11:21,961 INFO  [org.jboss.as.server] (ServerService Thread Pool -- 32) JBAS015859: Deployed "hibernate-on-top-of-teiid.war" (runtime-name : "hibernate-on-top-of-teiid.war")
+[0m[0m16:11:21,961 INFO  [org.jboss.as.server] (ServerService Thread Pool -- 32) JBAS015859: Deployed "CustomerRESTWebSvc.war" (runtime-name : "CustomerRESTWebSvc.war")
+[0m[0m16:11:21,961 INFO  [org.jboss.as.server] (ServerService Thread Pool -- 32) JBAS015859: Deployed "integration-platform-console.war" (runtime-name : "integration-platform-console.war")
+[0m[0m16:11:21,963 INFO  [org.jboss.as.server] (ServerService Thread Pool -- 56) JBAS015859: Deployed "modeshape-cmis.war" (runtime-name : "modeshape-cmis.war")
+[0m[0m16:11:21,963 INFO  [org.jboss.as.server] (ServerService Thread Pool -- 56) JBAS015859: Deployed "modeshape-webdav.war" (runtime-name : "modeshape-webdav.war")
+[0m[0m16:11:21,963 INFO  [org.jboss.as.server] (ServerService Thread Pool -- 56) JBAS015859: Deployed "modeshape-rest.war" (runtime-name : "modeshape-rest.war")
+[0m[0m16:11:21,965 INFO  [org.jboss.as.controller] (Controller Boot Thread) JBAS014774: Service status report
+JBAS014775:    New missing/unsatisfied dependencies:
+      service jboss.jdbc-driver.CHECKER (missing) dependents: [service jboss.data-source.java:/accounts-ds, service jboss.driver-demander.java:/accounts-ds] 
+
+[0m[0m16:11:22,119 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015961: Http management interface listening on http://127.0.0.1:9990/management
+[0m[0m16:11:22,119 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015951: Admin console listening on http://127.0.0.1:9990
+[0m[31m16:11:22,120 ERROR [org.jboss.as] (Controller Boot Thread) JBAS015875: JBoss Red Hat JBoss Data Virtualization 6.3.0 (AS 7.5.4.Final-redhat-4) started (with errors) in 21636ms - Started 1265 of 1366 services (4 services failed or missing dependencies, 192 services are lazy, passive or on-demand)
+[0m[31m16:13:14,489 ERROR [org.jboss.jca.core.tx.jbossts.XAResourceRecoveryImpl] (Periodic Recovery) IJ000906: Error during crash recovery: java:/oracle-ds (Could not create connection): javax.resource.ResourceException: Could not create connection
+	at org.jboss.jca.adapters.jdbc.xa.XAManagedConnectionFactory.getXAManagedConnection(XAManagedConnectionFactory.java:525)
+	at org.jboss.jca.adapters.jdbc.xa.XAManagedConnectionFactory$1.run(XAManagedConnectionFactory.java:416)
+	at org.jboss.jca.adapters.jdbc.xa.XAManagedConnectionFactory$1.run(XAManagedConnectionFactory.java:413)
+	at java.security.AccessController.doPrivileged(Native Method) [rt.jar:1.8.0_101]
+	at javax.security.auth.Subject.doAs(Subject.java:422) [rt.jar:1.8.0_101]
+	at org.jboss.jca.adapters.jdbc.xa.XAManagedConnectionFactory.createManagedConnection(XAManagedConnectionFactory.java:412)
+	at org.jboss.jca.core.tx.jbossts.XAResourceRecoveryImpl.open(XAResourceRecoveryImpl.java:343)
+	at org.jboss.jca.core.tx.jbossts.XAResourceRecoveryImpl.getXAResources(XAResourceRecoveryImpl.java:170)
+	at com.arjuna.ats.internal.jbossatx.jta.XAResourceRecoveryHelperWrapper.getXAResources(XAResourceRecoveryHelperWrapper.java:51)
+	at com.arjuna.ats.internal.jta.recovery.arjunacore.XARecoveryModule.resourceInitiatedRecoveryForRecoveryHelpers(XARecoveryModule.java:510)
+	at com.arjuna.ats.internal.jta.recovery.arjunacore.XARecoveryModule.periodicWorkFirstPass(XARecoveryModule.java:176)
+	at com.arjuna.ats.internal.arjuna.recovery.PeriodicRecovery.doWorkInternal(PeriodicRecovery.java:747)
+	at com.arjuna.ats.internal.arjuna.recovery.PeriodicRecovery.run(PeriodicRecovery.java:375)
+Caused by: java.sql.SQLException: Invalid Oracle URL specified: OracleDataSource.makeURL
+	at oracle.jdbc.pool.OracleDataSource.makeURL(OracleDataSource.java:1277)
+	at oracle.jdbc.pool.OracleDataSource.getURL(OracleDataSource.java:1025)
+	at oracle.jdbc.xa.client.OracleXADataSource.getPooledConnection(OracleXADataSource.java:205)
+	at oracle.jdbc.xa.client.OracleXADataSource.getXAConnection(OracleXADataSource.java:156)
+	at oracle.jdbc.xa.client.OracleXADataSource.getXAConnection(OracleXADataSource.java:130)
+	at org.jboss.jca.adapters.jdbc.xa.XAManagedConnectionFactory.getXAManagedConnection(XAManagedConnectionFactory.java:508)
+	... 12 more
+

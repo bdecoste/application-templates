@@ -102,24 +102,6 @@
             "from": "[a-zA-Z0-9]{8}",
             "generate": "expression",
             "required": true
-        },
-        {
-            "description": "Comma delimited list of files containing <resource-adapter> element(s) to be included in standalone.xml",
-            "name": "DATAVIRT_RESOURCE_ADAPTERS",
-            "value": "",
-            "required": false
-        },
-        {
-            "description": "Comma delimited list of files containing <datasource> element(s) to be included in standalone.xml",
-            "name": "DATAVIRT_DATASOURCES",
-            "value": "",
-            "required": false
-        },
-        {
-            "description": "Comma delimited list of files containing <translator> element(s) to be included in standalone.xml",
-            "name": "DATAVIRT_TRANSLATORS",
-            "value": "",
-            "required": false
         }
     ],
     "objects": [
@@ -410,18 +392,6 @@
                                     {
                                         "name": "JGROUPS_CLUSTER_PASSWORD",
                                         "value": "${JGROUPS_CLUSTER_PASSWORD}"
-                                    },
-                                    {
-                                        "name": "DATAVIRT_RESOURCE_ADAPTERS",
-                                        "value": "${DATAVIRT_RESOURCE_ADAPTERS}"
-                                    },
-                                    {
-                                        "name": "DATAVIRT_DATASOURCES",
-                                        "value": "${DATAVIRT_DATASOURCES}"
-                                    },
-                                    {
-                                        "name": "DATAVIRT_TRANSLATORS",
-                                        "value": "${DATAVIRT_TRANSLATORS}"
                                     }
                                 ]
                             }
