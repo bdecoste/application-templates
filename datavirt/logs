@@ -1,9 +1,3 @@
-+ configure_config_maps
-+ '[' -n '' ']'
-+ . /opt/eap/bin/launch/messaging.sh
-++ HORNETQ_SUBSYSTEM_FILE=/opt/eap/bin/launch/hornetq-subsystem.xml
-++ . /opt/eap/bin/launch/launch-common.sh
-+++ set -x
 + inject_brokers
 + IFS=,
 + read -a brokers
@@ -14,8 +8,8 @@
 + configure_hornetq
 + '[' true '!=' false ']'
 + configure_hornetq_cluster_password
-+ '[' -n iY3WwYAH ']'
-+ JBOSS_MESSAGING_ARGS=' -Djboss.messaging.cluster.password=iY3WwYAH'
++ '[' -n OYHdMQDI ']'
++ JBOSS_MESSAGING_ARGS=' -Djboss.messaging.cluster.password=OYHdMQDI'
 ++ configure_hornetq_destinations
 ++ IFS=,
 ++ read -a queues
@@ -44,487 +38,457 @@
 + timerservice='            <timer-service thread-pool-name="default" default-data-store="default-file-store">                <data-stores>                    <file-data-store name="default-file-store" path="timer-service-data" relative-to="jboss.server.data.dir"/>                    <!-- ##DATASTORES## -->                </data-stores>            </timer-service>'
 + sed -i 's|<!-- ##TIMER_SERVICE## -->|            <timer-service thread-pool-name="default" default-data-store="default-file-store">                <data-stores>                    <file-data-store name="default-file-store" path="timer-service-data" relative-to="jboss.server.data.dir"/>                    <!-- ##DATASTORES## -->                </data-stores>            </timer-service>|' /opt/eap/standalone/configuration/standalone-openshift.xml
 + datasources=
-++ echo datavirt-postgresql=POSTGRESQL,datavirt-mysql=MYSQL
+++ echo
 ++ sed 's/,/ /g'
-+ for db_backend in '$(echo $DB_SERVICE_PREFIX_MAPPING | sed "s/,/ /g")'
-+ '[' 1 -eq 0 ']'
-+ for db_backend in '${db_backend[@]}'
-+ service_name=datavirt-postgresql
-+ service=DATAVIRT-POSTGRESQL
-+ service=DATAVIRT_POSTGRESQL
-+ db=POSTGRESQL
-+ prefix=POSTGRESQL
-+ [[ DATAVIRT_POSTGRESQL != *\_* ]]
-+ inject_datasource POSTGRESQL DATAVIRT_POSTGRESQL
-+ prefix=POSTGRESQL
-+ service=DATAVIRT_POSTGRESQL
-++ find_env DATAVIRT_POSTGRESQL_SERVICE_HOST
-+++ printenv DATAVIRT_POSTGRESQL_SERVICE_HOST
-++ var=172.30.0.180
-++ envname=DATAVIRT_POSTGRESQL_SERVICE_HOST
-++ '[' -n 172.30.0.180 ']'
-++ echo 172.30.0.180
-+ host=172.30.0.180
-++ find_env DATAVIRT_POSTGRESQL_SERVICE_PORT
-+++ printenv DATAVIRT_POSTGRESQL_SERVICE_PORT
-++ var=5432
-++ envname=DATAVIRT_POSTGRESQL_SERVICE_PORT
-++ '[' -n 5432 ']'
-++ echo 5432
-+ port=5432
-+ '[' -z 172.30.0.180 ']'
-+ '[' -z 5432 ']'
-++ get_jndi_name POSTGRESQL DATAVIRT_POSTGRESQL
-++ prefix=POSTGRESQL
-+++ find_env POSTGRESQL_JNDI java:jboss/datasources/datavirt_postgresql
-++++ printenv POSTGRESQL_JNDI
-+++ var=java:/postgresql-ds
-+++ envname=POSTGRESQL_JNDI
-+++ '[' -n java:/postgresql-ds ']'
-+++ echo java:/postgresql-ds
-++ echo java:/postgresql-ds
-+ jndi=java:/postgresql-ds
-++ find_env POSTGRESQL_USERNAME
-+++ printenv POSTGRESQL_USERNAME
-++ var=jdv
-++ envname=POSTGRESQL_USERNAME
-++ '[' -n jdv ']'
-++ echo jdv
-+ username=jdv
-++ find_env POSTGRESQL_PASSWORD
-+++ printenv POSTGRESQL_PASSWORD
-++ var=jdv
-++ envname=POSTGRESQL_PASSWORD
-++ '[' -n jdv ']'
-++ echo jdv
-+ password=jdv
-++ find_env POSTGRESQL_DATABASE
-+++ printenv POSTGRESQL_DATABASE
-++ var=jdv
-++ envname=POSTGRESQL_DATABASE
-++ '[' -n jdv ']'
-++ echo jdv
-+ database=jdv
-+ '[' -z java:/postgresql-ds ']'
-+ '[' -z jdv ']'
-+ '[' -z jdv ']'
-+ '[' -z jdv ']'
-++ find_env POSTGRESQL_TX_ISOLATION
-+++ printenv POSTGRESQL_TX_ISOLATION
-++ var=TRANSACTION_READ_UNCOMMITTED
-++ envname=POSTGRESQL_TX_ISOLATION
-++ '[' -n TRANSACTION_READ_UNCOMMITTED ']'
-++ echo TRANSACTION_READ_UNCOMMITTED
-+ tx_isolation=TRANSACTION_READ_UNCOMMITTED
-++ find_env POSTGRESQL_MIN_POOL_SIZE
-+++ printenv POSTGRESQL_MIN_POOL_SIZE
-++ var=5
-++ envname=POSTGRESQL_MIN_POOL_SIZE
-++ '[' -n 5 ']'
-++ echo 5
-+ min_pool_size=5
-++ find_env POSTGRESQL_MAX_POOL_SIZE
-+++ printenv POSTGRESQL_MAX_POOL_SIZE
-++ var=20
-++ envname=POSTGRESQL_MAX_POOL_SIZE
-++ '[' -n 20 ']'
-++ echo 20
-+ max_pool_size=20
-++ find_env POSTGRESQL_JTA true
-+++ printenv POSTGRESQL_JTA
-++ var=
-++ envname=POSTGRESQL_JTA
-++ '[' -n '' ']'
-++ var=
-++ '[' -n '' ']'
-++ echo true
-+ jta=true
-++ find_env POSTGRESQL_NONXA false
-+++ printenv POSTGRESQL_NONXA
-++ var=
-++ envname=POSTGRESQL_NONXA
-++ '[' -n '' ']'
-++ var=
-++ '[' -n '' ']'
-++ echo false
-+ NON_XA_DATASOURCE=false
-++ find_env POSTGRESQL_PROTOCOL
-+++ printenv POSTGRESQL_PROTOCOL
-++ var=
-++ envname=POSTGRESQL_PROTOCOL
-++ '[' -n '' ']'
-++ var=
-++ '[' -n '' ']'
-++ echo
-+ protocol=
-+ case "$db" in
-+ driver=postgresql
-+ validate=true
-+ checker=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker
-+ sorter=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter
-++ generate_datasource datavirt_postgresql-POSTGRESQL java:/postgresql-ds jdv jdv 172.30.0.180 5432 jdv org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter postgresql datavirt-postgresql true true
-++ pool_name=datavirt_postgresql-POSTGRESQL
-++ jndi_name=java:/postgresql-ds
-++ driver=postgresql
-++ service_name=datavirt-postgresql
-++ validate=true
-++ protocol=
-++ case "${10}" in
-++ '[' -n false ']'
-++ '[' false = true ']'
-++ ds='                <xa-datasource jndi-name="java:/postgresql-ds" pool-name="datavirt_postgresql-POSTGRESQL" use-java-context="true" enabled="true">
-                    <xa-datasource-property name="ServerName">172.30.0.180</xa-datasource-property>
-                    <xa-datasource-property name="PortNumber">5432</xa-datasource-property>
-                    <xa-datasource-property name="DatabaseName">jdv</xa-datasource-property>
-                    <driver>postgresql</driver>'
-++ '[' -n TRANSACTION_READ_UNCOMMITTED ']'
-++ ds='                <xa-datasource jndi-name="java:/postgresql-ds" pool-name="datavirt_postgresql-POSTGRESQL" use-java-context="true" enabled="true">
-                    <xa-datasource-property name="ServerName">172.30.0.180</xa-datasource-property>
-                    <xa-datasource-property name="PortNumber">5432</xa-datasource-property>
-                    <xa-datasource-property name="DatabaseName">jdv</xa-datasource-property>
-                    <driver>postgresql</driver> 
-                      <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation>'
-++ '[' -n 5 ']'
-++ '[' -n false ']'
-++ '[' false = true ']'
-++ ds='                <xa-datasource jndi-name="java:/postgresql-ds" pool-name="datavirt_postgresql-POSTGRESQL" use-java-context="true" enabled="true">
-                    <xa-datasource-property name="ServerName">172.30.0.180</xa-datasource-property>
-                    <xa-datasource-property name="PortNumber">5432</xa-datasource-property>
-                    <xa-datasource-property name="DatabaseName">jdv</xa-datasource-property>
-                    <driver>postgresql</driver> 
-                      <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation>
-                        <xa-pool>'
-++ '[' -n 5 ']'
-++ ds='                <xa-datasource jndi-name="java:/postgresql-ds" pool-name="datavirt_postgresql-POSTGRESQL" use-java-context="true" enabled="true">
-                    <xa-datasource-property name="ServerName">172.30.0.180</xa-datasource-property>
-                    <xa-datasource-property name="PortNumber">5432</xa-datasource-property>
-                    <xa-datasource-property name="DatabaseName">jdv</xa-datasource-property>
-                    <driver>postgresql</driver> 
-                      <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation>
-                        <xa-pool>
-                          <min-pool-size>5</min-pool-size>'
-++ '[' -n 20 ']'
-++ ds='                <xa-datasource jndi-name="java:/postgresql-ds" pool-name="datavirt_postgresql-POSTGRESQL" use-java-context="true" enabled="true">
-                    <xa-datasource-property name="ServerName">172.30.0.180</xa-datasource-property>
-                    <xa-datasource-property name="PortNumber">5432</xa-datasource-property>
-                    <xa-datasource-property name="DatabaseName">jdv</xa-datasource-property>
-                    <driver>postgresql</driver> 
-                      <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation>
-                        <xa-pool>
-                          <min-pool-size>5</min-pool-size>
-                          <max-pool-size>20</max-pool-size>'
-++ '[' -n false ']'
-++ '[' false = true ']'
-++ ds='                <xa-datasource jndi-name="java:/postgresql-ds" pool-name="datavirt_postgresql-POSTGRESQL" use-java-context="true" enabled="true">
-                    <xa-datasource-property name="ServerName">172.30.0.180</xa-datasource-property>
-                    <xa-datasource-property name="PortNumber">5432</xa-datasource-property>
-                    <xa-datasource-property name="DatabaseName">jdv</xa-datasource-property>
-                    <driver>postgresql</driver> 
-                      <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation>
-                        <xa-pool>
-                          <min-pool-size>5</min-pool-size>
-                          <max-pool-size>20</max-pool-size>
-                        </xa-pool>'
-++ ds='                <xa-datasource jndi-name="java:/postgresql-ds" pool-name="datavirt_postgresql-POSTGRESQL" use-java-context="true" enabled="true">
-                    <xa-datasource-property name="ServerName">172.30.0.180</xa-datasource-property>
-                    <xa-datasource-property name="PortNumber">5432</xa-datasource-property>
-                    <xa-datasource-property name="DatabaseName">jdv</xa-datasource-property>
-                    <driver>postgresql</driver> 
-                      <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation>
-                        <xa-pool>
-                          <min-pool-size>5</min-pool-size>
-                          <max-pool-size>20</max-pool-size>
-                        </xa-pool>
-                    <security>
-                        <user-name>jdv</user-name>
-                        <password>jdv</password>
-                    </security>
-                    <validation>
-                        <validate-on-match>true</validate-on-match>
-                        <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker"></valid-connection-checker>
-                        <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter"></exception-sorter>
-                    </validation>'
-++ '[' -n false ']'
-++ '[' false = true ']'
-++ ds='                <xa-datasource jndi-name="java:/postgresql-ds" pool-name="datavirt_postgresql-POSTGRESQL" use-java-context="true" enabled="true">
-                    <xa-datasource-property name="ServerName">172.30.0.180</xa-datasource-property>
-                    <xa-datasource-property name="PortNumber">5432</xa-datasource-property>
-                    <xa-datasource-property name="DatabaseName">jdv</xa-datasource-property>
-                    <driver>postgresql</driver> 
-                      <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation>
-                        <xa-pool>
-                          <min-pool-size>5</min-pool-size>
-                          <max-pool-size>20</max-pool-size>
-                        </xa-pool>
-                    <security>
-                        <user-name>jdv</user-name>
-                        <password>jdv</password>
-                    </security>
-                    <validation>
-                        <validate-on-match>true</validate-on-match>
-                        <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker"></valid-connection-checker>
-                        <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter"></exception-sorter>
-                    </validation>
-                  </xa-datasource>'
-++ '[' -n '' -a '' = datavirt-postgresql ']'
-++ echo '<xa-datasource' 'jndi-name="java:/postgresql-ds"' 'pool-name="datavirt_postgresql-POSTGRESQL"' 'use-java-context="true"' 'enabled="true">' '<xa-datasource-property' 'name="ServerName">172.30.0.180</xa-datasource-property>' '<xa-datasource-property' 'name="PortNumber">5432</xa-datasource-property>' '<xa-datasource-property' 'name="DatabaseName">jdv</xa-datasource-property>' '<driver>postgresql</driver>' '<transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation>' '<xa-pool>' '<min-pool-size>5</min-pool-size>' '<max-pool-size>20</max-pool-size>' '</xa-pool>' '<security>' '<user-name>jdv</user-name>' '<password>jdv</password>' '</security>' '<validation>' '<validate-on-match>true</validate-on-match>' '<valid-connection-checker' 'class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker"></valid-connection-checker>' '<exception-sorter' 'class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter"></exception-sorter>' '</validation>' '</xa-datasource>'
-++ sed ':a;N;$!ba;s|\n|\\n|g'
-+ datasources='<xa-datasource jndi-name="java:/postgresql-ds" pool-name="datavirt_postgresql-POSTGRESQL" use-java-context="true" enabled="true"> <xa-datasource-property name="ServerName">172.30.0.180</xa-datasource-property> <xa-datasource-property name="PortNumber">5432</xa-datasource-property> <xa-datasource-property name="DatabaseName">jdv</xa-datasource-property> <driver>postgresql</driver> <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation> <xa-pool> <min-pool-size>5</min-pool-size> <max-pool-size>20</max-pool-size> </xa-pool> <security> <user-name>jdv</user-name> <password>jdv</password> </security> <validation> <validate-on-match>true</validate-on-match> <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker"></valid-connection-checker> <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter"></exception-sorter> </validation> </xa-datasource>\n'
-+ for db_backend in '$(echo $DB_SERVICE_PREFIX_MAPPING | sed "s/,/ /g")'
-+ '[' 1 -eq 0 ']'
-+ for db_backend in '${db_backend[@]}'
-+ service_name=datavirt-mysql
-+ service=DATAVIRT-MYSQL
-+ service=DATAVIRT_MYSQL
-+ db=MYSQL
-+ prefix=MYSQL
-+ [[ DATAVIRT_MYSQL != *\_* ]]
-+ inject_datasource MYSQL DATAVIRT_MYSQL
-+ prefix=MYSQL
-+ service=DATAVIRT_MYSQL
-++ find_env DATAVIRT_MYSQL_SERVICE_HOST
-+++ printenv DATAVIRT_MYSQL_SERVICE_HOST
-++ var=172.30.23.218
-++ envname=DATAVIRT_MYSQL_SERVICE_HOST
-++ '[' -n 172.30.23.218 ']'
-++ echo 172.30.23.218
-+ host=172.30.23.218
-++ find_env DATAVIRT_MYSQL_SERVICE_PORT
-+++ printenv DATAVIRT_MYSQL_SERVICE_PORT
-++ var=3306
-++ envname=DATAVIRT_MYSQL_SERVICE_PORT
-++ '[' -n 3306 ']'
-++ echo 3306
-+ port=3306
-+ '[' -z 172.30.23.218 ']'
-+ '[' -z 3306 ']'
-++ get_jndi_name MYSQL DATAVIRT_MYSQL
-++ prefix=MYSQL
-+++ find_env MYSQL_JNDI java:jboss/datasources/datavirt_mysql
-++++ printenv MYSQL_JNDI
-+++ var=java:/mysql-ds
-+++ envname=MYSQL_JNDI
-+++ '[' -n java:/mysql-ds ']'
-+++ echo java:/mysql-ds
-++ echo java:/mysql-ds
-+ jndi=java:/mysql-ds
-++ find_env MYSQL_USERNAME
-+++ printenv MYSQL_USERNAME
-++ var=jdv
-++ envname=MYSQL_USERNAME
-++ '[' -n jdv ']'
-++ echo jdv
-+ username=jdv
-++ find_env MYSQL_PASSWORD
-+++ printenv MYSQL_PASSWORD
-++ var=jdv
-++ envname=MYSQL_PASSWORD
-++ '[' -n jdv ']'
-++ echo jdv
-+ password=jdv
-++ find_env MYSQL_DATABASE
-+++ printenv MYSQL_DATABASE
-++ var=jdv
-++ envname=MYSQL_DATABASE
-++ '[' -n jdv ']'
-++ echo jdv
-+ database=jdv
-+ '[' -z java:/mysql-ds ']'
-+ '[' -z jdv ']'
-+ '[' -z jdv ']'
-+ '[' -z jdv ']'
-++ find_env MYSQL_TX_ISOLATION
-+++ printenv MYSQL_TX_ISOLATION
-++ var=TRANSACTION_READ_UNCOMMITTED
-++ envname=MYSQL_TX_ISOLATION
-++ '[' -n TRANSACTION_READ_UNCOMMITTED ']'
-++ echo TRANSACTION_READ_UNCOMMITTED
-+ tx_isolation=TRANSACTION_READ_UNCOMMITTED
-++ find_env MYSQL_MIN_POOL_SIZE
-+++ printenv MYSQL_MIN_POOL_SIZE
-++ var=5
-++ envname=MYSQL_MIN_POOL_SIZE
-++ '[' -n 5 ']'
-++ echo 5
-+ min_pool_size=5
-++ find_env MYSQL_MAX_POOL_SIZE
-+++ printenv MYSQL_MAX_POOL_SIZE
-++ var=20
-++ envname=MYSQL_MAX_POOL_SIZE
-++ '[' -n 20 ']'
-++ echo 20
-+ max_pool_size=20
-++ find_env MYSQL_JTA true
-+++ printenv MYSQL_JTA
-++ var=
-++ envname=MYSQL_JTA
-++ '[' -n '' ']'
-++ var=
-++ '[' -n '' ']'
-++ echo true
-+ jta=true
-++ find_env MYSQL_NONXA false
-+++ printenv MYSQL_NONXA
-++ var=
-++ envname=MYSQL_NONXA
-++ '[' -n '' ']'
-++ var=
-++ '[' -n '' ']'
-++ echo false
-+ NON_XA_DATASOURCE=false
-++ find_env MYSQL_PROTOCOL
-+++ printenv MYSQL_PROTOCOL
-++ var=
-++ envname=MYSQL_PROTOCOL
-++ '[' -n '' ']'
-++ var=
-++ '[' -n '' ']'
-++ echo
-+ protocol=
-+ case "$db" in
-+ driver=mysql
-+ validate=true
-+ checker=org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker
-+ sorter=org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter
-++ generate_datasource datavirt_mysql-MYSQL java:/mysql-ds jdv jdv 172.30.23.218 3306 jdv org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter mysql datavirt-mysql true true
-++ pool_name=datavirt_mysql-MYSQL
-++ jndi_name=java:/mysql-ds
-++ driver=mysql
-++ service_name=datavirt-mysql
-++ validate=true
-++ protocol=
-++ case "${10}" in
-++ '[' -n false ']'
-++ '[' false = true ']'
-++ ds='
-                  <xa-datasource jndi-name="java:/mysql-ds" pool-name="datavirt_mysql-MYSQL" use-java-context="true" enabled="true">
-                      <xa-datasource-property name="ServerName">172.30.23.218</xa-datasource-property>
-                      <xa-datasource-property name="Port">3306</xa-datasource-property>
-                      <xa-datasource-property name="DatabaseName">jdv</xa-datasource-property>
-                      <driver>mysql</driver>'
-++ '[' -n TRANSACTION_READ_UNCOMMITTED ']'
-++ ds='
-                  <xa-datasource jndi-name="java:/mysql-ds" pool-name="datavirt_mysql-MYSQL" use-java-context="true" enabled="true">
-                      <xa-datasource-property name="ServerName">172.30.23.218</xa-datasource-property>
-                      <xa-datasource-property name="Port">3306</xa-datasource-property>
-                      <xa-datasource-property name="DatabaseName">jdv</xa-datasource-property>
-                      <driver>mysql</driver> 
-                      <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation>'
-++ '[' -n 5 ']'
-++ '[' -n false ']'
-++ '[' false = true ']'
-++ ds='
-                  <xa-datasource jndi-name="java:/mysql-ds" pool-name="datavirt_mysql-MYSQL" use-java-context="true" enabled="true">
-                      <xa-datasource-property name="ServerName">172.30.23.218</xa-datasource-property>
-                      <xa-datasource-property name="Port">3306</xa-datasource-property>
-                      <xa-datasource-property name="DatabaseName">jdv</xa-datasource-property>
-                      <driver>mysql</driver> 
-                      <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation>
-                        <xa-pool>'
-++ '[' -n 5 ']'
-++ ds='
-                  <xa-datasource jndi-name="java:/mysql-ds" pool-name="datavirt_mysql-MYSQL" use-java-context="true" enabled="true">
-                      <xa-datasource-property name="ServerName">172.30.23.218</xa-datasource-property>
-                      <xa-datasource-property name="Port">3306</xa-datasource-property>
-                      <xa-datasource-property name="DatabaseName">jdv</xa-datasource-property>
-                      <driver>mysql</driver> 
-                      <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation>
-                        <xa-pool>
-                          <min-pool-size>5</min-pool-size>'
-++ '[' -n 20 ']'
-++ ds='
-                  <xa-datasource jndi-name="java:/mysql-ds" pool-name="datavirt_mysql-MYSQL" use-java-context="true" enabled="true">
-                      <xa-datasource-property name="ServerName">172.30.23.218</xa-datasource-property>
-                      <xa-datasource-property name="Port">3306</xa-datasource-property>
-                      <xa-datasource-property name="DatabaseName">jdv</xa-datasource-property>
-                      <driver>mysql</driver> 
-                      <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation>
-                        <xa-pool>
-                          <min-pool-size>5</min-pool-size>
-                          <max-pool-size>20</max-pool-size>'
-++ '[' -n false ']'
-++ '[' false = true ']'
-++ ds='
-                  <xa-datasource jndi-name="java:/mysql-ds" pool-name="datavirt_mysql-MYSQL" use-java-context="true" enabled="true">
-                      <xa-datasource-property name="ServerName">172.30.23.218</xa-datasource-property>
-                      <xa-datasource-property name="Port">3306</xa-datasource-property>
-                      <xa-datasource-property name="DatabaseName">jdv</xa-datasource-property>
-                      <driver>mysql</driver> 
-                      <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation>
-                        <xa-pool>
-                          <min-pool-size>5</min-pool-size>
-                          <max-pool-size>20</max-pool-size>
-                        </xa-pool>'
-++ ds='
-                  <xa-datasource jndi-name="java:/mysql-ds" pool-name="datavirt_mysql-MYSQL" use-java-context="true" enabled="true">
-                      <xa-datasource-property name="ServerName">172.30.23.218</xa-datasource-property>
-                      <xa-datasource-property name="Port">3306</xa-datasource-property>
-                      <xa-datasource-property name="DatabaseName">jdv</xa-datasource-property>
-                      <driver>mysql</driver> 
-                      <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation>
-                        <xa-pool>
-                          <min-pool-size>5</min-pool-size>
-                          <max-pool-size>20</max-pool-size>
-                        </xa-pool>
-                      <security>
-                          <user-name>jdv</user-name>
-                          <password>jdv</password>
-                      </security>'
-++ '[' true == true ']'
-++ ds='
-                  <xa-datasource jndi-name="java:/mysql-ds" pool-name="datavirt_mysql-MYSQL" use-java-context="true" enabled="true">
-                      <xa-datasource-property name="ServerName">172.30.23.218</xa-datasource-property>
-                      <xa-datasource-property name="Port">3306</xa-datasource-property>
-                      <xa-datasource-property name="DatabaseName">jdv</xa-datasource-property>
-                      <driver>mysql</driver> 
-                      <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation>
-                        <xa-pool>
-                          <min-pool-size>5</min-pool-size>
-                          <max-pool-size>20</max-pool-size>
-                        </xa-pool>
-                      <security>
-                          <user-name>jdv</user-name>
-                          <password>jdv</password>
-                      </security>
-                      <validation>
-                          <validate-on-match>true</validate-on-match>
-                          <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker"></valid-connection-checker>
-                          <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter"></exception-sorter>
-                      </validation>'
-++ '[' -n false ']'
-++ '[' false = true ']'
-++ ds='
-                  <xa-datasource jndi-name="java:/mysql-ds" pool-name="datavirt_mysql-MYSQL" use-java-context="true" enabled="true">
-                      <xa-datasource-property name="ServerName">172.30.23.218</xa-datasource-property>
-                      <xa-datasource-property name="Port">3306</xa-datasource-property>
-                      <xa-datasource-property name="DatabaseName">jdv</xa-datasource-property>
-                      <driver>mysql</driver> 
-                      <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation>
-                        <xa-pool>
-                          <min-pool-size>5</min-pool-size>
-                          <max-pool-size>20</max-pool-size>
-                        </xa-pool>
-                      <security>
-                          <user-name>jdv</user-name>
-                          <password>jdv</password>
-                      </security>
-                      <validation>
-                          <validate-on-match>true</validate-on-match>
-                          <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker"></valid-connection-checker>
-                          <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter"></exception-sorter>
-                      </validation>
-                  </xa-datasource>'
-++ '[' -n '' -a '' = datavirt-mysql ']'
-++ echo '<xa-datasource' 'jndi-name="java:/mysql-ds"' 'pool-name="datavirt_mysql-MYSQL"' 'use-java-context="true"' 'enabled="true">' '<xa-datasource-property' 'name="ServerName">172.30.23.218</xa-datasource-property>' '<xa-datasource-property' 'name="Port">3306</xa-datasource-property>' '<xa-datasource-property' 'name="DatabaseName">jdv</xa-datasource-property>' '<driver>mysql</driver>' '<transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation>' '<xa-pool>' '<min-pool-size>5</min-pool-size>' '<max-pool-size>20</max-pool-size>' '</xa-pool>' '<security>' '<user-name>jdv</user-name>' '<password>jdv</password>' '</security>' '<validation>' '<validate-on-match>true</validate-on-match>' '<valid-connection-checker' 'class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker"></valid-connection-checker>' '<exception-sorter' 'class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter"></exception-sorter>' '</validation>' '</xa-datasource>'
-++ sed ':a;N;$!ba;s|\n|\\n|g'
-+ datasources='<xa-datasource jndi-name="java:/postgresql-ds" pool-name="datavirt_postgresql-POSTGRESQL" use-java-context="true" enabled="true"> <xa-datasource-property name="ServerName">172.30.0.180</xa-datasource-property> <xa-datasource-property name="PortNumber">5432</xa-datasource-property> <xa-datasource-property name="DatabaseName">jdv</xa-datasource-property> <driver>postgresql</driver> <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation> <xa-pool> <min-pool-size>5</min-pool-size> <max-pool-size>20</max-pool-size> </xa-pool> <security> <user-name>jdv</user-name> <password>jdv</password> </security> <validation> <validate-on-match>true</validate-on-match> <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker"></valid-connection-checker> <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter"></exception-sorter> </validation> </xa-datasource>\n<xa-datasource jndi-name="java:/mysql-ds" pool-name="datavirt_mysql-MYSQL" use-java-context="true" enabled="true"> <xa-datasource-property name="ServerName">172.30.23.218</xa-datasource-property> <xa-datasource-property name="Port">3306</xa-datasource-property> <xa-datasource-property name="DatabaseName">jdv</xa-datasource-property> <driver>mysql</driver> <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation> <xa-pool> <min-pool-size>5</min-pool-size> <max-pool-size>20</max-pool-size> </xa-pool> <security> <user-name>jdv</user-name> <password>jdv</password> </security> <validation> <validate-on-match>true</validate-on-match> <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker"></valid-connection-checker> <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter"></exception-sorter> </validation> </xa-datasource>\n'
 ++ inject_tx_datasource
 ++ tx_backend=
 ++ '[' -n '' ']'
-+ datasources='<xa-datasource jndi-name="java:/postgresql-ds" pool-name="datavirt_postgresql-POSTGRESQL" use-java-context="true" enabled="true"> <xa-datasource-property name="ServerName">172.30.0.180</xa-datasource-property> <xa-datasource-property name="PortNumber">5432</xa-datasource-property> <xa-datasource-property name="DatabaseName">jdv</xa-datasource-property> <driver>postgresql</driver> <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation> <xa-pool> <min-pool-size>5</min-pool-size> <max-pool-size>20</max-pool-size> </xa-pool> <security> <user-name>jdv</user-name> <password>jdv</password> </security> <validation> <validate-on-match>true</validate-on-match> <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker"></valid-connection-checker> <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter"></exception-sorter> </validation> </xa-datasource>\n<xa-datasource jndi-name="java:/mysql-ds" pool-name="datavirt_mysql-MYSQL" use-java-context="true" enabled="true"> <xa-datasource-property name="ServerName">172.30.23.218</xa-datasource-property> <xa-datasource-property name="Port">3306</xa-datasource-property> <xa-datasource-property name="DatabaseName">jdv</xa-datasource-property> <driver>mysql</driver> <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation> <xa-pool> <min-pool-size>5</min-pool-size> <max-pool-size>20</max-pool-size> </xa-pool> <security> <user-name>jdv</user-name> <password>jdv</password> </security> <validation> <validate-on-match>true</validate-on-match> <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker"></valid-connection-checker> <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter"></exception-sorter> </validation> </xa-datasource>\n'
++ datasources=
 + db=EXTERNAL
++ '[' -n /etc/jdv-account1/jdv-account1.properties,/etc/jdv-account2/jdv-account2.properties ']'
+++ echo /etc/jdv-account1/jdv-account1.properties,/etc/jdv-account2/jdv-account2.properties
+++ sed 's/,/ /g'
++ for cm_file in '$(echo $DATASOURCE_CONFIG_MAP | sed "s/,/ /g")'
++ . /etc/jdv-account1/jdv-account1.properties
+++ DATASOURCES=ACCOUNT1
+++ ACCOUNT1_JNDI=java:/accounts-ds
+++ ACCOUNT1_DRIVER=h2
+++ ACCOUNT1_USERNAME=sa
+++ ACCOUNT1_PASSWORD=sa
+++ ACCOUNT1_DATABASE=accounts
+++ ACCOUNT1_IMPORT_SQL=/home/jboss/source/injected/injected-files/customer-schema.sql
+++ ACCOUNT1_PROTOCOL=jdbc:h2
+++ ACCOUNT1_SERVICE_HOST=mem
+++ ACCOUNT1_SERVICE_PORT=9092
+++ ACCOUNT1_NONXA=true
++ '[' -n ACCOUNT1 ']'
+++ echo ACCOUNT1
+++ sed 's/,/ /g'
++ for datasource_prefix in '$(echo $DATASOURCES | sed "s/,/ /g")'
++ inject_datasource ACCOUNT1 ACCOUNT1
++ prefix=ACCOUNT1
++ service=ACCOUNT1
+++ find_env ACCOUNT1_SERVICE_HOST
++++ printenv ACCOUNT1_SERVICE_HOST
+++ var=
+++ envname=ACCOUNT1_SERVICE_HOST
+++ '[' -n '' ']'
+++ var=mem
+++ '[' -n mem ']'
+++ echo mem
++ host=mem
+++ find_env ACCOUNT1_SERVICE_PORT
++++ printenv ACCOUNT1_SERVICE_PORT
+++ var=
+++ envname=ACCOUNT1_SERVICE_PORT
+++ '[' -n '' ']'
+++ var=9092
+++ '[' -n 9092 ']'
+++ echo 9092
++ port=9092
++ '[' -z mem ']'
++ '[' -z 9092 ']'
+++ get_jndi_name ACCOUNT1 ACCOUNT1
+++ prefix=ACCOUNT1
++++ find_env ACCOUNT1_JNDI java:jboss/datasources/account1
+++++ printenv ACCOUNT1_JNDI
++++ var=
++++ envname=ACCOUNT1_JNDI
++++ '[' -n '' ']'
++++ var=java:/accounts-ds
++++ '[' -n java:/accounts-ds ']'
++++ echo java:/accounts-ds
+++ echo java:/accounts-ds
++ jndi=java:/accounts-ds
+++ find_env ACCOUNT1_USERNAME
++++ printenv ACCOUNT1_USERNAME
+++ var=
+++ envname=ACCOUNT1_USERNAME
+++ '[' -n '' ']'
+++ var=sa
+++ '[' -n sa ']'
+++ echo sa
++ username=sa
+++ find_env ACCOUNT1_PASSWORD
++++ printenv ACCOUNT1_PASSWORD
+++ var=
+++ envname=ACCOUNT1_PASSWORD
+++ '[' -n '' ']'
+++ var=sa
+++ '[' -n sa ']'
+++ echo sa
++ password=sa
+++ find_env ACCOUNT1_DATABASE
++++ printenv ACCOUNT1_DATABASE
+++ var=
+++ envname=ACCOUNT1_DATABASE
+++ '[' -n '' ']'
+++ var=accounts
+++ '[' -n accounts ']'
+++ echo accounts
++ database=accounts
++ '[' -z java:/accounts-ds ']'
++ '[' -z sa ']'
++ '[' -z sa ']'
++ '[' -z accounts ']'
+++ find_env ACCOUNT1_TX_ISOLATION
++++ printenv ACCOUNT1_TX_ISOLATION
+++ var=
+++ envname=ACCOUNT1_TX_ISOLATION
+++ '[' -n '' ']'
+++ var=
+++ '[' -n '' ']'
+++ echo
++ tx_isolation=
+++ find_env ACCOUNT1_MIN_POOL_SIZE
++++ printenv ACCOUNT1_MIN_POOL_SIZE
+++ var=
+++ envname=ACCOUNT1_MIN_POOL_SIZE
+++ '[' -n '' ']'
+++ var=
+++ '[' -n '' ']'
+++ echo
++ min_pool_size=
+++ find_env ACCOUNT1_MAX_POOL_SIZE
++++ printenv ACCOUNT1_MAX_POOL_SIZE
+++ var=
+++ envname=ACCOUNT1_MAX_POOL_SIZE
+++ '[' -n '' ']'
+++ var=
+++ '[' -n '' ']'
+++ echo
++ max_pool_size=
+++ find_env ACCOUNT1_JTA true
++++ printenv ACCOUNT1_JTA
+++ var=
+++ envname=ACCOUNT1_JTA
+++ '[' -n '' ']'
+++ var=
+++ '[' -n '' ']'
+++ echo true
++ jta=true
+++ find_env ACCOUNT1_NONXA false
++++ printenv ACCOUNT1_NONXA
+++ var=
+++ envname=ACCOUNT1_NONXA
+++ '[' -n '' ']'
+++ var=true
+++ '[' -n true ']'
+++ echo true
++ NON_XA_DATASOURCE=true
+++ find_env ACCOUNT1_PROTOCOL
++++ printenv ACCOUNT1_PROTOCOL
+++ var=
+++ envname=ACCOUNT1_PROTOCOL
+++ '[' -n '' ']'
+++ var=jdbc:h2
+++ '[' -n jdbc:h2 ']'
+++ echo jdbc:h2
++ protocol=jdbc:h2
++ case "$db" in
+++ find_env ACCOUNT1_DRIVER true
++++ printenv ACCOUNT1_DRIVER
+++ var=
+++ envname=ACCOUNT1_DRIVER
+++ '[' -n '' ']'
+++ var=h2
+++ '[' -n h2 ']'
+++ echo h2
++ driver=h2
+++ find_env ACCOUNT1_CONNECTION_CHECKER
++++ printenv ACCOUNT1_CONNECTION_CHECKER
+++ var=
+++ envname=ACCOUNT1_CONNECTION_CHECKER
+++ '[' -n '' ']'
+++ var=
+++ '[' -n '' ']'
+++ echo
++ checker=
+++ find_env ACCOUNT1_EXCEPTION_SORTER
++++ printenv ACCOUNT1_EXCEPTION_SORTER
+++ var=
+++ envname=ACCOUNT1_EXCEPTION_SORTER
+++ '[' -n '' ']'
+++ var=
+++ '[' -n '' ']'
+++ echo
++ sorter=
 + '[' -n '' ']'
-+ sed -i 's|<!-- ##DATASOURCES## -->|<xa-datasource jndi-name="java:/postgresql-ds" pool-name="datavirt_postgresql-POSTGRESQL" use-java-context="true" enabled="true"> <xa-datasource-property name="ServerName">172.30.0.180</xa-datasource-property> <xa-datasource-property name="PortNumber">5432</xa-datasource-property> <xa-datasource-property name="DatabaseName">jdv</xa-datasource-property> <driver>postgresql</driver> <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation> <xa-pool> <min-pool-size>5</min-pool-size> <max-pool-size>20</max-pool-size> </xa-pool> <security> <user-name>jdv</user-name> <password>jdv</password> </security> <validation> <validate-on-match>true</validate-on-match> <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker"></valid-connection-checker> <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter"></exception-sorter> </validation> </xa-datasource>\n<xa-datasource jndi-name="java:/mysql-ds" pool-name="datavirt_mysql-MYSQL" use-java-context="true" enabled="true"> <xa-datasource-property name="ServerName">172.30.23.218</xa-datasource-property> <xa-datasource-property name="Port">3306</xa-datasource-property> <xa-datasource-property name="DatabaseName">jdv</xa-datasource-property> <driver>mysql</driver> <transaction-isolation>TRANSACTION_READ_UNCOMMITTED</transaction-isolation> <xa-pool> <min-pool-size>5</min-pool-size> <max-pool-size>20</max-pool-size> </xa-pool> <security> <user-name>jdv</user-name> <password>jdv</password> </security> <validation> <validate-on-match>true</validate-on-match> <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker"></valid-connection-checker> <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter"></exception-sorter> </validation> </xa-datasource>\n|' /opt/eap/standalone/configuration/standalone-openshift.xml
++ validate=false
++ checker=CHECKER
++ sorter=SORTER
++ service_name=ACCOUNT1
+++ generate_datasource account1-ACCOUNT1 java:/accounts-ds sa sa mem 9092 accounts CHECKER SORTER h2 ACCOUNT1 true false jdbc:h2
+++ pool_name=account1-ACCOUNT1
+++ jndi_name=java:/accounts-ds
+++ driver=h2
+++ service_name=ACCOUNT1
+++ validate=false
+++ protocol=jdbc:h2
+++ case "${10}" in
+++ '[' -n h2 ']'
+++ '[' -n true ']'
+++ '[' true = true ']'
+++ '[' h2 == h2 ']'
++++ find_env ACCOUNT1_IMPORT_SQL
+++++ printenv ACCOUNT1_IMPORT_SQL
++++ var=
++++ envname=ACCOUNT1_IMPORT_SQL
++++ '[' -n '' ']'
++++ var=/home/jboss/source/injected/injected-files/customer-schema.sql
++++ '[' -n /home/jboss/source/injected/injected-files/customer-schema.sql ']'
++++ echo /home/jboss/source/injected/injected-files/customer-schema.sql
+++ h2_import=/home/jboss/source/injected/injected-files/customer-schema.sql
+++ '[' -n /home/jboss/source/injected/injected-files/customer-schema.sql ']'
+++ ds=' <datasource jndi-name="java:/accounts-ds" pool-name="account1-ACCOUNT1" enabled="true" use-java-context="true">
+                    <connection-url>jdbc:h2:mem:accounts;INIT=RUNSCRIPT FROM '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;</connection-url>
+                    <driver>h2</driver>'
+++ '[' -n '' ']'
+++ '[' -n '' ']'
+++ '[' -n '' ']'
+++ ds=' <datasource jndi-name="java:/accounts-ds" pool-name="account1-ACCOUNT1" enabled="true" use-java-context="true">
+                    <connection-url>jdbc:h2:mem:accounts;INIT=RUNSCRIPT FROM '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;</connection-url>
+                    <driver>h2</driver>
+                    <security>
+                        <user-name>sa</user-name>
+                        <password>sa</password>
+                    </security>'
+++ '[' false == true ']'
+++ '[' -n true ']'
+++ '[' true = true ']'
+++ ds=' <datasource jndi-name="java:/accounts-ds" pool-name="account1-ACCOUNT1" enabled="true" use-java-context="true">
+                    <connection-url>jdbc:h2:mem:accounts;INIT=RUNSCRIPT FROM '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;</connection-url>
+                    <driver>h2</driver>
+                    <security>
+                        <user-name>sa</user-name>
+                        <password>sa</password>
+                    </security>
+                  </datasource>'
+++ '[' -n '' -a '' = ACCOUNT1 ']'
+++ echo '<datasource' 'jndi-name="java:/accounts-ds"' 'pool-name="account1-ACCOUNT1"' 'enabled="true"' 'use-java-context="true">' '<connection-url>jdbc:h2:mem:accounts;INIT=RUNSCRIPT' FROM ''\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;</connection-url>' '<driver>h2</driver>' '<security>' '<user-name>sa</user-name>' '<password>sa</password>' '</security>' '</datasource>'
+++ sed ':a;N;$!ba;s|\n|\\n|g'
++ datasources='<datasource jndi-name="java:/accounts-ds" pool-name="account1-ACCOUNT1" enabled="true" use-java-context="true"> <connection-url>jdbc:h2:mem:accounts;INIT=RUNSCRIPT FROM '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;</connection-url> <driver>h2</driver> <security> <user-name>sa</user-name> <password>sa</password> </security> </datasource>\n'
++ for cm_file in '$(echo $DATASOURCE_CONFIG_MAP | sed "s/,/ /g")'
++ . /etc/jdv-account2/jdv-account2.properties
+++ DATASOURCES=ACCOUNT2
+++ ACCOUNT2_JNDI=java:/accounts2-ds
+++ ACCOUNT2_DRIVER=h2
+++ ACCOUNT2_USERNAME=sa
+++ ACCOUNT2_PASSWORD=sa
+++ ACCOUNT2_DATABASE=accounts2
+++ ACCOUNT2_IMPORT_SQL=/home/jboss/source/injected/injected-files/customer-schema.sql
+++ ACCOUNT2_PROTOCOL=jdbc:h2
+++ ACCOUNT2_SERVICE_HOST=mem
+++ ACCOUNT2_SERVICE_PORT=9092
+++ ACCOUNT2_NONXA=true
++ '[' -n ACCOUNT2 ']'
+++ echo ACCOUNT2
+++ sed 's/,/ /g'
++ for datasource_prefix in '$(echo $DATASOURCES | sed "s/,/ /g")'
++ inject_datasource ACCOUNT2 ACCOUNT2
++ prefix=ACCOUNT2
++ service=ACCOUNT2
+++ find_env ACCOUNT2_SERVICE_HOST
++++ printenv ACCOUNT2_SERVICE_HOST
+++ var=
+++ envname=ACCOUNT2_SERVICE_HOST
+++ '[' -n '' ']'
+++ var=mem
+++ '[' -n mem ']'
+++ echo mem
++ host=mem
+++ find_env ACCOUNT2_SERVICE_PORT
++++ printenv ACCOUNT2_SERVICE_PORT
+++ var=
+++ envname=ACCOUNT2_SERVICE_PORT
+++ '[' -n '' ']'
+++ var=9092
+++ '[' -n 9092 ']'
+++ echo 9092
++ port=9092
++ '[' -z mem ']'
++ '[' -z 9092 ']'
+++ get_jndi_name ACCOUNT2 ACCOUNT2
+++ prefix=ACCOUNT2
++++ find_env ACCOUNT2_JNDI java:jboss/datasources/account2
+++++ printenv ACCOUNT2_JNDI
++++ var=
++++ envname=ACCOUNT2_JNDI
++++ '[' -n '' ']'
++++ var=java:/accounts2-ds
++++ '[' -n java:/accounts2-ds ']'
++++ echo java:/accounts2-ds
+++ echo java:/accounts2-ds
++ jndi=java:/accounts2-ds
+++ find_env ACCOUNT2_USERNAME
++++ printenv ACCOUNT2_USERNAME
+++ var=
+++ envname=ACCOUNT2_USERNAME
+++ '[' -n '' ']'
+++ var=sa
+++ '[' -n sa ']'
+++ echo sa
++ username=sa
+++ find_env ACCOUNT2_PASSWORD
++++ printenv ACCOUNT2_PASSWORD
+++ var=
+++ envname=ACCOUNT2_PASSWORD
+++ '[' -n '' ']'
+++ var=sa
+++ '[' -n sa ']'
+++ echo sa
++ password=sa
+++ find_env ACCOUNT2_DATABASE
++++ printenv ACCOUNT2_DATABASE
+++ var=
+++ envname=ACCOUNT2_DATABASE
+++ '[' -n '' ']'
+++ var=accounts2
+++ '[' -n accounts2 ']'
+++ echo accounts2
++ database=accounts2
++ '[' -z java:/accounts2-ds ']'
++ '[' -z sa ']'
++ '[' -z sa ']'
++ '[' -z accounts2 ']'
+++ find_env ACCOUNT2_TX_ISOLATION
++++ printenv ACCOUNT2_TX_ISOLATION
+++ var=
+++ envname=ACCOUNT2_TX_ISOLATION
+++ '[' -n '' ']'
+++ var=
+++ '[' -n '' ']'
+++ echo
++ tx_isolation=
+++ find_env ACCOUNT2_MIN_POOL_SIZE
++++ printenv ACCOUNT2_MIN_POOL_SIZE
+++ var=
+++ envname=ACCOUNT2_MIN_POOL_SIZE
+++ '[' -n '' ']'
+++ var=
+++ '[' -n '' ']'
+++ echo
++ min_pool_size=
+++ find_env ACCOUNT2_MAX_POOL_SIZE
++++ printenv ACCOUNT2_MAX_POOL_SIZE
+++ var=
+++ envname=ACCOUNT2_MAX_POOL_SIZE
+++ '[' -n '' ']'
+++ var=
+++ '[' -n '' ']'
+++ echo
++ max_pool_size=
+++ find_env ACCOUNT2_JTA true
++++ printenv ACCOUNT2_JTA
+++ var=
+++ envname=ACCOUNT2_JTA
+++ '[' -n '' ']'
+++ var=
+++ '[' -n '' ']'
+++ echo true
++ jta=true
+++ find_env ACCOUNT2_NONXA false
++++ printenv ACCOUNT2_NONXA
+++ var=
+++ envname=ACCOUNT2_NONXA
+++ '[' -n '' ']'
+++ var=true
+++ '[' -n true ']'
+++ echo true
++ NON_XA_DATASOURCE=true
+++ find_env ACCOUNT2_PROTOCOL
++++ printenv ACCOUNT2_PROTOCOL
+++ var=
+++ envname=ACCOUNT2_PROTOCOL
+++ '[' -n '' ']'
+++ var=jdbc:h2
+++ '[' -n jdbc:h2 ']'
+++ echo jdbc:h2
++ protocol=jdbc:h2
++ case "$db" in
+++ find_env ACCOUNT2_DRIVER true
++++ printenv ACCOUNT2_DRIVER
+++ var=
+++ envname=ACCOUNT2_DRIVER
+++ '[' -n '' ']'
+++ var=h2
+++ '[' -n h2 ']'
+++ echo h2
++ driver=h2
+++ find_env ACCOUNT2_CONNECTION_CHECKER
++++ printenv ACCOUNT2_CONNECTION_CHECKER
+++ var=
+++ envname=ACCOUNT2_CONNECTION_CHECKER
+++ '[' -n '' ']'
+++ var=
+++ '[' -n '' ']'
+++ echo
++ checker=
+++ find_env ACCOUNT2_EXCEPTION_SORTER
++++ printenv ACCOUNT2_EXCEPTION_SORTER
+++ var=
+++ envname=ACCOUNT2_EXCEPTION_SORTER
+++ '[' -n '' ']'
+++ var=
+++ '[' -n '' ']'
+++ echo
++ sorter=
++ '[' -n '' ']'
++ validate=false
++ checker=CHECKER
++ sorter=SORTER
++ service_name=ACCOUNT2
+++ generate_datasource account2-ACCOUNT2 java:/accounts2-ds sa sa mem 9092 accounts2 CHECKER SORTER h2 ACCOUNT2 true false jdbc:h2
+++ pool_name=account2-ACCOUNT2
+++ jndi_name=java:/accounts2-ds
+++ driver=h2
+++ service_name=ACCOUNT2
+++ validate=false
+++ protocol=jdbc:h2
+++ case "${10}" in
+++ '[' -n h2 ']'
+++ '[' -n true ']'
+++ '[' true = true ']'
+++ '[' h2 == h2 ']'
++++ find_env ACCOUNT2_IMPORT_SQL
+++++ printenv ACCOUNT2_IMPORT_SQL
++++ var=
++++ envname=ACCOUNT2_IMPORT_SQL
++++ '[' -n '' ']'
++++ var=/home/jboss/source/injected/injected-files/customer-schema.sql
++++ '[' -n /home/jboss/source/injected/injected-files/customer-schema.sql ']'
++++ echo /home/jboss/source/injected/injected-files/customer-schema.sql
+++ h2_import=/home/jboss/source/injected/injected-files/customer-schema.sql
+++ '[' -n /home/jboss/source/injected/injected-files/customer-schema.sql ']'
+++ ds=' <datasource jndi-name="java:/accounts2-ds" pool-name="account2-ACCOUNT2" enabled="true" use-java-context="true">
+                    <connection-url>jdbc:h2:mem:accounts2;INIT=RUNSCRIPT FROM '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;</connection-url>
+                    <driver>h2</driver>'
+++ '[' -n '' ']'
+++ '[' -n '' ']'
+++ '[' -n '' ']'
+++ ds=' <datasource jndi-name="java:/accounts2-ds" pool-name="account2-ACCOUNT2" enabled="true" use-java-context="true">
+                    <connection-url>jdbc:h2:mem:accounts2;INIT=RUNSCRIPT FROM '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;</connection-url>
+                    <driver>h2</driver>
+                    <security>
+                        <user-name>sa</user-name>
+                        <password>sa</password>
+                    </security>'
+++ '[' false == true ']'
+++ '[' -n true ']'
+++ '[' true = true ']'
+++ ds=' <datasource jndi-name="java:/accounts2-ds" pool-name="account2-ACCOUNT2" enabled="true" use-java-context="true">
+                    <connection-url>jdbc:h2:mem:accounts2;INIT=RUNSCRIPT FROM '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;</connection-url>
+                    <driver>h2</driver>
+                    <security>
+                        <user-name>sa</user-name>
+                        <password>sa</password>
+                    </security>
+                  </datasource>'
+++ '[' -n '' -a '' = ACCOUNT2 ']'
+++ echo '<datasource' 'jndi-name="java:/accounts2-ds"' 'pool-name="account2-ACCOUNT2"' 'enabled="true"' 'use-java-context="true">' '<connection-url>jdbc:h2:mem:accounts2;INIT=RUNSCRIPT' FROM ''\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;</connection-url>' '<driver>h2</driver>' '<security>' '<user-name>sa</user-name>' '<password>sa</password>' '</security>' '</datasource>'
+++ sed ':a;N;$!ba;s|\n|\\n|g'
++ datasources='<datasource jndi-name="java:/accounts-ds" pool-name="account1-ACCOUNT1" enabled="true" use-java-context="true"> <connection-url>jdbc:h2:mem:accounts;INIT=RUNSCRIPT FROM '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;</connection-url> <driver>h2</driver> <security> <user-name>sa</user-name> <password>sa</password> </security> </datasource>\n<datasource jndi-name="java:/accounts2-ds" pool-name="account2-ACCOUNT2" enabled="true" use-java-context="true"> <connection-url>jdbc:h2:mem:accounts2;INIT=RUNSCRIPT FROM '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;</connection-url> <driver>h2</driver> <security> <user-name>sa</user-name> <password>sa</password> </security> </datasource>\n'
++ sed -i 's|<!-- ##DATASOURCES## -->|<datasource jndi-name="java:/accounts-ds" pool-name="account1-ACCOUNT1" enabled="true" use-java-context="true"> <connection-url>jdbc:h2:mem:accounts;INIT=RUNSCRIPT FROM '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;</connection-url> <driver>h2</driver> <security> <user-name>sa</user-name> <password>sa</password> </security> </datasource>\n<datasource jndi-name="java:/accounts2-ds" pool-name="account2-ACCOUNT2" enabled="true" use-java-context="true"> <connection-url>jdbc:h2:mem:accounts2;INIT=RUNSCRIPT FROM '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;</connection-url> <driver>h2</driver> <security> <user-name>sa</user-name> <password>sa</password> </security> </datasource>\n|' /opt/eap/standalone/configuration/standalone-openshift.xml
 + inject_drivers
 + drivers=
 + '[' -n '' ']'
@@ -534,7 +498,7 @@
 +++ set -x
 + inject_resource_adapters
 ++ hostname
-+ hostname=datavirt-1-d9oc1
++ hostname=datavirt-1-5284s
 + resource_adapters=
 + '[' -n '' ']'
 + sed -i 's|<!-- ##RESOURCE_ADAPTERS## -->||' /opt/eap/standalone/configuration/standalone-openshift.xml
@@ -560,14 +524,14 @@ Service account has sufficient permissions to view pods in kubernetes (HTTP 200)
 + JBOSS_HA_ARGS='-b 10.1.0.2'
 + '[' -n '' ']'
 + '[' -n '' ']'
-+ '[' -n datavirt-1-d9oc1 ']'
-+ JBOSS_NODE_NAME=datavirt-1-d9oc1
-+ '[' -n datavirt-1-d9oc1 ']'
++ '[' -n datavirt-1-5284s ']'
++ JBOSS_NODE_NAME=datavirt-1-5284s
++ '[' -n datavirt-1-5284s ']'
 + '[' 16 -gt 23 ']'
-+ JBOSS_HA_ARGS='-b 10.1.0.2 -Djboss.node.name=datavirt-1-d9oc1'
-+ '[' -z qphUbbRe ']'
-+ JGROUPS_AUTH='\n                <protocol type="AUTH">\n                    <property name="auth_class">org.jgroups.auth.MD5Token</property>\n                    <property name="token_hash">SHA</property>\n                    <property name="auth_value">qphUbbRe</property>\n                </protocol>\n'
-+ sed -i 's|<!-- ##JGROUPS_AUTH## -->|\n                <protocol type="AUTH">\n                    <property name="auth_class">org.jgroups.auth.MD5Token</property>\n                    <property name="token_hash">SHA</property>\n                    <property name="auth_value">qphUbbRe</property>\n                </protocol>\n|g' /opt/eap/standalone/configuration/standalone-openshift.xml
++ JBOSS_HA_ARGS='-b 10.1.0.2 -Djboss.node.name=datavirt-1-5284s'
++ '[' -z xw11Gh4k ']'
++ JGROUPS_AUTH='\n                <protocol type="AUTH">\n                    <property name="auth_class">org.jgroups.auth.MD5Token</property>\n                    <property name="token_hash">SHA</property>\n                    <property name="auth_value">xw11Gh4k</property>\n                </protocol>\n'
++ sed -i 's|<!-- ##JGROUPS_AUTH## -->|\n                <protocol type="AUTH">\n                    <property name="auth_class">org.jgroups.auth.MD5Token</property>\n                    <property name="token_hash">SHA</property>\n                    <property name="auth_value">xw11Gh4k</property>\n                </protocol>\n|g' /opt/eap/standalone/configuration/standalone-openshift.xml
 + configure_jgroups_encryption
 + jgroups_encrypt=
 + '[' -n '' ']'
@@ -602,55 +566,25 @@ Service account has sufficient permissions to view pods in kubernetes (HTTP 200)
 + configure_keycloak
 + '[' -f /opt/eap/standalone/configuration/secure-deployments ']'
 + '[' -f /opt/eap/standalone/configuration/secure-saml-deployments ']'
+Missing SSO_URL. Unable to properly configure SSO-enabled applications
 + '[' -n '' ']'
 + echo 'Missing SSO_URL. Unable to properly configure SSO-enabled applications'
 + . /opt/eap/bin/launch/teiid.sh
-Missing SSO_URL. Unable to properly configure SSO-enabled applications
 ++ set -x
 ++ . /opt/eap/bin/launch/launch-common.sh
 +++ set -x
 +++ hostname
-++ hostname=datavirt-1-d9oc1
+++ hostname=datavirt-1-5284s
 + configure_teiid
 + import_sql_files
 + IFS=,
 + read -a db_backends
-+ for db_backend in '${db_backends[@]}'
-+ service_name=datavirt-postgresql
-+ service=DATAVIRT-POSTGRESQL
-+ service=DATAVIRT_POSTGRESQL
-+ db=POSTGRESQL
-++ find_env DATAVIRT_POSTGRESQL_SERVICE_HOST
-+++ printenv DATAVIRT_POSTGRESQL_SERVICE_HOST
-++ var=172.30.0.180
-++ envname=DATAVIRT_POSTGRESQL_SERVICE_HOST
-++ '[' -n 172.30.0.180 ']'
-++ echo 172.30.0.180
-+ host=172.30.0.180
-+ '[' POSTGRESQL == POSTGRESQL ']'
-+ '[' -n '' ']'
-+ for db_backend in '${db_backends[@]}'
-+ service_name=datavirt-mysql
-+ service=DATAVIRT-MYSQL
-+ service=DATAVIRT_MYSQL
-+ db=MYSQL
-++ find_env DATAVIRT_MYSQL_SERVICE_HOST
-+++ printenv DATAVIRT_MYSQL_SERVICE_HOST
-++ var=172.30.23.218
-++ envname=DATAVIRT_MYSQL_SERVICE_HOST
-++ '[' -n 172.30.23.218 ']'
-++ echo 172.30.23.218
-+ host=172.30.23.218
-+ '[' MYSQL == POSTGRESQL ']'
-+ '[' MYSQL == MYSQL ']'
-++ echo
-++ sed 's/,/ /g'
 + configure_translators
 + teiid_translators=
 + '[' -n '' ']'
 + sed -i 's|<!-- ##TEIID_TRANSLATORS## -->||' /opt/eap/standalone/configuration/standalone-openshift.xml
 + echo 'Running jboss-datavirt-6/datavirt63-openshift image, version 1.4-dev'
-+ exec /opt/eap/bin/standalone.sh -c standalone-openshift.xml -bmanagement 127.0.0.1 -b 10.1.0.2 -Djboss.node.name=datavirt-1-d9oc1 -Djboss.messaging.cluster.password=iY3WwYAH
++ exec /opt/eap/bin/standalone.sh -c standalone-openshift.xml -bmanagement 127.0.0.1 -b 10.1.0.2 -Djboss.node.name=datavirt-1-5284s -Djboss.messaging.cluster.password=OYHdMQDI
 Running jboss-datavirt-6/datavirt63-openshift image, version 1.4-dev
 =========================================================================
 
@@ -667,10 +601,10 @@ Running jboss-datavirt-6/datavirt63-openshift image, version 1.4-dev
 Picked up JAVA_TOOL_OPTIONS: -Duser.home=/home/jboss -Duser.name=jboss
 I> No access restrictor found, access to all MBean is allowed
 Jolokia: Agent started with URL https://10.1.0.2:8778/jolokia/
-[0m14:23:54,971 INFO  [org.jboss.modules] (main) JBoss Modules version 1.3.7.Final-redhat-1
-[0m[0m14:23:55,186 INFO  [org.jboss.msc] (main) JBoss MSC version 1.1.5.Final-redhat-1
-[0m[0m14:23:55,261 INFO  [org.jboss.as] (MSC service thread 1-7) JBAS015899: JBoss Red Hat JBoss Data Virtualization 6.3.0 (AS 7.5.4.Final-redhat-4) starting
-[0m[32m14:23:55,266 DEBUG [org.jboss.as.config] (MSC service thread 1-7) Configured system properties:
+[0m11:49:39,849 INFO  [org.jboss.modules] (main) JBoss Modules version 1.3.7.Final-redhat-1
+[0m[0m11:49:40,103 INFO  [org.jboss.msc] (main) JBoss MSC version 1.1.5.Final-redhat-1
+[0m[0m11:49:40,197 INFO  [org.jboss.as] (MSC service thread 1-8) JBAS015899: JBoss Red Hat JBoss Data Virtualization 6.3.0 (AS 7.5.4.Final-redhat-4) starting
+[0m[32m11:49:40,203 DEBUG [org.jboss.as.config] (MSC service thread 1-8) Configured system properties:
 	[Standalone] = 
 	awt.toolkit = sun.awt.X11.XToolkit
 	file.encoding = ANSI_X3.4-1968
@@ -718,19 +652,19 @@ Jolokia: Agent started with URL https://10.1.0.2:8778/jolokia/
 	jboss.bind.address = 10.1.0.2
 	jboss.bind.address.management = 127.0.0.1
 	jboss.home.dir = /opt/eap
-	jboss.host.name = datavirt-1-d9oc1
+	jboss.host.name = datavirt-1-5284s
 	jboss.messaging.cluster.password = <redacted>
 	jboss.modules.dir = /opt/eap/modules
 	jboss.modules.policy-permissions = true
 	jboss.modules.system.pkgs = org.jboss.logmanager
-	jboss.node.name = datavirt-1-d9oc1
-	jboss.qualified.host.name = datavirt-1-d9oc1
+	jboss.node.name = datavirt-1-5284s
+	jboss.qualified.host.name = datavirt-1-5284s
 	jboss.server.base.dir = /opt/eap/standalone
 	jboss.server.config.dir = /opt/eap/standalone/configuration
 	jboss.server.data.dir = /opt/eap/standalone/data
 	jboss.server.deploy.dir = /opt/eap/standalone/data/content
 	jboss.server.log.dir = /opt/eap/standalone/log
-	jboss.server.name = datavirt-1-d9oc1
+	jboss.server.name = datavirt-1-5284s
 	jboss.server.persist.config = true
 	jboss.server.temp.dir = /opt/eap/standalone/tmp
 	jolokia.agent = https://10.1.0.2:8778/jolokia/
@@ -751,7 +685,7 @@ Jolokia: Agent started with URL https://10.1.0.2:8778/jolokia/
 	sun.cpu.endian = little
 	sun.cpu.isalist = 
 	sun.io.unicode.encoding = UnicodeLittle
-	sun.java.command = /opt/eap/jboss-modules.jar -mp /opt/eap/modules -jaxpmodule javax.xml.jaxp-provider org.jboss.as.standalone -Djboss.home.dir=/opt/eap -Djboss.server.base.dir=/opt/eap/standalone -c standalone-openshift.xml -bmanagement 127.0.0.1 -b 10.1.0.2 -Djboss.node.name=datavirt-1-d9oc1 -Djboss.messaging.cluster.password=iY3WwYAH
+	sun.java.command = /opt/eap/jboss-modules.jar -mp /opt/eap/modules -jaxpmodule javax.xml.jaxp-provider org.jboss.as.standalone -Djboss.home.dir=/opt/eap -Djboss.server.base.dir=/opt/eap/standalone -c standalone-openshift.xml -bmanagement 127.0.0.1 -b 10.1.0.2 -Djboss.node.name=datavirt-1-5284s -Djboss.messaging.cluster.password=OYHdMQDI
 	sun.java.launcher = SUN_STANDARD
 	sun.jnu.encoding = ANSI_X3.4-1968
 	sun.management.compiler = HotSpot 64-Bit Tiered Compilers
@@ -762,319 +696,32 @@ Jolokia: Agent started with URL https://10.1.0.2:8778/jolokia/
 	user.language = en
 	user.name = jboss
 	user.timezone = America/New_York
-[0m[32m14:23:55,267 DEBUG [org.jboss.as.config] (MSC service thread 1-7) VM Arguments: -Duser.home=/home/jboss -Duser.name=jboss -D[Standalone] -XX:+UseCompressedOops -verbose:gc -Xloggc:/opt/eap/standalone/log/gc.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=3M -XX:-TraceClassUnloading -Xms1303m -Xmx1303m -Djava.net.preferIPv4Stack=true -Djboss.modules.system.pkgs=org.jboss.logmanager -Djava.awt.headless=true -Djboss.modules.policy-permissions=true -Xbootclasspath/p:/opt/eap/jboss-modules.jar:/opt/eap/modules/system/layers/base/org/jboss/logmanager/main/jboss-logmanager-1.5.4.Final-redhat-1.jar:/opt/eap/modules/system/layers/base/org/jboss/logmanager/ext/main/javax.json-1.0.4.jar:/opt/eap/modules/system/layers/base/org/jboss/logmanager/ext/main/jboss-logmanager-ext-1.0.0.Alpha2-redhat-1.jar -Djava.util.logging.manager=org.jboss.logmanager.LogManager -javaagent:/opt/eap/jolokia.jar=port=8778,protocol=https,caCert=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt,clientPrincipal=cn=system:master-proxy,useSslClientAuthentication=true,extraClientCheck=true,host=0.0.0.0,discoveryEnabled=false -Djava.security.egd=file:/dev/./urandom -Dorg.jboss.boot.log.file=/opt/eap/standalone/log/server.log -Dlogging.configuration=file:/opt/eap/standalone/configuration/logging.properties 
-[0m[0m14:23:57,112 INFO  [org.jboss.as.server.deployment.scanner] (DeploymentScanner-threads - 1) JBAS015003: Found integration-platform-console.war in deployment directory. To trigger deployment create a file called integration-platform-console.war.dodeploy
-[0m[0m14:23:57,212 INFO  [org.jboss.as.repository] (ServerService Thread Pool -- 28) JBAS014900: Content added at location /opt/eap/standalone/data/content/fd/c7b127aecb9161f1f674f7581a89c56620694a/content
-[0m[0m14:23:57,285 INFO  [org.jboss.as.repository] (ServerService Thread Pool -- 28) JBAS014900: Content added at location /opt/eap/standalone/data/content/62/0dbdd88f84e855f4635e9cd2ccd89f09cbd676/content
-[0m[0m14:23:57,570 INFO  [org.jboss.as.repository] (ServerService Thread Pool -- 28) JBAS014900: Content added at location /opt/eap/standalone/data/content/59/687c42f4045d778d7322b335028316764f35e8/content
-[0m[0m14:23:57,663 INFO  [org.jboss.security] (Controller Boot Thread) PBOX000361: Default Security Vault Implementation Initialized and Ready
-[0m[0m14:23:57,673 INFO  [org.xnio] (MSC service thread 1-5) XNIO Version 3.0.14.GA-redhat-1
-[0m[0m14:23:57,677 INFO  [org.jboss.as.server] (Controller Boot Thread) JBAS015888: Creating http management service using socket-binding (management-http)
-[0m[0m14:23:57,678 INFO  [org.xnio.nio] (MSC service thread 1-5) XNIO NIO Implementation Version 3.0.14.GA-redhat-1
-[0m[0m14:23:57,701 INFO  [org.jboss.remoting] (MSC service thread 1-5) JBoss Remoting version 3.3.5.Final-redhat-1
-[0m[0m14:23:57,753 INFO  [org.jboss.as.clustering.infinispan] (ServerService Thread Pool -- 35) JBAS010280: Activating Infinispan subsystem.
-[0m[0m14:23:57,754 INFO  [org.jboss.as.clustering.jgroups] (ServerService Thread Pool -- 39) JBAS010260: Activating JGroups subsystem.
-[0m[0m14:23:57,788 INFO  [org.jboss.as.jsf] (ServerService Thread Pool -- 42) JBAS012615: Activated the following JSF Implementations: [main, 1.2]
-[0m[0m14:23:57,799 INFO  [org.jboss.as.security] (ServerService Thread Pool -- 50) JBAS013371: Activating Security Subsystem
-[0m[0m14:23:57,826 INFO  [org.jboss.as.naming] (ServerService Thread Pool -- 45) JBAS011800: Activating Naming Subsystem
-[0m[0m14:23:57,842 INFO  [org.jboss.as.connector.logging] (MSC service thread 1-2) JBAS010408: Starting JCA Subsystem (IronJacamar 1.0.32.Final-redhat-1)
-[0m[0m14:23:57,846 INFO  [org.jboss.as.security] (MSC service thread 1-5) JBAS013370: Current PicketBox version=4.1.1.Final-redhat-1
-[0m[0m14:23:57,859 INFO  [org.jboss.as.webservices] (ServerService Thread Pool -- 54) JBAS015537: Activating WebServices Extension
-[0m[0m14:23:58,008 INFO  [org.modeshape.common.logging.LogFactory] (ServerService Thread Pool -- 56) SLF4J implementation located in the classpath. It will be used by ModeShape for logging.
-[0m[0m14:23:58,189 INFO  [org.jboss.as.naming] (MSC service thread 1-8) JBAS011802: Starting Naming Service
-[0m[0m14:23:58,212 INFO  [org.jboss.as.mail.extension] (MSC service thread 1-3) JBAS015400: Bound mail session [java:jboss/mail/Default]
-[0m[0m14:23:58,215 INFO  [org.jboss.as.connector.subsystems.datasources] (ServerService Thread Pool -- 31) JBAS010403: Deploying JDBC-compliant driver class org.h2.Driver (version 1.3)
-[0m[0m14:23:58,275 INFO  [org.jboss.as.connector.subsystems.datasources] (ServerService Thread Pool -- 31) JBAS010404: Deploying non-JDBC-compliant driver class com.mysql.jdbc.Driver (version 5.1)
-[0m[0m14:23:58,290 INFO  [org.jboss.as.connector.subsystems.datasources] (ServerService Thread Pool -- 31) JBAS010404: Deploying non-JDBC-compliant driver class org.postgresql.Driver (version 9.2)
-[0m[0m14:23:58,373 INFO  [org.jboss.as.connector.subsystems.datasources] (ServerService Thread Pool -- 31) JBAS010404: Deploying non-JDBC-compliant driver class org.modeshape.jdbc.LocalJcrDriver (version 3.8)
-[0m[0m14:23:58,376 INFO  [org.jboss.as.connector.subsystems.datasources] (ServerService Thread Pool -- 31) JBAS010404: Deploying non-JDBC-compliant driver class org.teiid.jdbc.TeiidDriver (version 8.12)
-[0m[0m14:23:58,377 INFO  [org.jboss.as.connector.subsystems.datasources] (ServerService Thread Pool -- 31) JBAS010404: Deploying non-JDBC-compliant driver class org.teiid.jdbc.TeiidDriver (version 8.12)
-[0m[0m14:23:58,461 INFO  [org.apache.coyote.http11.Http11Protocol] (MSC service thread 1-5) JBWEB003001: Coyote HTTP/1.1 initializing on : http-/10.1.0.2:8080
-[0m[0m14:23:58,493 INFO  [org.apache.coyote.http11.Http11Protocol] (MSC service thread 1-5) JBWEB003000: Coyote HTTP/1.1 starting on: http-/10.1.0.2:8080
-[0m[0m14:23:58,659 INFO  [org.infinispan.configuration.cache.EvictionConfigurationBuilder] (ServerService Thread Pool -- 35) ISPN000152: Passivation configured without an eviction policy being selected. Only manually evicted entities will be passivated.
-[0m[0m14:23:58,666 INFO  [org.infinispan.configuration.cache.EvictionConfigurationBuilder] (ServerService Thread Pool -- 35) ISPN000152: Passivation configured without an eviction policy being selected. Only manually evicted entities will be passivated.
-[0m[0m14:23:58,713 INFO  [org.jgroups.protocols.openshift.KUBE_PING] (MSC service thread 1-8) namespace [demo] set; clustering enabled
-[0m[0m14:23:58,737 INFO  [org.jboss.ws.common.management] (MSC service thread 1-1) JBWS022052: Starting JBoss Web Services - Stack CXF Server 4.3.5.Final-redhat-3
-[0m[0m14:23:58,818 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-5) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/webservice/main/
-[0m[0m14:23:58,819 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-2) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/accumulo/main/
-[0m[0m14:23:58,988 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-2) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/file/main/
-[0m[0m14:23:58,991 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-2) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/ldap/main/
-[0m[0m14:23:59,001 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-1) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/salesforce/main/
-[0m[0m14:23:59,004 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-1) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/mongodb/main/
-[0m[0m14:23:59,012 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-7) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/google/main/
-[0m[0m14:23:59,056 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-1) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/accumulo/main/
-[0m[0m14:23:59,072 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-2) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/file/main/
-[0m[0m14:23:59,082 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-5) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/mongodb/main/
-[0m[0m14:23:59,083 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-4) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/ldap/main/
-[0m[0m14:23:59,089 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-6) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/webservice/main/
-[0m[0m14:23:59,094 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-7) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/salesforce/main/
-[0m[0m14:23:59,095 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-2) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/file/main/
-[0m[0m14:23:59,096 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-1) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/accumulo/main/
-[0m[0m14:23:59,097 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-1) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/google/main/
-[0m[0m14:23:59,098 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-1) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/google/main/
-[0m[0m14:23:59,099 INFO  [org.jboss.as.connector.subsystems.datasources] (MSC service thread 1-1) JBAS010400: Bound data source [java:/datasources/ModeShapeDS]
-[0m[0m14:23:59,099 INFO  [org.jboss.as.connector.subsystems.datasources] (MSC service thread 1-1) JBAS010400: Bound data source [java:jboss/datasources/DashboardDS]
-[0m[0m14:23:59,099 INFO  [org.jboss.as.connector.subsystems.datasources] (MSC service thread 1-1) JBAS010400: Bound data source [java:/mysql-ds]
-[0m[0m14:23:59,099 INFO  [org.jboss.as.connector.subsystems.datasources] (MSC service thread 1-1) JBAS010400: Bound data source [java:/postgresql-ds]
-[0m[0m14:23:59,100 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-4) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/ldap/main/
-[0m[0m14:23:59,100 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-7) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/salesforce/main/
-[0m[0m14:23:59,100 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-6) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/webservice/main/
-[0m[0m14:23:59,103 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-5) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/mongodb/main/
-[0m[0m14:23:59,435 INFO  [org.modeshape.jcr.JcrRepository] (MSC service thread 1-3) ModeShape version 3.8.4.GA-redhat-10
-[0m[0m14:23:59,568 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 58) HQ221000: live server is starting with configuration HornetQ Configuration (clustered=true,backup=false,sharedStore=true,journalDirectory=/opt/eap/standalone/data/messagingjournal,bindingsDirectory=/opt/eap/standalone/data/messagingbindings,largeMessagesDirectory=/opt/eap/standalone/data/messaginglargemessages,pagingDirectory=/opt/eap/standalone/data/messagingpaging)
-[0m[0m14:23:59,572 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 58) HQ221006: Waiting to obtain live lock
-[0m[0m14:23:59,617 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 58) HQ221013: Using NIO Journal
-[0m[0m14:23:59,761 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 58) HQ221034: Waiting to obtain live lock
-[0m[0m14:23:59,761 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 58) HQ221035: Live Server Obtained live lock
-[0m[0m14:23:59,852 INFO  [org.infinispan.factories.GlobalComponentRegistry] (ServerService Thread Pool -- 61) ISPN000128: Infinispan version: Infinispan 'Delirium' 5.2.15.Final
-[0m[0m14:23:59,934 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "jdbc-simple" added.
-[0m[0m14:23:59,943 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "jdbc-ansi" added.
-[0m[0m14:23:59,966 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "access" added.
-[0m[0m14:23:59,987 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "db2" added.
-[0m[0m14:23:59,999 INFO  [org.infinispan.factories.TransactionManagerFactory] (ServerService Thread Pool -- 62) ISPN000161: Using a batchMode transaction manager
-[0m[0m14:24:00,002 INFO  [org.infinispan.factories.TransactionManagerFactory] (ServerService Thread Pool -- 61) ISPN000161: Using a batchMode transaction manager
-[0m[0m14:24:00,003 INFO  [org.infinispan.factories.TransactionManagerFactory] (ServerService Thread Pool -- 59) ISPN000161: Using a batchMode transaction manager
-[0m[0m14:24:00,097 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "derby" added.
-[0m[0m14:24:00,160 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "h2" added.
-[0m[0m14:24:00,197 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "hsql" added.
-[0m[0m14:24:00,231 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "informix" added.
-[0m[0m14:24:00,299 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "metamatrix" added.
-[0m[0m14:24:00,337 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "mysql" added.
-[0m[0m14:24:00,366 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "mysql5" added.
-[0m[0m14:24:00,419 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "oracle" added.
-[0m[0m14:24:00,449 INFO  [org.infinispan.jmx.CacheJmxRegistration] (ServerService Thread Pool -- 59) ISPN000031: MBeans were successfully registered to the platform MBean server.
-[0m[0m14:24:00,452 INFO  [org.infinispan.jmx.CacheJmxRegistration] (ServerService Thread Pool -- 62) ISPN000031: MBeans were successfully registered to the platform MBean server.
-[0m[0m14:24:00,453 INFO  [org.infinispan.jmx.CacheJmxRegistration] (ServerService Thread Pool -- 61) ISPN000031: MBeans were successfully registered to the platform MBean server.
-[0m[0m14:24:00,456 INFO  [org.jboss.as.clustering.infinispan] (ServerService Thread Pool -- 62) JBAS010281: Started resultset cache from teiid-cache container
-[0m[0m14:24:00,463 INFO  [org.jboss.as.clustering.infinispan] (ServerService Thread Pool -- 61) JBAS010281: Started resultset-repl cache from teiid-cache container
-[0m[0m14:24:00,466 INFO  [org.jboss.as.clustering.infinispan] (ServerService Thread Pool -- 59) JBAS010281: Started preparedplan cache from teiid-cache container
-[0m[0m14:24:00,467 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "postgresql" added.
-[0m[0m14:24:00,510 INFO  [org.teiid.RUNTIME] (MSC service thread 1-2) TEIID50001 Teiid Engine 8.12.5.redhat-8 Started = Tue Aug 23 14:24:00 EDT 2016
-[0m[0m14:24:00,519 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "greenplum" added.
-[0m[0m14:24:00,537 INFO  [org.teiid.RUNTIME] (MSC service thread 1-5) TEIID50038 Teiid Embedded transport enabled. Bound to: teiid/queryengine/embedded
-[0m[0m14:24:00,540 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "sqlserver" added.
-[0m[0m14:24:00,540 INFO  [org.teiid.RUNTIME] (MSC service thread 1-8) TEIID50038 Teiid Embedded transport enabled. Bound to: teiid/queryengine/odata
-[0m[0m14:24:00,564 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "sybase" added.
-[0m[0m14:24:00,599 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "teiid" added.
-[0m[0m14:24:00,631 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "teradata" added.
-[0m[0m14:24:00,652 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "modeshape" added.
-[0m[0m14:24:00,657 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "ingres" added.
-[0m[0m14:24:00,660 INFO  [org.teiid.RUNTIME] (MSC service thread 1-6) TEIID50037 Teiid ODBC - Name = odbc, Host = datavirt-1-d9oc1,  Port = 35432, SSL = OFF, security-domains = teiid-security
-[0m[0m14:24:00,646 INFO  [org.teiid.RUNTIME] (MSC service thread 1-2) TEIID50012 Teiid JDBC - Name = jdbc, Host = datavirt-1-d9oc1,  Port = 31000, SSL = OFF, security-domains = teiid-security
-[0m[0m14:24:00,671 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "ingres93" added.
-[0m[0m14:24:00,681 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "intersystems-cache" added.
-[0m[0m14:24:00,695 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "netezza" added.
-[0m[0m14:24:00,736 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "file" added.
-[0m[0m14:24:00,766 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "ldap" added.
-[0m[0m14:24:00,775 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "loopback" added.
-[0m[0m14:24:00,793 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "olap" added.
-[0m[0m14:24:00,797 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 58) HQ221020: Started Netty Acceptor version 3.6.10.Final-266dbdf 10.1.0.2:5445 for CORE protocol
-[0m[0m14:24:00,801 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 58) HQ221020: Started Netty Acceptor version 3.6.10.Final-266dbdf 10.1.0.2:5455 for CORE protocol
-[0m[0m14:24:00,815 INFO  [org.jgroups.protocols.openshift.KUBE_PING] (ServerService Thread Pool -- 58) Starting JBossServer on port 8888 for channel address: datavirt-1-d9oc1/hornetq-channel
-[0m[0m14:24:00,824 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "ws" added.
-[0m[0m14:24:00,855 INFO  [org.jgroups.protocols.openshift.KUBE_PING] (ServerService Thread Pool -- 58) JBossServer started.
-[0m[0m14:24:00,862 INFO  [stdout] (ServerService Thread Pool -- 58) 
-[0m[0m14:24:00,863 INFO  [stdout] (ServerService Thread Pool -- 58) -------------------------------------------------------------------
-[0m[0m14:24:00,863 INFO  [stdout] (ServerService Thread Pool -- 58) GMS: address=datavirt-1-d9oc1/hornetq-channel, cluster=hornetq-channel, physical address=10.1.0.2:7600
-[0m[0m14:24:00,863 INFO  [stdout] (ServerService Thread Pool -- 58) -------------------------------------------------------------------
-[0m[0m14:24:00,865 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "salesforce" added.
-[0m[0m14:24:00,897 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "hive" added.
-[0m[0m14:24:00,925 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "google-spreadsheet" added.
-[0m[0m14:24:00,943 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "odata" added.
-[0m[0m14:24:00,949 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "sap-nw-gateway" added.
-[0m[0m14:24:00,969 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "mongodb" added.
-[0m[0m14:24:00,983 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "cassandra" added.
-[0m[0m14:24:01,010 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "accumulo" added.
-[0m[0m14:24:01,022 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "solr" added.
-[0m[0m14:24:01,073 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "excel" added.
-[0m[0m14:24:01,080 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "impala" added.
-[0m[0m14:24:01,105 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "hbase" added.
-[0m[0m14:24:01,110 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "hana" added.
-[0m[0m14:24:01,157 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "infinispan-cache-dsl" added.
-[0m[0m14:24:01,211 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "infinispan-cache" added.
-[0m[0m14:24:01,266 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-5) JBAS015876: Starting deployment of "modeshape-cmis.war" (runtime-name: "modeshape-cmis.war")
-[0m[0m14:24:01,267 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015876: Starting deployment of "teiid-dashboard-builder.war" (runtime-name: "teiid-dashboard-builder.war")
-[0m[0m14:24:01,268 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-2) JBAS015876: Starting deployment of "jdv-vdb.xml" (runtime-name: "jdv-vdb.xml")
-[0m[0m14:24:01,271 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-6) JBAS015876: Starting deployment of "integration-platform-console.war" (runtime-name: "integration-platform-console.war")
-[0m[0m14:24:01,272 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-6) JBAS015876: Starting deployment of "modeshape-webdav.war" (runtime-name: "modeshape-webdav.war")
-[0m[0m14:24:01,272 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-6) JBAS015876: Starting deployment of "teiid-odata.war" (runtime-name: "teiid-odata.war")
-[0m[0m14:24:01,274 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-2) JBAS015876: Starting deployment of "teiid-olingo-odata4.war" (runtime-name: "teiid-olingo-odata4.war")
-[0m[0m14:24:01,275 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-5) JBAS015876: Starting deployment of "modeshape-rest.war" (runtime-name: "modeshape-rest.war")
-[0m[0m14:24:01,282 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-1) JBAS015876: Starting deployment of "ModeShape.vdb" (runtime-name: "ModeShape.vdb")
-[0m[0m14:24:01,284 INFO  [org.jboss.as.server.deployment.scanner] (MSC service thread 1-5) JBAS015012: Started FileSystemDeploymentService for directory /opt/eap/standalone/deployments
-[0m[0m14:24:01,289 INFO  [org.jboss.as.remoting] (MSC service thread 1-8) JBAS017100: Listening on 10.1.0.2:4447
-[0m[0m14:24:01,289 INFO  [org.jboss.as.remoting] (MSC service thread 1-3) JBAS017100: Listening on 127.0.0.1:9999
-[0m[33m14:24:01,761 WARN  [org.jboss.as.dependency.unsupported] (MSC service thread 1-3) JBAS015868: Deployment "deployment.teiid-odata.war" is using an unsupported module ("org.joda.time:main") which may be changed or removed in future versions without notice.
-[0m[31m14:24:02,203 ERROR [stderr] (MSC service thread 1-5) ScriptEngineManager providers.next(): javax.script.ScriptEngineFactory: Provider jdk.nashorn.api.scripting.NashornScriptEngineFactory not found
-[0m[31m14:24:02,235 ERROR [stderr] (MSC service thread 1-5) ScriptEngineManager providers.next(): javax.script.ScriptEngineFactory: Provider jdk.nashorn.api.scripting.NashornScriptEngineFactory not found
-[0m[31m14:24:02,358 ERROR [stderr] (MSC service thread 1-3) ScriptEngineManager providers.next(): javax.script.ScriptEngineFactory: Provider jdk.nashorn.api.scripting.NashornScriptEngineFactory not found
-[0m[31m14:24:02,359 ERROR [stderr] (MSC service thread 1-3) ScriptEngineManager providers.next(): javax.script.ScriptEngineFactory: Provider jdk.nashorn.api.scripting.NashornScriptEngineFactory not found
-[0m[33m14:24:02,504 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry jaxws-api.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
-[0m[33m14:24:02,505 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry jsr181-api.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
-[0m[33m14:24:02,505 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry jsr250-api.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
-[0m[33m14:24:02,505 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry saaj-api.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
-[0m[33m14:24:02,505 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry saaj-impl.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
-[0m[33m14:24:02,505 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry jsr173_api.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
-[0m[33m14:24:02,505 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry sjsxp.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
-[0m[33m14:24:02,505 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry woodstox.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
-[0m[33m14:24:02,505 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry resolver.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
-[0m[33m14:24:02,505 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry jaxb-api.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
-[0m[33m14:24:02,505 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry jaxb-impl.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
-[0m[33m14:24:02,505 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry activation.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
-[0m[33m14:24:02,505 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry stax-ex.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
-[0m[33m14:24:02,505 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry streambuffer.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
-[0m[33m14:24:02,506 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry stax-utils.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
-[0m[0m14:24:02,657 INFO  [org.jboss.web] (ServerService Thread Pool -- 66) JBAS018210: Register web context: 
-[0m[0m14:24:02,663 INFO  [org.jboss.web] (ServerService Thread Pool -- 65) JBAS018210: Register web context: /modeshape-webdav
-[0m[0m14:24:02,723 INFO  [org.jboss.web] (ServerService Thread Pool -- 61) JBAS018210: Register web context: /modeshape-rest
-[0m[0m14:24:02,797 INFO  [org.jboss.web] (ServerService Thread Pool -- 62) JBAS018210: Register web context: /odata4
-[0m[0m14:24:02,840 INFO  [org.jboss.web] (ServerService Thread Pool -- 64) JBAS018210: Register web context: /odata
-[0m[33m14:24:02,922 WARN  [org.jboss.as.dependency.private] (MSC service thread 1-1) JBAS015867: Deployment "deployment.modeshape-cmis.war" is using a private module ("com.sun.xml.messaging.saaj:main") which may be changed or removed in future versions without notice.
-[0m[33m14:24:02,922 WARN  [org.jboss.as.dependency.private] (MSC service thread 1-1) JBAS015867: Deployment "deployment.modeshape-cmis.war" is using a private module ("com.sun.xml.messaging.saaj:main") which may be changed or removed in future versions without notice.
-[0m[0m14:24:03,261 INFO  [org.jboss.web] (ServerService Thread Pool -- 66) JBAS018210: Register web context: /modeshape-cmis
-[0m[0m14:24:03,319 INFO  [org.teiid.RUNTIME.VDBLifeCycleListener] (MSC service thread 1-7) TEIID40118 VDB jdv.1 added to the repository
-[0m[0m14:24:03,334 INFO  [org.teiid.RUNTIME] (MSC service thread 1-7) TEIID50029 VDB jdv.1 model "CustomerView" metadata is currently being loaded. Start Time: 8/23/16 2:24 PM
-[0m[0m14:24:03,348 INFO  [org.hibernate.validator.internal.util.Version] (ServerService Thread Pool -- 61) HV000001: Hibernate Validator 4.3.2.Final-redhat-2
-[0m[0m14:24:03,360 INFO  [org.teiid.RUNTIME] (MSC service thread 1-7) TEIID50029 VDB jdv.1 model "PG_SOURCE" metadata is currently being loaded. Start Time: 8/23/16 2:24 PM
-[0m[0m14:24:03,365 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 1) TEIID50030 VDB jdv.1 model "CustomerView" metadata loaded. End Time: 8/23/16 2:24 PM
-[0m[0m14:24:03,367 INFO  [org.teiid.RUNTIME] (MSC service thread 1-7) TEIID50029 VDB jdv.1 model "MS_SOURCE" metadata is currently being loaded. Start Time: 8/23/16 2:24 PM
-[0m[0m14:24:03,373 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 3) TEIID50030 VDB jdv.1 model "MS_SOURCE" metadata loaded. End Time: 8/23/16 2:24 PM
-[0m[0m14:24:03,389 INFO  [org.teiid.RUNTIME.VDBLifeCycleListener] (MSC service thread 1-5) TEIID40118 VDB ModeShape.1 added to the repository
-[0m[0m14:24:03,390 INFO  [org.teiid.RUNTIME] (MSC service thread 1-5) TEIID50029 VDB ModeShape.1 model "VDB_Lineage" metadata is currently being loaded. Start Time: 8/23/16 2:24 PM
-[0m[0m14:24:03,390 INFO  [org.teiid.RUNTIME] (MSC service thread 1-5) TEIID50029 VDB ModeShape.1 model "Relational_Model_View" metadata is currently being loaded. Start Time: 8/23/16 2:24 PM
-[0m[0m14:24:03,397 INFO  [org.teiid.RUNTIME] (MSC service thread 1-5) TEIID50029 VDB ModeShape.1 model "ModeShape" metadata is currently being loaded. Start Time: 8/23/16 2:24 PM
-[0m[0m14:24:03,409 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 2) TEIID50030 VDB jdv.1 model "PG_SOURCE" metadata loaded. End Time: 8/23/16 2:24 PM
-[0m[0m14:24:03,447 INFO  [org.teiid.RUNTIME.VDBLifeCycleListener] (teiid-async-threads - 2) TEIID40003 VDB jdv.1 is set to ACTIVE
-[0m[0m14:24:03,694 INFO  [org.apache.chemistry.opencmis.jcr.JcrTypeManager] (ServerService Thread Pool -- 66) Added type 'cmis:folder'.
-[0m[0m14:24:03,701 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 4) TEIID50030 VDB ModeShape.1 model "VDB_Lineage" metadata loaded. End Time: 8/23/16 2:24 PM
-[0m[0m14:24:03,706 INFO  [org.apache.chemistry.opencmis.jcr.JcrTypeManager] (ServerService Thread Pool -- 66) Added type 'cmis:document'.
-[0m[0m14:24:03,739 INFO  [org.apache.chemistry.opencmis.jcr.JcrTypeManager] (ServerService Thread Pool -- 66) Added type 'cmis:unversioned-document'.
-[0m[0m14:24:03,758 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 1) TEIID50030 VDB ModeShape.1 model "Relational_Model_View" metadata loaded. End Time: 8/23/16 2:24 PM
-[0m[0m14:24:03,758 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 3) TEIID50030 VDB ModeShape.1 model "ModeShape" metadata loaded. End Time: 8/23/16 2:24 PM
-[0m[0m14:24:03,762 INFO  [stdout] (ServerService Thread Pool -- 66) --- loaded repository dv
-[0m[0m14:24:03,770 INFO  [javax.enterprise.resource.webservices.jaxws.server.http] (ServerService Thread Pool -- 66) WSSERVLET12: JAX-WS context listener initializing
-[0m[33m14:24:03,786 WARN  [org.jboss.as.dependency.unsupported] (MSC service thread 1-8) JBAS015868: Deployment "deployment.teiid-dashboard-builder.war" is using an unsupported module ("org.dom4j:main") which may be changed or removed in future versions without notice.
-[0m[33m14:24:03,786 WARN  [org.jboss.as.dependency.unsupported] (MSC service thread 1-8) JBAS015868: Deployment "deployment.teiid-dashboard-builder.war" is using an unsupported module ("org.dom4j:main") which may be changed or removed in future versions without notice.
-[0m[33m14:24:03,786 WARN  [org.jboss.as.dependency.unsupported] (MSC service thread 1-8) JBAS015868: Deployment "deployment.teiid-dashboard-builder.war" is using an unsupported module ("org.jdom:main") which may be changed or removed in future versions without notice.
-[0m[33m14:24:03,786 WARN  [org.jboss.as.dependency.unsupported] (MSC service thread 1-8) JBAS015868: Deployment "deployment.teiid-dashboard-builder.war" is using an unsupported module ("org.jdom:main") which may be changed or removed in future versions without notice.
-[0m[33m14:24:03,786 WARN  [org.jboss.as.dependency.private] (MSC service thread 1-8) JBAS015867: Deployment "deployment.teiid-dashboard-builder.war" is using a private module ("org.apache.commons.lang:main") which may be changed or removed in future versions without notice.
-[0m[33m14:24:03,786 WARN  [org.jboss.as.dependency.private] (MSC service thread 1-8) JBAS015867: Deployment "deployment.teiid-dashboard-builder.war" is using a private module ("org.apache.commons.lang:main") which may be changed or removed in future versions without notice.
-[0m[33m14:24:03,786 WARN  [org.jboss.as.dependency.private] (MSC service thread 1-8) JBAS015867: Deployment "deployment.teiid-dashboard-builder.war" is using a private module ("org.apache.commons.io:main") which may be changed or removed in future versions without notice.
-[0m[33m14:24:03,786 WARN  [org.jboss.as.dependency.private] (MSC service thread 1-8) JBAS015867: Deployment "deployment.teiid-dashboard-builder.war" is using a private module ("org.apache.commons.io:main") which may be changed or removed in future versions without notice.
-[0m[33m14:24:03,786 WARN  [org.jboss.as.dependency.private] (MSC service thread 1-8) JBAS015867: Deployment "deployment.teiid-dashboard-builder.war" is using a private module ("org.apache.commons.collections:main") which may be changed or removed in future versions without notice.
-[0m[33m14:24:03,786 WARN  [org.jboss.as.dependency.private] (MSC service thread 1-8) JBAS015867: Deployment "deployment.teiid-dashboard-builder.war" is using a private module ("org.apache.commons.collections:main") which may be changed or removed in future versions without notice.
-[0m[33m14:24:03,786 WARN  [org.jboss.as.dependency.private] (MSC service thread 1-8) JBAS015867: Deployment "deployment.teiid-dashboard-builder.war" is using a private module ("org.apache.commons.codec:main") which may be changed or removed in future versions without notice.
-[0m[33m14:24:03,786 WARN  [org.jboss.as.dependency.private] (MSC service thread 1-8) JBAS015867: Deployment "deployment.teiid-dashboard-builder.war" is using a private module ("org.apache.commons.codec:main") which may be changed or removed in future versions without notice.
-[0m[33m14:24:03,786 WARN  [org.jboss.as.dependency.private] (MSC service thread 1-8) JBAS015867: Deployment "deployment.teiid-dashboard-builder.war" is using a private module ("org.jboss.ironjacamar.jdbcadapters:main") which may be changed or removed in future versions without notice.
-[0m[33m14:24:03,787 WARN  [org.jboss.as.dependency.private] (MSC service thread 1-8) JBAS015867: Deployment "deployment.teiid-dashboard-builder.war" is using a private module ("org.jboss.ironjacamar.jdbcadapters:main") which may be changed or removed in future versions without notice.
-[0m[0m14:24:03,905 INFO  [org.jboss.resteasy.resteasy_jaxrs.i18n] (ServerService Thread Pool -- 64) RESTEASY000320: Deploying javax.ws.rs.core.Application: class org.teiid.odata.TeiidODataApplication
-[0m[0m14:24:03,905 INFO  [org.jboss.resteasy.resteasy_jaxrs.i18n] (ServerService Thread Pool -- 61) RESTEASY000320: Deploying javax.ws.rs.core.Application: class org.modeshape.web.jcr.rest.JcrApplication
-[0m[0m14:24:03,981 INFO  [org.jboss.weld.deployer] (MSC service thread 1-8) JBAS016002: Processing weld deployment teiid-dashboard-builder.war
-[0m[0m14:24:04,069 INFO  [org.jboss.weld.deployer] (MSC service thread 1-8) JBAS016005: Starting Services for CDI deployment: teiid-dashboard-builder.war
-[0m[0m14:24:04,119 INFO  [org.teiid.RUNTIME.VDBLifeCycleListener] (teiid-async-threads - 1) TEIID40003 VDB ModeShape.1 is set to ACTIVE
-[0m[0m14:24:04,239 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 58) HQ221007: Server is now live
-[0m[0m14:24:04,239 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 58) HQ221001: HornetQ Server version 2.3.25.SP3 (2.3.x, 123) [c2ab57df-695e-11e6-84ec-e5680f29273d] 
-[0m[0m14:24:04,304 INFO  [org.jboss.as.messaging] (ServerService Thread Pool -- 62) JBAS011601: Bound messaging object to jndi name java:/ConnectionFactory
-[0m[0m14:24:04,321 INFO  [org.jboss.weld.Version] (MSC service thread 1-8) WELD-000900 1.1.31 (redhat)
-[0m[0m14:24:04,330 INFO  [org.jboss.as.connector.deployment] (MSC service thread 1-4) JBAS010406: Registered connection factory java:/JmsXA
-[0m[0m14:24:04,365 INFO  [org.jboss.weld.deployer] (MSC service thread 1-8) JBAS016008: Starting weld service for deployment teiid-dashboard-builder.war
-[0m[0m14:24:04,423 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 68) HQ221003: trying to deploy queue jms.queue.ExpiryQueue
-[0m[0m14:24:04,684 INFO  [org.jboss.as.messaging] (ServerService Thread Pool -- 68) JBAS011601: Bound messaging object to jndi name java:/jms/queue/ExpiryQueue
-[0m[0m14:24:04,734 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 58) HQ221003: trying to deploy queue jms.queue.DLQ
-[0m[0m14:24:04,781 INFO  [org.jboss.as.messaging] (ServerService Thread Pool -- 58) JBAS011601: Bound messaging object to jndi name java:/jms/queue/DLQ
-[0m[0m14:24:04,782 INFO  [org.hornetq.ra] (MSC service thread 1-4) HornetQ resource adaptor started
-[0m[0m14:24:04,782 INFO  [org.jboss.as.messaging] (ServerService Thread Pool -- 65) JBAS011601: Bound messaging object to jndi name java:jboss/exported/jms/RemoteConnectionFactory
-[0m[0m14:24:04,782 INFO  [org.jboss.as.connector.services.resourceadapters.ResourceAdapterActivatorService$ResourceAdapterActivator] (MSC service thread 1-4) IJ020002: Deployed: file://RaActivatorhornetq-ra
-[0m[0m14:24:04,784 INFO  [org.jboss.as.connector.deployment] (MSC service thread 1-4) JBAS010401: Bound JCA ConnectionFactory [java:/JmsXA]
-[0m[0m14:24:07,995 INFO  [org.jboss.web] (ServerService Thread Pool -- 74) JBAS018210: Register web context: /dashboard
-[0m[0m14:24:08,043 INFO  [org.jboss.dashboard.ui.controller.ControllerServlet] (ServerService Thread Pool -- 74) Application Directory: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war
-[0m[0m14:24:08,043 INFO  [org.jboss.dashboard.ui.controller.ControllerServlet] (ServerService Thread Pool -- 74) Application Config Directory: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc
-[0m[0m14:24:08,330 INFO  [org.hibernate.annotations.common.Version] (ServerService Thread Pool -- 74) HCANN000001: Hibernate Commons Annotations {4.0.2.Final-redhat-1}
-[0m[0m14:24:08,345 INFO  [org.hibernate.Version] (ServerService Thread Pool -- 74) HHH000412: Hibernate Core {4.2.20.Final-redhat-1}
-[0m[0m14:24:08,347 INFO  [org.hibernate.cfg.Environment] (ServerService Thread Pool -- 74) HHH000206: hibernate.properties not found
-[0m[0m14:24:08,349 INFO  [org.hibernate.cfg.Environment] (ServerService Thread Pool -- 74) HHH000021: Bytecode provider name : javassist
-[0m[0m14:24:08,385 INFO  [org.hibernate.cfg.Configuration] (ServerService Thread Pool -- 74) HHH000042: Configuring from file: hibernate.cfg.xml
-[0m[0m14:24:08,432 INFO  [org.hibernate.cfg.Configuration] (ServerService Thread Pool -- 74) HHH000041: Configured SessionFactory: null
-[0m[0m14:24:08,499 INFO  [javax.enterprise.resource.webservices.jaxws.servlet.http] (ServerService Thread Pool -- 66) WSSERVLET14: JAX-WS servlet initializing
-[0m[0m14:24:08,786 INFO  [org.jboss.dashboard.database.hibernate.HibernateInitializer] (ServerService Thread Pool -- 74) The underlying database is: h2
-[0m[0m14:24:09,154 INFO  [org.hibernate.dialect.Dialect] (ServerService Thread Pool -- 74) HHH000400: Using dialect: org.hibernate.dialect.H2Dialect
-[0m[33m14:24:09,166 WARN  [org.hibernate.dialect.H2Dialect] (ServerService Thread Pool -- 74) HHH000431: Unable to determine H2 database version, certain features may not work
-[0m[0m14:24:09,286 INFO  [org.hibernate.engine.transaction.internal.TransactionFactoryInitiator] (ServerService Thread Pool -- 74) HHH000399: Using default transaction strategy (direct JDBC transactions)
-[0m[0m14:24:09,291 INFO  [org.hibernate.hql.internal.ast.ASTQueryTranslatorFactory] (ServerService Thread Pool -- 74) HHH000397: Using ASTQueryTranslatorFactory
-[0m[33m14:24:09,863 WARN  [org.jboss.dashboard.database.DatabaseAutoSynchronizer] (ServerService Thread Pool -- 74) Running file 1-create-h2.sql
-[0m[0m14:24:10,105 INFO  [org.jboss.dashboard.workspace.GraphicElementManagerImpl] (ServerService Thread Pool -- 74) Starting org.jboss.dashboard.workspace.SkinsManagerImpl
-[0m[0m14:24:10,121 INFO  [org.jboss.dashboard.workspace.GraphicElementManagerImpl] (ServerService Thread Pool -- 74) Deploying to database Skin /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/skins/Default_Skin.zip
-[0m[0m14:24:10,258 INFO  [org.jboss.dashboard.ui.resources.GraphicElement] (ServerService Thread Pool -- 74) Deploying files for org.jboss.dashboard.ui.resources.Skin Default_Skin
-[0m[0m14:24:10,326 INFO  [org.jboss.dashboard.cluster.ClusterNodesManager] (ServerService Thread Pool -- 74) Registering cluster node with ip address 10.1.0.2
-[0m[0m14:24:10,360 INFO  [org.jboss.dashboard.cluster.ClusterNodesManager] (ServerService Thread Pool -- 74) Successfully registered cluster node with ip address 10.1.0.2 and identifier 1001
-[0m[0m14:24:10,466 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 74) Loading panels. Scanning dir: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels
-[0m[0m14:24:10,469 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 74) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/dashboard/dashboardFilter/dashb_filter.panel
-[0m[0m14:24:10,481 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 74) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/dashboard/dataProviderManager/dashb_providermgr.panel
-[0m[0m14:24:10,494 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 74) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/dashboard/htmlEditor/dashb_html_editor.panel
-[0m[0m14:24:10,507 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 74) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/dashboard/kpi/dashb_kpi.panel
-[0m[0m14:24:10,517 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 74) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/navigation/breadCrumb/breadCrumb.panel
-[0m[0m14:24:10,527 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 74) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/navigation/logout/logout.panel
-[0m[0m14:24:10,536 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 74) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/navigation/tree/treeMenu.panel
-[0m[0m14:24:10,545 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 74) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/navigation/navigator_language_horiz.panel
-[0m[0m14:24:10,556 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 74) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/navigation/navigator_sections.panel
-[0m[0m14:24:10,558 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 74) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/navigation/navigator_sections_horiz.panel
-[0m[0m14:24:10,562 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 74) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/navigation/navigator_sections_vert.panel
-[0m[0m14:24:10,565 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 74) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/navigation/navigator_workspace.panel
-[0m[0m14:24:10,569 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 74) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/navigation/navigator_workspace_horiz.panel
-[0m[0m14:24:10,571 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 74) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/navigation/navigator_workspace_vert.panel
-[0m[0m14:24:10,572 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 74) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/system/dashboardExport/dashb_export.panel
-[0m[0m14:24:10,581 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 74) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/system/dashboardImport/dashb_import.panel
-[0m[0m14:24:10,586 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 74) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/system/dataSourceManagement/DataSourceManager.panel
-[0m[0m14:24:10,600 INFO  [org.jboss.dashboard.workspace.PanelsProvidersManagerImpl] (ServerService Thread Pool -- 74) Reading file: /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/panels/system/workspaceExport/workspaceImportexport.panel
-[0m[0m14:24:10,770 INFO  [org.jboss.dashboard.workspace.GraphicElementManagerImpl] (ServerService Thread Pool -- 74) Starting org.jboss.dashboard.workspace.EnvelopesManagerImpl
-[0m[0m14:24:10,774 INFO  [org.jboss.dashboard.workspace.GraphicElementManagerImpl] (ServerService Thread Pool -- 74) Deploying to database Envelope /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/envelopes/Default_Envelope.zip
-[0m[0m14:24:10,793 INFO  [org.jboss.dashboard.ui.resources.GraphicElement] (ServerService Thread Pool -- 74) Deploying files for org.jboss.dashboard.ui.resources.Envelope Default_Envelope
-[0m[0m14:24:10,816 INFO  [org.jboss.dashboard.workspace.GraphicElementManagerImpl] (ServerService Thread Pool -- 74) Starting org.jboss.dashboard.workspace.LayoutsManagerImpl
-[0m[0m14:24:10,823 INFO  [org.jboss.dashboard.workspace.GraphicElementManagerImpl] (ServerService Thread Pool -- 74) Deploying to database Layout /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/layouts/Default_Layout.zip
-[0m[0m14:24:10,839 INFO  [org.jboss.dashboard.workspace.GraphicElementManagerImpl] (ServerService Thread Pool -- 74) Deploying to database Layout /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/layouts/Default_template_with_sliding_menu.zip
-[0m[0m14:24:10,861 INFO  [org.jboss.dashboard.workspace.GraphicElementManagerImpl] (ServerService Thread Pool -- 74) Deploying to database Layout /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/layouts/Template_25-50-25.zip
-[0m[0m14:24:10,875 INFO  [org.jboss.dashboard.workspace.GraphicElementManagerImpl] (ServerService Thread Pool -- 74) Deploying to database Layout /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/layouts/Template_25-75.zip
-[0m[0m14:24:10,885 INFO  [org.jboss.dashboard.workspace.GraphicElementManagerImpl] (ServerService Thread Pool -- 74) Deploying to database Layout /opt/eap/dataVirtualization/teiid-dashboard/teiid-dashboard-builder.war/WEB-INF/etc/layouts/Template_75-25.zip
-[0m[0m14:24:10,904 INFO  [org.jboss.dashboard.ui.resources.GraphicElement] (ServerService Thread Pool -- 74) Deploying files for org.jboss.dashboard.ui.resources.Layout Default_Layout
-[0m[0m14:24:10,905 INFO  [org.jboss.dashboard.ui.resources.GraphicElement] (ServerService Thread Pool -- 74) Deploying files for org.jboss.dashboard.ui.resources.Layout Default_template_with_sliding_menu
-[0m[0m14:24:10,906 INFO  [org.jboss.dashboard.ui.resources.GraphicElement] (ServerService Thread Pool -- 74) Deploying files for org.jboss.dashboard.ui.resources.Layout Template_25-50-25
-[0m[0m14:24:10,907 INFO  [org.jboss.dashboard.ui.resources.GraphicElement] (ServerService Thread Pool -- 74) Deploying files for org.jboss.dashboard.ui.resources.Layout Template_25-75
-[0m[0m14:24:10,908 INFO  [org.jboss.dashboard.ui.resources.GraphicElement] (ServerService Thread Pool -- 74) Deploying files for org.jboss.dashboard.ui.resources.Layout Template_75-25
-[0m[0m14:24:10,959 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 74) Parsing KPI's XML file: WEB-INF/etc/appdata/initialData/showcaseKPIs.xml
-[0m[0m14:24:11,593 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 74) BAM_00000 - Data provider created. dataprovider_63791223772073037, Expense reports demo.
-[0m[0m14:24:11,593 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 74) BAM_00000 - Data provider created. dataprovider_29881353499006573, Sales dashboard demo.
-[0m[0m14:24:11,593 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 74) BAM_00001 - Business indicator created. kpi_21591363786594721, Amount by status .
-[0m[0m14:24:11,593 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 74) BAM_00001 - Business indicator created. kpi_30771353684719633, - New indicator -.
-[0m[0m14:24:11,594 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 74) BAM_00001 - Business indicator created. kpi_30301353506280659, Expected pipeline.
-[0m[0m14:24:11,594 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 74) BAM_00001 - Business indicator created. kpi_30251353675275870, Pipeline status.
-[0m[0m14:24:11,594 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 74) BAM_00001 - Business indicator created. kpi_63901223772516707, Expenses by office USD.
-[0m[0m14:24:11,594 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 74) BAM_00001 - Business indicator created. kpi_64011223773089901, Expense evolution.
-[0m[0m14:24:11,594 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 74) BAM_00001 - Business indicator created. kpi_30861353687605533, Amount by probability (%).
-[0m[0m14:24:11,594 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 74) BAM_00001 - Business indicator created. kpi_30831353686700387, By product.
-[0m[0m14:24:11,594 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 74) BAM_00001 - Business indicator created. kpi_30461354643057084, Expenses by user.
-[0m[0m14:24:11,594 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 74) BAM_00001 - Business indicator created. kpi_30101353505177974, Opportunities by country.
-[0m[0m14:24:11,594 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 74) BAM_00001 - Business indicator created. kpi_30331353506453066, By sales person.
-[0m[0m14:24:11,594 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 74) BAM_00001 - Business indicator created. kpi_30391353506887646, By product.
-[0m[0m14:24:11,594 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 74) BAM_00001 - Business indicator created. kpi_63931223772633377, Expenses by department USD.
-[0m[0m14:24:11,594 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 74) BAM_00001 - Business indicator created. kpi_30441353507392054, Opportunities by closing date (USD).
-[0m[0m14:24:11,594 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 74) BAM_00001 - Business indicator created. kpi_30281353675541472, By country.
-[0m[0m14:24:11,595 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 74) BAM_00001 - Business indicator created. kpi_30651353683614640, By sales person.
-[0m[0m14:24:11,595 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 74) BAM_00001 - Business indicator created. kpi_30361353506582145, By status.
-[0m[0m14:24:11,595 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 74) BAM_00001 - Business indicator created. kpi_29761353668431694, Sales report table.
-[0m[0m14:24:11,595 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 74) BAM_00001 - Business indicator created. kpi_64061223773274641, Expense reports table.
-[0m[0m14:24:11,595 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 74) BAM_00001 - Business indicator created. kpi_30801353685378049, By customer.
-[0m[0m14:24:11,595 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 74) BAM_00001 - Business indicator created. kpi_30041353504912610, Opportunities by employee.
-[0m[0m14:24:11,595 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 74) BAM_00001 - Business indicator created. kpi_30011353503663716, Opportunities by status.
-[0m[0m14:24:11,595 INFO  [org.jboss.dashboard.kpi.KPIInitialModule] (ServerService Thread Pool -- 74) BAM_00001 - Business indicator created. kpi_30621353683547916, Sales evolution.
-[0m[0m14:24:14,177 INFO  [org.jboss.as.server] (Controller Boot Thread) JBAS015859: Deployed "teiid-dashboard-builder.war" (runtime-name : "teiid-dashboard-builder.war")
-[0m[0m14:24:14,177 INFO  [org.jboss.as.server] (Controller Boot Thread) JBAS015859: Deployed "teiid-olingo-odata4.war" (runtime-name : "teiid-olingo-odata4.war")
-[0m[0m14:24:14,177 INFO  [org.jboss.as.server] (Controller Boot Thread) JBAS015859: Deployed "teiid-odata.war" (runtime-name : "teiid-odata.war")
-[0m[0m14:24:14,178 INFO  [org.jboss.as.server] (Controller Boot Thread) JBAS015859: Deployed "ModeShape.vdb" (runtime-name : "ModeShape.vdb")
-[0m[0m14:24:14,178 INFO  [org.jboss.as.server] (ServerService Thread Pool -- 32) JBAS015859: Deployed "jdv-vdb.xml" (runtime-name : "jdv-vdb.xml")
-[0m[0m14:24:14,178 INFO  [org.jboss.as.server] (ServerService Thread Pool -- 32) JBAS015859: Deployed "integration-platform-console.war" (runtime-name : "integration-platform-console.war")
-[0m[0m14:24:14,179 INFO  [org.jboss.as.server] (ServerService Thread Pool -- 56) JBAS015859: Deployed "modeshape-cmis.war" (runtime-name : "modeshape-cmis.war")
-[0m[0m14:24:14,179 INFO  [org.jboss.as.server] (ServerService Thread Pool -- 56) JBAS015859: Deployed "modeshape-webdav.war" (runtime-name : "modeshape-webdav.war")
-[0m[0m14:24:14,179 INFO  [org.jboss.as.server] (ServerService Thread Pool -- 56) JBAS015859: Deployed "modeshape-rest.war" (runtime-name : "modeshape-rest.war")
-[0m[0m14:24:14,315 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015961: Http management interface listening on http://127.0.0.1:9990/management
-[0m[0m14:24:14,315 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015951: Admin console listening on http://127.0.0.1:9990
-[0m[0m14:24:14,315 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015874: JBoss Red Hat JBoss Data Virtualization 6.3.0 (AS 7.5.4.Final-redhat-4) started in 19542ms - Started 1013 of 1110 services (178 services are lazy, passive or on-demand)
+[0m[32m11:49:40,203 DEBUG [org.jboss.as.config] (MSC service thread 1-8) VM Arguments: -Duser.home=/home/jboss -Duser.name=jboss -D[Standalone] -XX:+UseCompressedOops -verbose:gc -Xloggc:/opt/eap/standalone/log/gc.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=3M -XX:-TraceClassUnloading -Xms1303m -Xmx1303m -Djava.net.preferIPv4Stack=true -Djboss.modules.system.pkgs=org.jboss.logmanager -Djava.awt.headless=true -Djboss.modules.policy-permissions=true -Xbootclasspath/p:/opt/eap/jboss-modules.jar:/opt/eap/modules/system/layers/base/org/jboss/logmanager/main/jboss-logmanager-1.5.4.Final-redhat-1.jar:/opt/eap/modules/system/layers/base/org/jboss/logmanager/ext/main/javax.json-1.0.4.jar:/opt/eap/modules/system/layers/base/org/jboss/logmanager/ext/main/jboss-logmanager-ext-1.0.0.Alpha2-redhat-1.jar -Djava.util.logging.manager=org.jboss.logmanager.LogManager -javaagent:/opt/eap/jolokia.jar=port=8778,protocol=https,caCert=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt,clientPrincipal=cn=system:master-proxy,useSslClientAuthentication=true,extraClientCheck=true,host=0.0.0.0,discoveryEnabled=false -Djava.security.egd=file:/dev/./urandom -Dorg.jboss.boot.log.file=/opt/eap/standalone/log/server.log -Dlogging.configuration=file:/opt/eap/standalone/configuration/logging.properties 
+[0m[31m11:49:41,108 ERROR [org.jboss.as.server] (Controller Boot Thread) JBAS015956: Caught exception during boot: org.jboss.as.controller.persistence.ConfigurationPersistenceException: JBAS014676: Failed to parse configuration
+	at org.jboss.as.controller.persistence.XmlConfigurationPersister.load(XmlConfigurationPersister.java:141)
+	at org.jboss.as.server.ServerService.boot(ServerService.java:336)
+	at org.jboss.as.controller.AbstractControllerService$1.run(AbstractControllerService.java:263)
+	at java.lang.Thread.run(Thread.java:745) [rt.jar:1.8.0_101]
+Caused by: java.lang.IllegalArgumentException
+	at org.jboss.dmr.StringModelValue.asBoolean(StringModelValue.java:154)
+	at org.jboss.dmr.ModelNode.asBoolean(ModelNode.java:262)
+	at org.jboss.as.controller.SimpleAttributeDefinition.parse(SimpleAttributeDefinition.java:331)
+	at org.jboss.as.controller.SimpleAttributeDefinition.parse(SimpleAttributeDefinition.java:188)
+	at org.jboss.as.controller.SimpleAttributeDefinition.parseAndSetParameter(SimpleAttributeDefinition.java:243)
+	at org.jboss.as.server.deployment.scanner.DeploymentScannerParser_1_1.parseScanner(DeploymentScannerParser_1_1.java:167)
+	at org.jboss.as.server.deployment.scanner.DeploymentScannerParser_1_1.readElement(DeploymentScannerParser_1_1.java:114)
+	at org.jboss.as.server.deployment.scanner.DeploymentScannerParser_1_1.readElement(DeploymentScannerParser_1_1.java:50)
+	at org.jboss.staxmapper.XMLMapperImpl.processNested(XMLMapperImpl.java:110)
+	at org.jboss.staxmapper.XMLExtendedStreamReaderImpl.handleAny(XMLExtendedStreamReaderImpl.java:69)
+	at org.jboss.as.server.parsing.StandaloneXml.parseServerProfile(StandaloneXml.java:1094)
+	at org.jboss.as.server.parsing.StandaloneXml.readServerElement_1_4(StandaloneXml.java:469)
+	at org.jboss.as.server.parsing.StandaloneXml.readElement(StandaloneXml.java:145)
+	at org.jboss.as.server.parsing.StandaloneXml.readElement(StandaloneXml.java:107)
+	at org.jboss.staxmapper.XMLMapperImpl.processNested(XMLMapperImpl.java:110)
+	at org.jboss.staxmapper.XMLMapperImpl.parseDocument(XMLMapperImpl.java:69)
+	at org.jboss.as.controller.persistence.XmlConfigurationPersister.load(XmlConfigurationPersister.java:133)
+	... 3 more
+
+[0m[31m11:49:41,108 FATAL [org.jboss.as.server] (Controller Boot Thread) JBAS015957: Server boot has failed in an unrecoverable manner; exiting. See previous messages for details.
+[0m[0m11:49:41,121 INFO  [org.jboss.as] (MSC service thread 1-5) JBAS015950: JBoss Red Hat JBoss Data Virtualization 6.3.0 (AS 7.5.4.Final-redhat-4) stopped in 8ms
+[0m

@@ -36,7 +36,7 @@
         {
             "description": "Git source URI for application",
             "name": "SOURCE_REPOSITORY_URL",
-            "value": "https://github.com/bdecoste/jdv-test",
+            "value": "https://github.com/bdecoste/datavirt-quickstarts",
             "required": true
         },
         {
@@ -54,91 +54,7 @@
         {
             "description": "List of directories from which archives will be copied into the deployment folder.  If unspecified, all archives in /target will be copied.",
             "name": "ARTIFACT_DIR",
-            "value": "",
-            "required": false
-        },
-        {
-            "description": "Database JNDI name used by application to resolve the datasource, e.g. java:/jboss/datasources/postgresql",
-            "name": "POSTGRESQL_JNDI",
-            "value": "java:/postgresql-ds",
-            "required": false
-        },
-        {
-            "description": "Database name",
-            "name": "POSTGRESQL_DATABASE",
-            "value": "jdv",
-            "required": true
-        },
-        {
-            "description": "Sets xa-pool/min-pool-size for the configured datasource.",
-            "name": "POSTGRESQL_MIN_POOL_SIZE",
-            "value": "5",
-            "required": false
-        },
-        {
-            "description": "Sets xa-pool/max-pool-size for the configured datasource.",
-            "name": "POSTGRESQL_MAX_POOL_SIZE",
-            "value": "20",
-            "required": false
-        },
-        {
-            "description": "Sets transaction-isolation for the configured datasource.",
-            "name": "POSTGRESQL_TX_ISOLATION",
-            "value": "TRANSACTION_READ_UNCOMMITTED",
-            "required": false
-        },
-        {
-            "description": "Database user name",
-            "name": "POSTGRESQL_USERNAME",
-            "value": "jdv",
-            "required": false
-        },
-        {
-            "description": "Database user password",
-            "name": "POSTGRESQL_PASSWORD",
-            "value": "jdv",
-            "required": false
-        },
-        {
-            "description": "Database JNDI name used by application to resolve the datasource, e.g. java:/jboss/datasources/postgresql",
-            "name": "MYSQL_JNDI",
-            "value": "java:/mysql-ds",
-            "required": false
-        },
-        {
-            "description": "Database name",
-            "name": "MYSQL_DATABASE",
-            "value": "jdv",
-            "required": true
-        },
-        {
-            "description": "Sets xa-pool/min-pool-size for the configured datasource.",
-            "name": "MYSQL_MIN_POOL_SIZE",
-            "value": "5",
-            "required": false
-        },
-        {
-            "description": "Sets xa-pool/max-pool-size for the configured datasource.",
-            "name": "MYSQL_MAX_POOL_SIZE",
-            "value": "20",
-            "required": false
-        },
-        {
-            "description": "Sets transaction-isolation for the configured datasource.",
-            "name": "MYSQL_TX_ISOLATION",
-            "value": "TRANSACTION_READ_UNCOMMITTED",
-            "required": false
-        },
-        {
-            "description": "Database user name",
-            "name": "MYSQL_USERNAME",
-            "value": "jdv",
-            "required": false
-        },
-        {
-            "description": "Database user password",
-            "name": "MYSQL_PASSWORD",
-            "value": "jdv",
+            "value": "webservices-as-a-datasource/target,hibernate-on-top-of-teiid/target",
             "required": false
         },
         {
@@ -174,6 +90,12 @@
             "from": "[a-zA-Z0-9]{8}",
             "generate": "expression",
             "required": true
+        },
+        {
+            "description": "Comma delimited list of properties files from ConfigMap volumes containing datasource properties",
+            "name": "DATASOURCE_CONFIG_MAP",
+            "value": "/etc/jdv-account1/jdv-account1.properties,/etc/jdv-account2/jdv-account2.properties",
+            "required": false
         }
     ],
     "objects": [
@@ -226,90 +148,6 @@
             }
         },
         {
-            "kind": "Service",
-            "apiVersion": "v1",
-            "spec": {
-                "ports": [
-                    {
-                        "name": "postgresql",
-                        "port": 5432,
-                        "targetPort": 5432,
-                        "nodePort": 0,
-                        "protocol": "TCP"
-                    }
-                ],
-                "selector": {
-                }
-            },
-            "metadata": {
-                "name": "${APPLICATION_NAME}-postgresql"
-            }
-        },
-        {
-            "kind": "Service",
-            "apiVersion": "v1",
-            "spec": {
-                "ports": [
-                    {
-                        "name": "mysql",
-                        "port": 3306,
-                        "targetPort": 3306,
-                        "nodePort": 0,
-                        "protocol": "TCP"
-                    }
-                ],
-                "selector": {
-                }
-            },
-            "metadata": {
-                "name": "${APPLICATION_NAME}-mysql"
-            }
-        },
-        {
-            "kind": "Endpoints",
-            "apiVersion": "v1",
-            "subsets": [
-                {
-                    "addresses": [
-                        {
-                            "ip": "192.168.1.48"
-                        }
-                    ],
-                    "ports": [
-                        {
-                            "name": "postgresql",
-                            "port": 5432
-                        }
-                    ]
-                }
-            ],
-            "metadata": {
-                "name": "${APPLICATION_NAME}-postgresql"
-            }
-        },
-        {
-            "kind": "Endpoints",
-            "apiVersion": "v1",
-            "subsets": [
-                {
-                    "addresses": [
-                        {
-                            "ip": "192.168.1.48"
-                        }
-                    ],
-                    "ports": [
-                        {
-                            "name": "mysql",
-                            "port": 3306
-                        }
-                    ]
-                }
-            ],
-            "metadata": {
-                "name": "${APPLICATION_NAME}-mysql"
-            }
-        },
-        {
             "kind": "Route",
             "apiVersion": "v1",
             "id": "${APPLICATION_NAME}-http",
@@ -343,9 +181,12 @@
                 }
             },
             "spec": {
-                "host": "${HOSTNAME_HTTP}",
+                "host": "${HOSTNAME_HTTPS}",
                 "to": {
                     "name": "jdbc-${APPLICATION_NAME}"
+                },
+                "tls": {
+                    "termination": "passthrough"
                 }
             }
         },
@@ -477,6 +318,18 @@
                                 "name": "${APPLICATION_NAME}",
                                 "image": "${APPLICATION_NAME}",
                                 "imagePullPolicy": "Always",
+                                "volumeMounts": [
+                                    {
+                                        "name": "jdv-account1-volume",
+                                        "mountPath": "/etc/jdv-account1",
+                                        "readOnly": true
+                                    },
+                                    {
+                                        "name": "jdv-account2-volume",
+                                        "mountPath": "/etc/jdv-account2",
+                                        "readOnly": true
+                                    }
+                                ],
                                 "livenessProbe": {
                                     "exec": {
                                         "command": [
@@ -519,66 +372,6 @@
                                 ],
                                 "env": [
                                     {
-                                        "name": "DB_SERVICE_PREFIX_MAPPING",
-                                        "value": "${APPLICATION_NAME}-postgresql=POSTGRESQL,${APPLICATION_NAME}-mysql=MYSQL"
-                                    },
-                                    {
-                                        "name": "POSTGRESQL_JNDI",
-                                        "value": "${POSTGRESQL_JNDI}"
-                                    },
-                                    {
-                                        "name": "POSTGRESQL_USERNAME",
-                                        "value": "${POSTGRESQL_USERNAME}"
-                                    },
-                                    {
-                                        "name": "POSTGRESQL_PASSWORD",
-                                        "value": "${POSTGRESQL_PASSWORD}"
-                                    },
-                                    {
-                                        "name": "POSTGRESQL_DATABASE",
-                                        "value": "${POSTGRESQL_DATABASE}"
-                                    },
-                                    {
-                                        "name": "POSTGRESQL_MIN_POOL_SIZE",
-                                        "value": "${POSTGRESQL_MIN_POOL_SIZE}"
-                                    },
-                                    {
-                                        "name": "POSTGRESQL_MAX_POOL_SIZE",
-                                        "value": "${POSTGRESQL_MAX_POOL_SIZE}"
-                                    },
-                                    {
-                                        "name": "POSTGRESQL_TX_ISOLATION",
-                                        "value": "${POSTGRESQL_TX_ISOLATION}"
-                                    },
-                                    {
-                                        "name": "MYSQL_JNDI",
-                                        "value": "${MYSQL_JNDI}"
-                                    },
-                                    {
-                                        "name": "MYSQL_USERNAME",
-                                        "value": "${MYSQL_USERNAME}"
-                                    },
-                                    {
-                                        "name": "MYSQL_PASSWORD",
-                                        "value": "${MYSQL_PASSWORD}"
-                                    },
-                                    {
-                                        "name": "MYSQL_DATABASE",
-                                        "value": "${MYSQL_DATABASE}"
-                                    },
-                                    {
-                                        "name": "MYSQL_MIN_POOL_SIZE",
-                                        "value": "${MYSQL_MIN_POOL_SIZE}"
-                                    },
-                                    {
-                                        "name": "MYSQL_MAX_POOL_SIZE",
-                                        "value": "${MYSQL_MAX_POOL_SIZE}"
-                                    },
-                                    {
-                                        "name": "MYSQL_TX_ISOLATION",
-                                        "value": "${MYSQL_TX_ISOLATION}"
-                                    },
-                                    {
                                         "name": "OPENSHIFT_KUBE_PING_LABELS",
                                         "value": "application=${APPLICATION_NAME}"
                                     },
@@ -597,8 +390,26 @@
                                     {
                                         "name": "JGROUPS_CLUSTER_PASSWORD",
                                         "value": "${JGROUPS_CLUSTER_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "DATASOURCE_CONFIG_MAP",
+                                        "value": "${DATASOURCE_CONFIG_MAP}"
                                     }
                                 ]
+                            }
+                        ],
+                        "volumes": [
+                            {
+                                "name": "jdv-account1-volume",
+                                "configMap": {
+                                    "name": "jdv-account1-configmap"
+                                }
+                            },
+                            {
+                                "name": "jdv-account2-volume",
+                                "configMap": {
+                                    "name": "jdv-account2-configmap"
+                                }
                             }
                         ]
                     }
