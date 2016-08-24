@@ -8,8 +8,8 @@
 + configure_hornetq
 + '[' true '!=' false ']'
 + configure_hornetq_cluster_password
-+ '[' -n OYHdMQDI ']'
-+ JBOSS_MESSAGING_ARGS=' -Djboss.messaging.cluster.password=OYHdMQDI'
++ '[' -n SHeb3OkL ']'
++ JBOSS_MESSAGING_ARGS=' -Djboss.messaging.cluster.password=SHeb3OkL'
 ++ configure_hornetq_destinations
 ++ IFS=,
 ++ read -a queues
@@ -38,470 +38,580 @@
 + timerservice='            <timer-service thread-pool-name="default" default-data-store="default-file-store">                <data-stores>                    <file-data-store name="default-file-store" path="timer-service-data" relative-to="jboss.server.data.dir"/>                    <!-- ##DATASTORES## -->                </data-stores>            </timer-service>'
 + sed -i 's|<!-- ##TIMER_SERVICE## -->|            <timer-service thread-pool-name="default" default-data-store="default-file-store">                <data-stores>                    <file-data-store name="default-file-store" path="timer-service-data" relative-to="jboss.server.data.dir"/>                    <!-- ##DATASTORES## -->                </data-stores>            </timer-service>|' /opt/eap/standalone/configuration/standalone-openshift.xml
 + datasources=
-++ echo
+++ echo datavirt-postgresql=POSTGRESQL
 ++ sed 's/,/ /g'
++ for db_backend in '$(echo $DB_SERVICE_PREFIX_MAPPING | sed "s/,/ /g")'
++ '[' 1 -eq 0 ']'
++ for db_backend in '${db_backend[@]}'
++ service_name=datavirt-postgresql
++ service=DATAVIRT-POSTGRESQL
++ service=DATAVIRT_POSTGRESQL
++ db=POSTGRESQL
++ prefix=POSTGRESQL
++ [[ DATAVIRT_POSTGRESQL != *\_* ]]
++ inject_datasource POSTGRESQL DATAVIRT_POSTGRESQL
++ prefix=POSTGRESQL
++ service=DATAVIRT_POSTGRESQL
+++ find_env DATAVIRT_POSTGRESQL_SERVICE_HOST
++++ printenv DATAVIRT_POSTGRESQL_SERVICE_HOST
+++ var=172.30.111.148
+++ envname=DATAVIRT_POSTGRESQL_SERVICE_HOST
+++ '[' -n 172.30.111.148 ']'
+++ echo 172.30.111.148
++ host=172.30.111.148
+++ find_env DATAVIRT_POSTGRESQL_SERVICE_PORT
++++ printenv DATAVIRT_POSTGRESQL_SERVICE_PORT
+++ var=5432
+++ envname=DATAVIRT_POSTGRESQL_SERVICE_PORT
+++ '[' -n 5432 ']'
+++ echo 5432
++ port=5432
++ '[' -z 172.30.111.148 ']'
++ '[' -z 5432 ']'
+++ get_jndi_name POSTGRESQL DATAVIRT_POSTGRESQL
+++ prefix=POSTGRESQL
++++ find_env POSTGRESQL_JNDI java:jboss/datasources/datavirt_postgresql
+++++ printenv POSTGRESQL_JNDI
++++ var=java:/account-ds
++++ envname=POSTGRESQL_JNDI
++++ '[' -n java:/account-ds ']'
++++ echo java:/account-ds
+++ echo java:/account-ds
++ jndi=java:/account-ds
+++ find_env POSTGRESQL_USERNAME
++++ printenv POSTGRESQL_USERNAME
+++ var=userFds
+++ envname=POSTGRESQL_USERNAME
+++ '[' -n userFds ']'
+++ echo userFds
++ username=userFds
+++ find_env POSTGRESQL_PASSWORD
++++ printenv POSTGRESQL_PASSWORD
+++ var=Hr6Hw4aw
+++ envname=POSTGRESQL_PASSWORD
+++ '[' -n Hr6Hw4aw ']'
+++ echo Hr6Hw4aw
++ password=Hr6Hw4aw
+++ find_env POSTGRESQL_DATABASE
++++ printenv POSTGRESQL_DATABASE
+++ var=root
+++ envname=POSTGRESQL_DATABASE
+++ '[' -n root ']'
+++ echo root
++ database=root
++ '[' -z java:/account-ds ']'
++ '[' -z userFds ']'
++ '[' -z Hr6Hw4aw ']'
++ '[' -z root ']'
+++ find_env POSTGRESQL_TX_ISOLATION
++++ printenv POSTGRESQL_TX_ISOLATION
+++ var=
+++ envname=POSTGRESQL_TX_ISOLATION
+++ '[' -n '' ']'
+++ var=
+++ '[' -n '' ']'
+++ echo
++ tx_isolation=
+++ find_env POSTGRESQL_MIN_POOL_SIZE
++++ printenv POSTGRESQL_MIN_POOL_SIZE
+++ var=
+++ envname=POSTGRESQL_MIN_POOL_SIZE
+++ '[' -n '' ']'
+++ var=
+++ '[' -n '' ']'
+++ echo
++ min_pool_size=
+++ find_env POSTGRESQL_MAX_POOL_SIZE
++++ printenv POSTGRESQL_MAX_POOL_SIZE
+++ var=
+++ envname=POSTGRESQL_MAX_POOL_SIZE
+++ '[' -n '' ']'
+++ var=
+++ '[' -n '' ']'
+++ echo
++ max_pool_size=
+++ find_env POSTGRESQL_JTA true
++++ printenv POSTGRESQL_JTA
+++ var=
+++ envname=POSTGRESQL_JTA
+++ '[' -n '' ']'
+++ var=
+++ '[' -n '' ']'
+++ echo true
++ jta=true
+++ find_env POSTGRESQL_NONXA false
++++ printenv POSTGRESQL_NONXA
+++ var=
+++ envname=POSTGRESQL_NONXA
+++ '[' -n '' ']'
+++ var=
+++ '[' -n '' ']'
+++ echo false
++ NON_XA_DATASOURCE=false
+++ find_env POSTGRESQL_PROTOCOL
++++ printenv POSTGRESQL_PROTOCOL
+++ var=
+++ envname=POSTGRESQL_PROTOCOL
+++ '[' -n '' ']'
+++ var=
+++ '[' -n '' ']'
+++ echo
++ protocol=
++ case "$db" in
++ driver=postgresql
++ validate=true
++ checker=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker
++ sorter=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter
+++ generate_datasource datavirt_postgresql-POSTGRESQL java:/account-ds userFds Hr6Hw4aw 172.30.111.148 5432 root org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter postgresql datavirt-postgresql true true
+++ pool_name=datavirt_postgresql-POSTGRESQL
+++ jndi_name=java:/account-ds
+++ driver=postgresql
+++ service_name=datavirt-postgresql
+++ validate=true
+++ protocol=
+++ case "${10}" in
+++ '[' -n false ']'
+++ '[' false = true ']'
+++ ds='                <xa-datasource jndi-name="java:/account-ds" pool-name="datavirt_postgresql-POSTGRESQL" use-java-context="true" enabled="true">
+                    <xa-datasource-property name="ServerName">172.30.111.148</xa-datasource-property>
+                    <xa-datasource-property name="PortNumber">5432</xa-datasource-property>
+                    <xa-datasource-property name="DatabaseName">root</xa-datasource-property>
+                    <driver>postgresql</driver>'
+++ '[' -n '' ']'
+++ '[' -n '' ']'
+++ '[' -n '' ']'
+++ ds='                <xa-datasource jndi-name="java:/account-ds" pool-name="datavirt_postgresql-POSTGRESQL" use-java-context="true" enabled="true">
+                    <xa-datasource-property name="ServerName">172.30.111.148</xa-datasource-property>
+                    <xa-datasource-property name="PortNumber">5432</xa-datasource-property>
+                    <xa-datasource-property name="DatabaseName">root</xa-datasource-property>
+                    <driver>postgresql</driver>
+                    <security>
+                        <user-name>userFds</user-name>
+                        <password>Hr6Hw4aw</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>true</validate-on-match>
+                        <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker"></valid-connection-checker>
+                        <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter"></exception-sorter>
+                    </validation>'
+++ '[' -n false ']'
+++ '[' false = true ']'
+++ ds='                <xa-datasource jndi-name="java:/account-ds" pool-name="datavirt_postgresql-POSTGRESQL" use-java-context="true" enabled="true">
+                    <xa-datasource-property name="ServerName">172.30.111.148</xa-datasource-property>
+                    <xa-datasource-property name="PortNumber">5432</xa-datasource-property>
+                    <xa-datasource-property name="DatabaseName">root</xa-datasource-property>
+                    <driver>postgresql</driver>
+                    <security>
+                        <user-name>userFds</user-name>
+                        <password>Hr6Hw4aw</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>true</validate-on-match>
+                        <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker"></valid-connection-checker>
+                        <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter"></exception-sorter>
+                    </validation>
+                  </xa-datasource>'
+++ '[' -n '' -a '' = datavirt-postgresql ']'
+++ echo '<xa-datasource' 'jndi-name="java:/account-ds"' 'pool-name="datavirt_postgresql-POSTGRESQL"' 'use-java-context="true"' 'enabled="true">' '<xa-datasource-property' 'name="ServerName">172.30.111.148</xa-datasource-property>' '<xa-datasource-property' 'name="PortNumber">5432</xa-datasource-property>' '<xa-datasource-property' 'name="DatabaseName">root</xa-datasource-property>' '<driver>postgresql</driver>' '<security>' '<user-name>userFds</user-name>' '<password>Hr6Hw4aw</password>' '</security>' '<validation>' '<validate-on-match>true</validate-on-match>' '<valid-connection-checker' 'class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker"></valid-connection-checker>' '<exception-sorter' 'class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter"></exception-sorter>' '</validation>' '</xa-datasource>'
+++ sed ':a;N;$!ba;s|\n|\\n|g'
++ datasources='<xa-datasource jndi-name="java:/account-ds" pool-name="datavirt_postgresql-POSTGRESQL" use-java-context="true" enabled="true"> <xa-datasource-property name="ServerName">172.30.111.148</xa-datasource-property> <xa-datasource-property name="PortNumber">5432</xa-datasource-property> <xa-datasource-property name="DatabaseName">root</xa-datasource-property> <driver>postgresql</driver> <security> <user-name>userFds</user-name> <password>Hr6Hw4aw</password> </security> <validation> <validate-on-match>true</validate-on-match> <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker"></valid-connection-checker> <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter"></exception-sorter> </validation> </xa-datasource>\n'
 ++ inject_tx_datasource
-++ tx_backend=
-++ '[' -n '' ']'
-+ datasources=
+++ tx_backend=datavirt-postgresql=POSTGRESQL
+++ '[' -n datavirt-postgresql=POSTGRESQL ']'
+++ service_name=datavirt-postgresql
+++ service=DATAVIRT-POSTGRESQL
+++ service=DATAVIRT_POSTGRESQL
+++ db=POSTGRESQL
+++ prefix=POSTGRESQL
++++ find_env DATAVIRT_POSTGRESQL_SERVICE_HOST
+++++ printenv DATAVIRT_POSTGRESQL_SERVICE_HOST
++++ var=172.30.111.148
++++ envname=DATAVIRT_POSTGRESQL_SERVICE_HOST
++++ '[' -n 172.30.111.148 ']'
++++ echo 172.30.111.148
+++ host=172.30.111.148
++++ find_env DATAVIRT_POSTGRESQL_SERVICE_PORT
+++++ printenv DATAVIRT_POSTGRESQL_SERVICE_PORT
++++ var=5432
++++ envname=DATAVIRT_POSTGRESQL_SERVICE_PORT
++++ '[' -n 5432 ']'
++++ echo 5432
+++ port=5432
+++ '[' -z 172.30.111.148 ']'
+++ '[' -z 5432 ']'
++++ find_env POSTGRESQL_JNDI java:jboss/datasources/datavirt_postgresql
+++++ printenv POSTGRESQL_JNDI
++++ var=java:/account-ds
++++ envname=POSTGRESQL_JNDI
++++ '[' -n java:/account-ds ']'
++++ echo java:/account-ds
+++ jndi=java:/account-ds
++++ find_env POSTGRESQL_USERNAME
+++++ printenv POSTGRESQL_USERNAME
++++ var=userFds
++++ envname=POSTGRESQL_USERNAME
++++ '[' -n userFds ']'
++++ echo userFds
+++ username=userFds
++++ find_env POSTGRESQL_PASSWORD
+++++ printenv POSTGRESQL_PASSWORD
++++ var=Hr6Hw4aw
++++ envname=POSTGRESQL_PASSWORD
++++ '[' -n Hr6Hw4aw ']'
++++ echo Hr6Hw4aw
+++ password=Hr6Hw4aw
++++ find_env POSTGRESQL_DATABASE
+++++ printenv POSTGRESQL_DATABASE
++++ var=root
++++ envname=POSTGRESQL_DATABASE
++++ '[' -n root ']'
++++ echo root
+++ database=root
+++ '[' -z java:/account-ds ']'
+++ '[' -z userFds ']'
+++ '[' -z Hr6Hw4aw ']'
+++ '[' -z root ']'
++++ find_env POSTGRESQL_TX_ISOLATION
+++++ printenv POSTGRESQL_TX_ISOLATION
++++ var=
++++ envname=POSTGRESQL_TX_ISOLATION
++++ '[' -n '' ']'
++++ var=
++++ '[' -n '' ']'
++++ echo
+++ tx_isolation=
++++ find_env POSTGRESQL_MIN_POOL_SIZE
+++++ printenv POSTGRESQL_MIN_POOL_SIZE
++++ var=
++++ envname=POSTGRESQL_MIN_POOL_SIZE
++++ '[' -n '' ']'
++++ var=
++++ '[' -n '' ']'
++++ echo
+++ min_pool_size=
++++ find_env POSTGRESQL_MAX_POOL_SIZE
+++++ printenv POSTGRESQL_MAX_POOL_SIZE
++++ var=
++++ envname=POSTGRESQL_MAX_POOL_SIZE
++++ '[' -n '' ']'
++++ var=
++++ '[' -n '' ']'
++++ echo
+++ max_pool_size=
+++ case "$db" in
+++ driver=postgresql
++++ generate_tx_datasource datavirt_postgresql-POSTGRESQL java:/account-ds userFds Hr6Hw4aw 172.30.111.148 5432 root postgresql
++++ ds='                  <datasource jta="false" jndi-name="java:/account-dsObjectStore" pool-name="datavirt_postgresql-POSTGRESQLObjectStorePool" enabled="true">
+                      <connection-url>jdbc:postgresql://172.30.111.148:5432/root</connection-url>
+                      <driver>postgresql</driver>'
++++ '[' -n '' ']'
++++ '[' -n '' ']'
++++ '[' -n '' ']'
++++ ds='                  <datasource jta="false" jndi-name="java:/account-dsObjectStore" pool-name="datavirt_postgresql-POSTGRESQLObjectStorePool" enabled="true">
+                      <connection-url>jdbc:postgresql://172.30.111.148:5432/root</connection-url>
+                      <driver>postgresql</driver>
+                      
+                      <security>
+                          <user-name>userFds</user-name>
+                          <password>Hr6Hw4aw</password>
+                      </security>
+                  </datasource>'
++++ echo '<datasource' 'jta="false"' 'jndi-name="java:/account-dsObjectStore"' 'pool-name="datavirt_postgresql-POSTGRESQLObjectStorePool"' 'enabled="true">' '<connection-url>jdbc:postgresql://172.30.111.148:5432/root</connection-url>' '<driver>postgresql</driver>' '<security>' '<user-name>userFds</user-name>' '<password>Hr6Hw4aw</password>' '</security>' '</datasource>'
++++ sed ':a;N;$!ba;s|\n|\\n|g'
+++ datasource='<datasource jta="false" jndi-name="java:/account-dsObjectStore" pool-name="datavirt_postgresql-POSTGRESQLObjectStorePool" enabled="true"> <connection-url>jdbc:postgresql://172.30.111.148:5432/root</connection-url> <driver>postgresql</driver> <security> <user-name>userFds</user-name> <password>Hr6Hw4aw</password> </security> </datasource>\n'
+++ inject_jdbc_store java:/account-ds
+++ jdbcStore='<jdbc-store datasource-jndi-name="java:/account-dsObjectStore"/>'
+++ sed -i 's|<!-- ##JDBC_STORE## -->|<jdbc-store datasource-jndi-name="java:/account-dsObjectStore"/>|' /opt/eap/standalone/configuration/standalone-openshift.xml
+++ echo '<datasource' 'jta="false"' 'jndi-name="java:/account-dsObjectStore"' 'pool-name="datavirt_postgresql-POSTGRESQLObjectStorePool"' 'enabled="true">' '<connection-url>jdbc:postgresql://172.30.111.148:5432/root</connection-url>' '<driver>postgresql</driver>' '<security>' '<user-name>userFds</user-name>' '<password>Hr6Hw4aw</password>' '</security>' '</datasource>\n'
+++ sed ':a;N;$!ba;s|\n|\\n|g'
++ datasources='<xa-datasource jndi-name="java:/account-ds" pool-name="datavirt_postgresql-POSTGRESQL" use-java-context="true" enabled="true"> <xa-datasource-property name="ServerName">172.30.111.148</xa-datasource-property> <xa-datasource-property name="PortNumber">5432</xa-datasource-property> <xa-datasource-property name="DatabaseName">root</xa-datasource-property> <driver>postgresql</driver> <security> <user-name>userFds</user-name> <password>Hr6Hw4aw</password> </security> <validation> <validate-on-match>true</validate-on-match> <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker"></valid-connection-checker> <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter"></exception-sorter> </validation> </xa-datasource>\n<datasource jta="false" jndi-name="java:/account-dsObjectStore" pool-name="datavirt_postgresql-POSTGRESQLObjectStorePool" enabled="true"> <connection-url>jdbc:postgresql://172.30.111.148:5432/root</connection-url> <driver>postgresql</driver> <security> <user-name>userFds</user-name> <password>Hr6Hw4aw</password> </security> </datasource>\n'
 + db=EXTERNAL
-+ '[' -n /etc/jdv-account1/jdv-account1.properties,/etc/jdv-account2/jdv-account2.properties ']'
-++ echo /etc/jdv-account1/jdv-account1.properties,/etc/jdv-account2/jdv-account2.properties
++ '[' -n /etc/jdv-sample/jdv-sample.properties ']'
+++ echo /etc/jdv-sample/jdv-sample.properties
 ++ sed 's/,/ /g'
 + for cm_file in '$(echo $DATASOURCE_CONFIG_MAP | sed "s/,/ /g")'
-+ . /etc/jdv-account1/jdv-account1.properties
-++ DATASOURCES=ACCOUNT1
-++ ACCOUNT1_JNDI=java:/accounts-ds
-++ ACCOUNT1_DRIVER=h2
-++ ACCOUNT1_USERNAME=sa
-++ ACCOUNT1_PASSWORD=sa
-++ ACCOUNT1_DATABASE=accounts
-++ ACCOUNT1_IMPORT_SQL=/home/jboss/source/injected/injected-files/customer-schema.sql
-++ ACCOUNT1_PROTOCOL=jdbc:h2
-++ ACCOUNT1_SERVICE_HOST=mem
-++ ACCOUNT1_SERVICE_PORT=9092
-++ ACCOUNT1_NONXA=true
-+ '[' -n ACCOUNT1 ']'
-++ echo ACCOUNT1
-++ sed 's/,/ /g'
-+ for datasource_prefix in '$(echo $DATASOURCES | sed "s/,/ /g")'
-+ inject_datasource ACCOUNT1 ACCOUNT1
-+ prefix=ACCOUNT1
-+ service=ACCOUNT1
-++ find_env ACCOUNT1_SERVICE_HOST
-+++ printenv ACCOUNT1_SERVICE_HOST
-++ var=
-++ envname=ACCOUNT1_SERVICE_HOST
-++ '[' -n '' ']'
-++ var=mem
-++ '[' -n mem ']'
-++ echo mem
-+ host=mem
-++ find_env ACCOUNT1_SERVICE_PORT
-+++ printenv ACCOUNT1_SERVICE_PORT
-++ var=
-++ envname=ACCOUNT1_SERVICE_PORT
-++ '[' -n '' ']'
-++ var=9092
-++ '[' -n 9092 ']'
-++ echo 9092
-+ port=9092
-+ '[' -z mem ']'
-+ '[' -z 9092 ']'
-++ get_jndi_name ACCOUNT1 ACCOUNT1
-++ prefix=ACCOUNT1
-+++ find_env ACCOUNT1_JNDI java:jboss/datasources/account1
-++++ printenv ACCOUNT1_JNDI
-+++ var=
-+++ envname=ACCOUNT1_JNDI
-+++ '[' -n '' ']'
-+++ var=java:/accounts-ds
-+++ '[' -n java:/accounts-ds ']'
-+++ echo java:/accounts-ds
-++ echo java:/accounts-ds
-+ jndi=java:/accounts-ds
-++ find_env ACCOUNT1_USERNAME
-+++ printenv ACCOUNT1_USERNAME
-++ var=
-++ envname=ACCOUNT1_USERNAME
-++ '[' -n '' ']'
-++ var=sa
-++ '[' -n sa ']'
-++ echo sa
-+ username=sa
-++ find_env ACCOUNT1_PASSWORD
-+++ printenv ACCOUNT1_PASSWORD
-++ var=
-++ envname=ACCOUNT1_PASSWORD
-++ '[' -n '' ']'
-++ var=sa
-++ '[' -n sa ']'
-++ echo sa
-+ password=sa
-++ find_env ACCOUNT1_DATABASE
-+++ printenv ACCOUNT1_DATABASE
-++ var=
-++ envname=ACCOUNT1_DATABASE
-++ '[' -n '' ']'
-++ var=accounts
-++ '[' -n accounts ']'
-++ echo accounts
-+ database=accounts
-+ '[' -z java:/accounts-ds ']'
-+ '[' -z sa ']'
-+ '[' -z sa ']'
-+ '[' -z accounts ']'
-++ find_env ACCOUNT1_TX_ISOLATION
-+++ printenv ACCOUNT1_TX_ISOLATION
-++ var=
-++ envname=ACCOUNT1_TX_ISOLATION
-++ '[' -n '' ']'
-++ var=
-++ '[' -n '' ']'
-++ echo
-+ tx_isolation=
-++ find_env ACCOUNT1_MIN_POOL_SIZE
-+++ printenv ACCOUNT1_MIN_POOL_SIZE
-++ var=
-++ envname=ACCOUNT1_MIN_POOL_SIZE
-++ '[' -n '' ']'
-++ var=
-++ '[' -n '' ']'
-++ echo
-+ min_pool_size=
-++ find_env ACCOUNT1_MAX_POOL_SIZE
-+++ printenv ACCOUNT1_MAX_POOL_SIZE
-++ var=
-++ envname=ACCOUNT1_MAX_POOL_SIZE
-++ '[' -n '' ']'
-++ var=
-++ '[' -n '' ']'
-++ echo
-+ max_pool_size=
-++ find_env ACCOUNT1_JTA true
-+++ printenv ACCOUNT1_JTA
-++ var=
-++ envname=ACCOUNT1_JTA
-++ '[' -n '' ']'
-++ var=
-++ '[' -n '' ']'
-++ echo true
-+ jta=true
-++ find_env ACCOUNT1_NONXA false
-+++ printenv ACCOUNT1_NONXA
-++ var=
-++ envname=ACCOUNT1_NONXA
-++ '[' -n '' ']'
-++ var=true
-++ '[' -n true ']'
-++ echo true
-+ NON_XA_DATASOURCE=true
-++ find_env ACCOUNT1_PROTOCOL
-+++ printenv ACCOUNT1_PROTOCOL
-++ var=
-++ envname=ACCOUNT1_PROTOCOL
-++ '[' -n '' ']'
-++ var=jdbc:h2
-++ '[' -n jdbc:h2 ']'
-++ echo jdbc:h2
-+ protocol=jdbc:h2
-+ case "$db" in
-++ find_env ACCOUNT1_DRIVER true
-+++ printenv ACCOUNT1_DRIVER
-++ var=
-++ envname=ACCOUNT1_DRIVER
-++ '[' -n '' ']'
-++ var=h2
-++ '[' -n h2 ']'
-++ echo h2
-+ driver=h2
-++ find_env ACCOUNT1_CONNECTION_CHECKER
-+++ printenv ACCOUNT1_CONNECTION_CHECKER
-++ var=
-++ envname=ACCOUNT1_CONNECTION_CHECKER
-++ '[' -n '' ']'
-++ var=
-++ '[' -n '' ']'
-++ echo
-+ checker=
-++ find_env ACCOUNT1_EXCEPTION_SORTER
-+++ printenv ACCOUNT1_EXCEPTION_SORTER
-++ var=
-++ envname=ACCOUNT1_EXCEPTION_SORTER
-++ '[' -n '' ']'
-++ var=
-++ '[' -n '' ']'
-++ echo
-+ sorter=
++ . /etc/jdv-sample/jdv-sample.properties
+++ RESOURCE_ADAPTERS=QSEXCEL,QSFILE,QSWS
+++ QSEXCEL_ID=fileQSExcel
+++ QSEXCEL_MODULE_SLOT=main
+++ QSEXCEL_MODULE_ID=org.jboss.teiid.resource-adapter.file
+++ QSEXCEL_CONNECTION_CLASS=org.teiid.resource.adapter.file.FileManagedConnectionFactory
+++ QSEXCEL_CONNECTION_JNDI=java:/excel-file
+++ QSEXCEL_PROPERTY_ParentDirectory=/home/jboss/source/injected/injected-files/excel-files/
+++ QSEXCEL_PROPERTY_AllowParentPaths=true
+++ QSFILE_ID=fileQS
+++ QSFILE_MODULE_SLOT=main
+++ QSFILE_MODULE_ID=org.jboss.teiid.resource-adapter.file
+++ QSFILE_CONNECTION_CLASS=org.teiid.resource.adapter.file.FileManagedConnectionFactory
+++ QSFILE_CONNECTION_JNDI=java:/marketdata-file
+++ QSFILE_PROPERTY_ParentDirectory=/home/jboss/source/injected/injected-files/data
+++ QSFILE_PROPERTY_AllowParentPaths=true
+++ QSWS_ID=wsQS
+++ QSWS_MODULE_SLOT=main
+++ QSWS_MODULE_ID=org.jboss.teiid.resource-adapter.webservice
+++ QSWS_CONNECTION_CLASS=org.teiid.resource.adapter.ws.WSManagedConnectionFactory
+++ QSWS_CONNECTION_JNDI=java:/CustomerRESTWebSvcSource
+++ QSWS_PROPERTY_EndPoint=http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList
+++ TRANSLATORS=TESTTRANSLATOR
+++ TESTTRANSLATOR_NAME=test
+++ TESTTRANSLATOR_MODULE=org.jboss.teiid.translator.test
 + '[' -n '' ']'
-+ validate=false
-+ checker=CHECKER
-+ sorter=SORTER
-+ service_name=ACCOUNT1
-++ generate_datasource account1-ACCOUNT1 java:/accounts-ds sa sa mem 9092 accounts CHECKER SORTER h2 ACCOUNT1 true false jdbc:h2
-++ pool_name=account1-ACCOUNT1
-++ jndi_name=java:/accounts-ds
-++ driver=h2
-++ service_name=ACCOUNT1
-++ validate=false
-++ protocol=jdbc:h2
-++ case "${10}" in
-++ '[' -n h2 ']'
-++ '[' -n true ']'
-++ '[' true = true ']'
-++ '[' h2 == h2 ']'
-+++ find_env ACCOUNT1_IMPORT_SQL
-++++ printenv ACCOUNT1_IMPORT_SQL
-+++ var=
-+++ envname=ACCOUNT1_IMPORT_SQL
-+++ '[' -n '' ']'
-+++ var=/home/jboss/source/injected/injected-files/customer-schema.sql
-+++ '[' -n /home/jboss/source/injected/injected-files/customer-schema.sql ']'
-+++ echo /home/jboss/source/injected/injected-files/customer-schema.sql
-++ h2_import=/home/jboss/source/injected/injected-files/customer-schema.sql
-++ '[' -n /home/jboss/source/injected/injected-files/customer-schema.sql ']'
-++ ds=' <datasource jndi-name="java:/accounts-ds" pool-name="account1-ACCOUNT1" enabled="true" use-java-context="true">
-                    <connection-url>jdbc:h2:mem:accounts;INIT=RUNSCRIPT FROM '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;</connection-url>
-                    <driver>h2</driver>'
-++ '[' -n '' ']'
-++ '[' -n '' ']'
-++ '[' -n '' ']'
-++ ds=' <datasource jndi-name="java:/accounts-ds" pool-name="account1-ACCOUNT1" enabled="true" use-java-context="true">
-                    <connection-url>jdbc:h2:mem:accounts;INIT=RUNSCRIPT FROM '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;</connection-url>
-                    <driver>h2</driver>
-                    <security>
-                        <user-name>sa</user-name>
-                        <password>sa</password>
-                    </security>'
-++ '[' false == true ']'
-++ '[' -n true ']'
-++ '[' true = true ']'
-++ ds=' <datasource jndi-name="java:/accounts-ds" pool-name="account1-ACCOUNT1" enabled="true" use-java-context="true">
-                    <connection-url>jdbc:h2:mem:accounts;INIT=RUNSCRIPT FROM '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;</connection-url>
-                    <driver>h2</driver>
-                    <security>
-                        <user-name>sa</user-name>
-                        <password>sa</password>
-                    </security>
-                  </datasource>'
-++ '[' -n '' -a '' = ACCOUNT1 ']'
-++ echo '<datasource' 'jndi-name="java:/accounts-ds"' 'pool-name="account1-ACCOUNT1"' 'enabled="true"' 'use-java-context="true">' '<connection-url>jdbc:h2:mem:accounts;INIT=RUNSCRIPT' FROM ''\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;</connection-url>' '<driver>h2</driver>' '<security>' '<user-name>sa</user-name>' '<password>sa</password>' '</security>' '</datasource>'
-++ sed ':a;N;$!ba;s|\n|\\n|g'
-+ datasources='<datasource jndi-name="java:/accounts-ds" pool-name="account1-ACCOUNT1" enabled="true" use-java-context="true"> <connection-url>jdbc:h2:mem:accounts;INIT=RUNSCRIPT FROM '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;</connection-url> <driver>h2</driver> <security> <user-name>sa</user-name> <password>sa</password> </security> </datasource>\n'
-+ for cm_file in '$(echo $DATASOURCE_CONFIG_MAP | sed "s/,/ /g")'
-+ . /etc/jdv-account2/jdv-account2.properties
-++ DATASOURCES=ACCOUNT2
-++ ACCOUNT2_JNDI=java:/accounts2-ds
-++ ACCOUNT2_DRIVER=h2
-++ ACCOUNT2_USERNAME=sa
-++ ACCOUNT2_PASSWORD=sa
-++ ACCOUNT2_DATABASE=accounts2
-++ ACCOUNT2_IMPORT_SQL=/home/jboss/source/injected/injected-files/customer-schema.sql
-++ ACCOUNT2_PROTOCOL=jdbc:h2
-++ ACCOUNT2_SERVICE_HOST=mem
-++ ACCOUNT2_SERVICE_PORT=9092
-++ ACCOUNT2_NONXA=true
-+ '[' -n ACCOUNT2 ']'
-++ echo ACCOUNT2
-++ sed 's/,/ /g'
-+ for datasource_prefix in '$(echo $DATASOURCES | sed "s/,/ /g")'
-+ inject_datasource ACCOUNT2 ACCOUNT2
-+ prefix=ACCOUNT2
-+ service=ACCOUNT2
-++ find_env ACCOUNT2_SERVICE_HOST
-+++ printenv ACCOUNT2_SERVICE_HOST
-++ var=
-++ envname=ACCOUNT2_SERVICE_HOST
-++ '[' -n '' ']'
-++ var=mem
-++ '[' -n mem ']'
-++ echo mem
-+ host=mem
-++ find_env ACCOUNT2_SERVICE_PORT
-+++ printenv ACCOUNT2_SERVICE_PORT
-++ var=
-++ envname=ACCOUNT2_SERVICE_PORT
-++ '[' -n '' ']'
-++ var=9092
-++ '[' -n 9092 ']'
-++ echo 9092
-+ port=9092
-+ '[' -z mem ']'
-+ '[' -z 9092 ']'
-++ get_jndi_name ACCOUNT2 ACCOUNT2
-++ prefix=ACCOUNT2
-+++ find_env ACCOUNT2_JNDI java:jboss/datasources/account2
-++++ printenv ACCOUNT2_JNDI
-+++ var=
-+++ envname=ACCOUNT2_JNDI
-+++ '[' -n '' ']'
-+++ var=java:/accounts2-ds
-+++ '[' -n java:/accounts2-ds ']'
-+++ echo java:/accounts2-ds
-++ echo java:/accounts2-ds
-+ jndi=java:/accounts2-ds
-++ find_env ACCOUNT2_USERNAME
-+++ printenv ACCOUNT2_USERNAME
-++ var=
-++ envname=ACCOUNT2_USERNAME
-++ '[' -n '' ']'
-++ var=sa
-++ '[' -n sa ']'
-++ echo sa
-+ username=sa
-++ find_env ACCOUNT2_PASSWORD
-+++ printenv ACCOUNT2_PASSWORD
-++ var=
-++ envname=ACCOUNT2_PASSWORD
-++ '[' -n '' ']'
-++ var=sa
-++ '[' -n sa ']'
-++ echo sa
-+ password=sa
-++ find_env ACCOUNT2_DATABASE
-+++ printenv ACCOUNT2_DATABASE
-++ var=
-++ envname=ACCOUNT2_DATABASE
-++ '[' -n '' ']'
-++ var=accounts2
-++ '[' -n accounts2 ']'
-++ echo accounts2
-+ database=accounts2
-+ '[' -z java:/accounts2-ds ']'
-+ '[' -z sa ']'
-+ '[' -z sa ']'
-+ '[' -z accounts2 ']'
-++ find_env ACCOUNT2_TX_ISOLATION
-+++ printenv ACCOUNT2_TX_ISOLATION
-++ var=
-++ envname=ACCOUNT2_TX_ISOLATION
-++ '[' -n '' ']'
-++ var=
-++ '[' -n '' ']'
-++ echo
-+ tx_isolation=
-++ find_env ACCOUNT2_MIN_POOL_SIZE
-+++ printenv ACCOUNT2_MIN_POOL_SIZE
-++ var=
-++ envname=ACCOUNT2_MIN_POOL_SIZE
-++ '[' -n '' ']'
-++ var=
-++ '[' -n '' ']'
-++ echo
-+ min_pool_size=
-++ find_env ACCOUNT2_MAX_POOL_SIZE
-+++ printenv ACCOUNT2_MAX_POOL_SIZE
-++ var=
-++ envname=ACCOUNT2_MAX_POOL_SIZE
-++ '[' -n '' ']'
-++ var=
-++ '[' -n '' ']'
-++ echo
-+ max_pool_size=
-++ find_env ACCOUNT2_JTA true
-+++ printenv ACCOUNT2_JTA
-++ var=
-++ envname=ACCOUNT2_JTA
-++ '[' -n '' ']'
-++ var=
-++ '[' -n '' ']'
-++ echo true
-+ jta=true
-++ find_env ACCOUNT2_NONXA false
-+++ printenv ACCOUNT2_NONXA
-++ var=
-++ envname=ACCOUNT2_NONXA
-++ '[' -n '' ']'
-++ var=true
-++ '[' -n true ']'
-++ echo true
-+ NON_XA_DATASOURCE=true
-++ find_env ACCOUNT2_PROTOCOL
-+++ printenv ACCOUNT2_PROTOCOL
-++ var=
-++ envname=ACCOUNT2_PROTOCOL
-++ '[' -n '' ']'
-++ var=jdbc:h2
-++ '[' -n jdbc:h2 ']'
-++ echo jdbc:h2
-+ protocol=jdbc:h2
-+ case "$db" in
-++ find_env ACCOUNT2_DRIVER true
-+++ printenv ACCOUNT2_DRIVER
-++ var=
-++ envname=ACCOUNT2_DRIVER
-++ '[' -n '' ']'
-++ var=h2
-++ '[' -n h2 ']'
-++ echo h2
-+ driver=h2
-++ find_env ACCOUNT2_CONNECTION_CHECKER
-+++ printenv ACCOUNT2_CONNECTION_CHECKER
-++ var=
-++ envname=ACCOUNT2_CONNECTION_CHECKER
-++ '[' -n '' ']'
-++ var=
-++ '[' -n '' ']'
-++ echo
-+ checker=
-++ find_env ACCOUNT2_EXCEPTION_SORTER
-+++ printenv ACCOUNT2_EXCEPTION_SORTER
-++ var=
-++ envname=ACCOUNT2_EXCEPTION_SORTER
-++ '[' -n '' ']'
-++ var=
-++ '[' -n '' ']'
-++ echo
-+ sorter=
-+ '[' -n '' ']'
-+ validate=false
-+ checker=CHECKER
-+ sorter=SORTER
-+ service_name=ACCOUNT2
-++ generate_datasource account2-ACCOUNT2 java:/accounts2-ds sa sa mem 9092 accounts2 CHECKER SORTER h2 ACCOUNT2 true false jdbc:h2
-++ pool_name=account2-ACCOUNT2
-++ jndi_name=java:/accounts2-ds
-++ driver=h2
-++ service_name=ACCOUNT2
-++ validate=false
-++ protocol=jdbc:h2
-++ case "${10}" in
-++ '[' -n h2 ']'
-++ '[' -n true ']'
-++ '[' true = true ']'
-++ '[' h2 == h2 ']'
-+++ find_env ACCOUNT2_IMPORT_SQL
-++++ printenv ACCOUNT2_IMPORT_SQL
-+++ var=
-+++ envname=ACCOUNT2_IMPORT_SQL
-+++ '[' -n '' ']'
-+++ var=/home/jboss/source/injected/injected-files/customer-schema.sql
-+++ '[' -n /home/jboss/source/injected/injected-files/customer-schema.sql ']'
-+++ echo /home/jboss/source/injected/injected-files/customer-schema.sql
-++ h2_import=/home/jboss/source/injected/injected-files/customer-schema.sql
-++ '[' -n /home/jboss/source/injected/injected-files/customer-schema.sql ']'
-++ ds=' <datasource jndi-name="java:/accounts2-ds" pool-name="account2-ACCOUNT2" enabled="true" use-java-context="true">
-                    <connection-url>jdbc:h2:mem:accounts2;INIT=RUNSCRIPT FROM '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;</connection-url>
-                    <driver>h2</driver>'
-++ '[' -n '' ']'
-++ '[' -n '' ']'
-++ '[' -n '' ']'
-++ ds=' <datasource jndi-name="java:/accounts2-ds" pool-name="account2-ACCOUNT2" enabled="true" use-java-context="true">
-                    <connection-url>jdbc:h2:mem:accounts2;INIT=RUNSCRIPT FROM '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;</connection-url>
-                    <driver>h2</driver>
-                    <security>
-                        <user-name>sa</user-name>
-                        <password>sa</password>
-                    </security>'
-++ '[' false == true ']'
-++ '[' -n true ']'
-++ '[' true = true ']'
-++ ds=' <datasource jndi-name="java:/accounts2-ds" pool-name="account2-ACCOUNT2" enabled="true" use-java-context="true">
-                    <connection-url>jdbc:h2:mem:accounts2;INIT=RUNSCRIPT FROM '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;</connection-url>
-                    <driver>h2</driver>
-                    <security>
-                        <user-name>sa</user-name>
-                        <password>sa</password>
-                    </security>
-                  </datasource>'
-++ '[' -n '' -a '' = ACCOUNT2 ']'
-++ echo '<datasource' 'jndi-name="java:/accounts2-ds"' 'pool-name="account2-ACCOUNT2"' 'enabled="true"' 'use-java-context="true">' '<connection-url>jdbc:h2:mem:accounts2;INIT=RUNSCRIPT' FROM ''\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;</connection-url>' '<driver>h2</driver>' '<security>' '<user-name>sa</user-name>' '<password>sa</password>' '</security>' '</datasource>'
-++ sed ':a;N;$!ba;s|\n|\\n|g'
-+ datasources='<datasource jndi-name="java:/accounts-ds" pool-name="account1-ACCOUNT1" enabled="true" use-java-context="true"> <connection-url>jdbc:h2:mem:accounts;INIT=RUNSCRIPT FROM '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;</connection-url> <driver>h2</driver> <security> <user-name>sa</user-name> <password>sa</password> </security> </datasource>\n<datasource jndi-name="java:/accounts2-ds" pool-name="account2-ACCOUNT2" enabled="true" use-java-context="true"> <connection-url>jdbc:h2:mem:accounts2;INIT=RUNSCRIPT FROM '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;</connection-url> <driver>h2</driver> <security> <user-name>sa</user-name> <password>sa</password> </security> </datasource>\n'
-+ sed -i 's|<!-- ##DATASOURCES## -->|<datasource jndi-name="java:/accounts-ds" pool-name="account1-ACCOUNT1" enabled="true" use-java-context="true"> <connection-url>jdbc:h2:mem:accounts;INIT=RUNSCRIPT FROM '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;</connection-url> <driver>h2</driver> <security> <user-name>sa</user-name> <password>sa</password> </security> </datasource>\n<datasource jndi-name="java:/accounts2-ds" pool-name="account2-ACCOUNT2" enabled="true" use-java-context="true"> <connection-url>jdbc:h2:mem:accounts2;INIT=RUNSCRIPT FROM '\''/home/jboss/source/injected/injected-files/customer-schema.sql'\''\;</connection-url> <driver>h2</driver> <security> <user-name>sa</user-name> <password>sa</password> </security> </datasource>\n|' /opt/eap/standalone/configuration/standalone-openshift.xml
 + inject_drivers
 + drivers=
 + '[' -n '' ']'
++ sed -i 's|<!-- ##DATASOURCES## -->|<xa-datasource jndi-name="java:/account-ds" pool-name="datavirt_postgresql-POSTGRESQL" use-java-context="true" enabled="true"> <xa-datasource-property name="ServerName">172.30.111.148</xa-datasource-property> <xa-datasource-property name="PortNumber">5432</xa-datasource-property> <xa-datasource-property name="DatabaseName">root</xa-datasource-property> <driver>postgresql</driver> <security> <user-name>userFds</user-name> <password>Hr6Hw4aw</password> </security> <validation> <validate-on-match>true</validate-on-match> <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker"></valid-connection-checker> <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter"></exception-sorter> </validation> </xa-datasource>\n<datasource jta="false" jndi-name="java:/account-dsObjectStore" pool-name="datavirt_postgresql-POSTGRESQLObjectStorePool" enabled="true"> <connection-url>jdbc:postgresql://172.30.111.148:5432/root</connection-url> <driver>postgresql</driver> <security> <user-name>userFds</user-name> <password>Hr6Hw4aw</password> </security> </datasource>\n|' /opt/eap/standalone/configuration/standalone-openshift.xml
 + . /opt/eap/bin/launch/resource-adapters.sh
 ++ set -x
 ++ . /opt/eap/bin/launch/launch-common.sh
 +++ set -x
 + inject_resource_adapters
 ++ hostname
-+ hostname=datavirt-1-5284s
++ hostname=datavirt-1-tcyg5
 + resource_adapters=
-+ '[' -n '' ']'
-+ sed -i 's|<!-- ##RESOURCE_ADAPTERS## -->||' /opt/eap/standalone/configuration/standalone-openshift.xml
++ '[' -n QSEXCEL,QSFILE,QSWS ']'
+++ echo QSEXCEL,QSFILE,QSWS
+++ sed 's/,/ /g'
++ for ra_prefix in '$(echo $RESOURCE_ADAPTERS | sed "s/,/ /g")'
+++ find_env QSEXCEL_ID
++++ printenv QSEXCEL_ID
+++ var=
+++ envname=QSEXCEL_ID
+++ '[' -n '' ']'
+++ var=fileQSExcel
+++ '[' -n fileQSExcel ']'
+++ echo fileQSExcel
++ ra_id=fileQSExcel
+++ find_env QSEXCEL_MODULE_SLOT
++++ printenv QSEXCEL_MODULE_SLOT
+++ var=
+++ envname=QSEXCEL_MODULE_SLOT
+++ '[' -n '' ']'
+++ var=main
+++ '[' -n main ']'
+++ echo main
++ ra_module_slot=main
+++ find_env QSEXCEL_MODULE_ID
++++ printenv QSEXCEL_MODULE_ID
+++ var=
+++ envname=QSEXCEL_MODULE_ID
+++ '[' -n '' ']'
+++ var=org.jboss.teiid.resource-adapter.file
+++ '[' -n org.jboss.teiid.resource-adapter.file ']'
+++ echo org.jboss.teiid.resource-adapter.file
++ ra_module_id=org.jboss.teiid.resource-adapter.file
+++ find_env QSEXCEL_CONNECTION_CLASS
++++ printenv QSEXCEL_CONNECTION_CLASS
+++ var=
+++ envname=QSEXCEL_CONNECTION_CLASS
+++ '[' -n '' ']'
+++ var=org.teiid.resource.adapter.file.FileManagedConnectionFactory
+++ '[' -n org.teiid.resource.adapter.file.FileManagedConnectionFactory ']'
+++ echo org.teiid.resource.adapter.file.FileManagedConnectionFactory
++ ra_class=org.teiid.resource.adapter.file.FileManagedConnectionFactory
+++ find_env QSEXCEL_CONNECTION_JNDI
++++ printenv QSEXCEL_CONNECTION_JNDI
+++ var=
+++ envname=QSEXCEL_CONNECTION_JNDI
+++ '[' -n '' ']'
+++ var=java:/excel-file
+++ '[' -n java:/excel-file ']'
+++ echo java:/excel-file
++ ra_jndi=java:/excel-file
++ resource_adapter='<resource-adapter id="fileQSExcel"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/excel-file" enabled="true" use-java-context="true">'
+++ compgen -v
+++ grep -s QSEXCEL_PROPERTY_
++ ra_props='QSEXCEL_PROPERTY_AllowParentPaths
+QSEXCEL_PROPERTY_ParentDirectory'
+++ echo QSEXCEL_PROPERTY_AllowParentPaths QSEXCEL_PROPERTY_ParentDirectory
++ for ra_prop in '$(echo $ra_props)'
+++ echo QSEXCEL_PROPERTY_AllowParentPaths
+++ awk -F _ '{ print $3 }'
++ prop_name=AllowParentPaths
+++ find_env QSEXCEL_PROPERTY_AllowParentPaths
++++ printenv QSEXCEL_PROPERTY_AllowParentPaths
+++ var=
+++ envname=QSEXCEL_PROPERTY_AllowParentPaths
+++ '[' -n '' ']'
+++ var=true
+++ '[' -n true ']'
+++ echo true
++ prop_val=true
++ resource_adapter='<resource-adapter id="fileQSExcel"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/excel-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property>'
++ for ra_prop in '$(echo $ra_props)'
+++ echo QSEXCEL_PROPERTY_ParentDirectory
+++ awk -F _ '{ print $3 }'
++ prop_name=ParentDirectory
+++ find_env QSEXCEL_PROPERTY_ParentDirectory
++++ printenv QSEXCEL_PROPERTY_ParentDirectory
+++ var=
+++ envname=QSEXCEL_PROPERTY_ParentDirectory
+++ '[' -n '' ']'
+++ var=/home/jboss/source/injected/injected-files/excel-files/
+++ '[' -n /home/jboss/source/injected/injected-files/excel-files/ ']'
+++ echo /home/jboss/source/injected/injected-files/excel-files/
++ prop_val=/home/jboss/source/injected/injected-files/excel-files/
++ resource_adapter='<resource-adapter id="fileQSExcel"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/excel-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/home/jboss/source/injected/injected-files/excel-files/</config-property>'
++ resource_adapter='<resource-adapter id="fileQSExcel"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/excel-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/home/jboss/source/injected/injected-files/excel-files/</config-property></connection-definition></connection-definitions></resource-adapter>'
+++ echo '<resource-adapter' 'id="fileQSExcel"><module' 'slot="main"' 'id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition' 'class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory"' 'jndi-name="java:/excel-file"' 'enabled="true"' 'use-java-context="true"><config-property' 'name="AllowParentPaths">true</config-property><config-property' 'name="ParentDirectory">/home/jboss/source/injected/injected-files/excel-files/</config-property></connection-definition></connection-definitions></resource-adapter>'
+++ sed 's|localhost|datavirt-1-tcyg5|g'
++ resource_adapter='<resource-adapter id="fileQSExcel"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/excel-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/home/jboss/source/injected/injected-files/excel-files/</config-property></connection-definition></connection-definitions></resource-adapter>'
++ resource_adapters='<resource-adapter id="fileQSExcel"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/excel-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/home/jboss/source/injected/injected-files/excel-files/</config-property></connection-definition></connection-definitions></resource-adapter>'
++ for ra_prefix in '$(echo $RESOURCE_ADAPTERS | sed "s/,/ /g")'
+++ find_env QSFILE_ID
++++ printenv QSFILE_ID
+++ var=
+++ envname=QSFILE_ID
+++ '[' -n '' ']'
+++ var=fileQS
+++ '[' -n fileQS ']'
+++ echo fileQS
++ ra_id=fileQS
+++ find_env QSFILE_MODULE_SLOT
++++ printenv QSFILE_MODULE_SLOT
+++ var=
+++ envname=QSFILE_MODULE_SLOT
+++ '[' -n '' ']'
+++ var=main
+++ '[' -n main ']'
+++ echo main
++ ra_module_slot=main
+++ find_env QSFILE_MODULE_ID
++++ printenv QSFILE_MODULE_ID
+++ var=
+++ envname=QSFILE_MODULE_ID
+++ '[' -n '' ']'
+++ var=org.jboss.teiid.resource-adapter.file
+++ '[' -n org.jboss.teiid.resource-adapter.file ']'
+++ echo org.jboss.teiid.resource-adapter.file
++ ra_module_id=org.jboss.teiid.resource-adapter.file
+++ find_env QSFILE_CONNECTION_CLASS
++++ printenv QSFILE_CONNECTION_CLASS
+++ var=
+++ envname=QSFILE_CONNECTION_CLASS
+++ '[' -n '' ']'
+++ var=org.teiid.resource.adapter.file.FileManagedConnectionFactory
+++ '[' -n org.teiid.resource.adapter.file.FileManagedConnectionFactory ']'
+++ echo org.teiid.resource.adapter.file.FileManagedConnectionFactory
++ ra_class=org.teiid.resource.adapter.file.FileManagedConnectionFactory
+++ find_env QSFILE_CONNECTION_JNDI
++++ printenv QSFILE_CONNECTION_JNDI
+++ var=
+++ envname=QSFILE_CONNECTION_JNDI
+++ '[' -n '' ']'
+++ var=java:/marketdata-file
+++ '[' -n java:/marketdata-file ']'
+++ echo java:/marketdata-file
++ ra_jndi=java:/marketdata-file
++ resource_adapter='<resource-adapter id="fileQS"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/marketdata-file" enabled="true" use-java-context="true">'
+++ compgen -v
+++ grep -s QSFILE_PROPERTY_
++ ra_props='QSFILE_PROPERTY_AllowParentPaths
+QSFILE_PROPERTY_ParentDirectory'
+++ echo QSFILE_PROPERTY_AllowParentPaths QSFILE_PROPERTY_ParentDirectory
++ for ra_prop in '$(echo $ra_props)'
+++ echo QSFILE_PROPERTY_AllowParentPaths
+++ awk -F _ '{ print $3 }'
++ prop_name=AllowParentPaths
+++ find_env QSFILE_PROPERTY_AllowParentPaths
++++ printenv QSFILE_PROPERTY_AllowParentPaths
+++ var=
+++ envname=QSFILE_PROPERTY_AllowParentPaths
+++ '[' -n '' ']'
+++ var=true
+++ '[' -n true ']'
+++ echo true
++ prop_val=true
++ resource_adapter='<resource-adapter id="fileQS"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/marketdata-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property>'
++ for ra_prop in '$(echo $ra_props)'
+++ echo QSFILE_PROPERTY_ParentDirectory
+++ awk -F _ '{ print $3 }'
++ prop_name=ParentDirectory
+++ find_env QSFILE_PROPERTY_ParentDirectory
++++ printenv QSFILE_PROPERTY_ParentDirectory
+++ var=
+++ envname=QSFILE_PROPERTY_ParentDirectory
+++ '[' -n '' ']'
+++ var=/home/jboss/source/injected/injected-files/data
+++ '[' -n /home/jboss/source/injected/injected-files/data ']'
+++ echo /home/jboss/source/injected/injected-files/data
++ prop_val=/home/jboss/source/injected/injected-files/data
++ resource_adapter='<resource-adapter id="fileQS"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/marketdata-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/home/jboss/source/injected/injected-files/data</config-property>'
++ resource_adapter='<resource-adapter id="fileQS"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/marketdata-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/home/jboss/source/injected/injected-files/data</config-property></connection-definition></connection-definitions></resource-adapter>'
+++ echo '<resource-adapter' 'id="fileQS"><module' 'slot="main"' 'id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition' 'class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory"' 'jndi-name="java:/marketdata-file"' 'enabled="true"' 'use-java-context="true"><config-property' 'name="AllowParentPaths">true</config-property><config-property' 'name="ParentDirectory">/home/jboss/source/injected/injected-files/data</config-property></connection-definition></connection-definitions></resource-adapter>'
+++ sed 's|localhost|datavirt-1-tcyg5|g'
++ resource_adapter='<resource-adapter id="fileQS"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/marketdata-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/home/jboss/source/injected/injected-files/data</config-property></connection-definition></connection-definitions></resource-adapter>'
++ resource_adapters='<resource-adapter id="fileQSExcel"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/excel-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/home/jboss/source/injected/injected-files/excel-files/</config-property></connection-definition></connection-definitions></resource-adapter><resource-adapter id="fileQS"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/marketdata-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/home/jboss/source/injected/injected-files/data</config-property></connection-definition></connection-definitions></resource-adapter>'
++ for ra_prefix in '$(echo $RESOURCE_ADAPTERS | sed "s/,/ /g")'
+++ find_env QSWS_ID
++++ printenv QSWS_ID
+++ var=
+++ envname=QSWS_ID
+++ '[' -n '' ']'
+++ var=wsQS
+++ '[' -n wsQS ']'
+++ echo wsQS
++ ra_id=wsQS
+++ find_env QSWS_MODULE_SLOT
++++ printenv QSWS_MODULE_SLOT
+++ var=
+++ envname=QSWS_MODULE_SLOT
+++ '[' -n '' ']'
+++ var=main
+++ '[' -n main ']'
+++ echo main
++ ra_module_slot=main
+++ find_env QSWS_MODULE_ID
++++ printenv QSWS_MODULE_ID
+++ var=
+++ envname=QSWS_MODULE_ID
+++ '[' -n '' ']'
+++ var=org.jboss.teiid.resource-adapter.webservice
+++ '[' -n org.jboss.teiid.resource-adapter.webservice ']'
+++ echo org.jboss.teiid.resource-adapter.webservice
++ ra_module_id=org.jboss.teiid.resource-adapter.webservice
+++ find_env QSWS_CONNECTION_CLASS
++++ printenv QSWS_CONNECTION_CLASS
+++ var=
+++ envname=QSWS_CONNECTION_CLASS
+++ '[' -n '' ']'
+++ var=org.teiid.resource.adapter.ws.WSManagedConnectionFactory
+++ '[' -n org.teiid.resource.adapter.ws.WSManagedConnectionFactory ']'
+++ echo org.teiid.resource.adapter.ws.WSManagedConnectionFactory
++ ra_class=org.teiid.resource.adapter.ws.WSManagedConnectionFactory
+++ find_env QSWS_CONNECTION_JNDI
++++ printenv QSWS_CONNECTION_JNDI
+++ var=
+++ envname=QSWS_CONNECTION_JNDI
+++ '[' -n '' ']'
+++ var=java:/CustomerRESTWebSvcSource
+++ '[' -n java:/CustomerRESTWebSvcSource ']'
+++ echo java:/CustomerRESTWebSvcSource
++ ra_jndi=java:/CustomerRESTWebSvcSource
++ resource_adapter='<resource-adapter id="wsQS"><module slot="main" id="org.jboss.teiid.resource-adapter.webservice"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.ws.WSManagedConnectionFactory" jndi-name="java:/CustomerRESTWebSvcSource" enabled="true" use-java-context="true">'
+++ compgen -v
+++ grep -s QSWS_PROPERTY_
++ ra_props=QSWS_PROPERTY_EndPoint
+++ echo QSWS_PROPERTY_EndPoint
++ for ra_prop in '$(echo $ra_props)'
+++ echo QSWS_PROPERTY_EndPoint
+++ awk -F _ '{ print $3 }'
++ prop_name=EndPoint
+++ find_env QSWS_PROPERTY_EndPoint
++++ printenv QSWS_PROPERTY_EndPoint
+++ var=
+++ envname=QSWS_PROPERTY_EndPoint
+++ '[' -n '' ']'
+++ var=http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList
+++ '[' -n http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList ']'
+++ echo http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList
++ prop_val=http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList
++ resource_adapter='<resource-adapter id="wsQS"><module slot="main" id="org.jboss.teiid.resource-adapter.webservice"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.ws.WSManagedConnectionFactory" jndi-name="java:/CustomerRESTWebSvcSource" enabled="true" use-java-context="true"><config-property name="EndPoint">http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList</config-property>'
++ resource_adapter='<resource-adapter id="wsQS"><module slot="main" id="org.jboss.teiid.resource-adapter.webservice"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.ws.WSManagedConnectionFactory" jndi-name="java:/CustomerRESTWebSvcSource" enabled="true" use-java-context="true"><config-property name="EndPoint">http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList</config-property></connection-definition></connection-definitions></resource-adapter>'
+++ echo '<resource-adapter' 'id="wsQS"><module' 'slot="main"' 'id="org.jboss.teiid.resource-adapter.webservice"></module><connection-definitions><connection-definition' 'class-name="org.teiid.resource.adapter.ws.WSManagedConnectionFactory"' 'jndi-name="java:/CustomerRESTWebSvcSource"' 'enabled="true"' 'use-java-context="true"><config-property' 'name="EndPoint">http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList</config-property></connection-definition></connection-definitions></resource-adapter>'
+++ sed 's|localhost|datavirt-1-tcyg5|g'
++ resource_adapter='<resource-adapter id="wsQS"><module slot="main" id="org.jboss.teiid.resource-adapter.webservice"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.ws.WSManagedConnectionFactory" jndi-name="java:/CustomerRESTWebSvcSource" enabled="true" use-java-context="true"><config-property name="EndPoint">http://datavirt-1-tcyg5:8080/CustomerRESTWebSvc/MyRESTApplication/customerList</config-property></connection-definition></connection-definitions></resource-adapter>'
++ resource_adapters='<resource-adapter id="fileQSExcel"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/excel-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/home/jboss/source/injected/injected-files/excel-files/</config-property></connection-definition></connection-definitions></resource-adapter><resource-adapter id="fileQS"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/marketdata-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/home/jboss/source/injected/injected-files/data</config-property></connection-definition></connection-definitions></resource-adapter><resource-adapter id="wsQS"><module slot="main" id="org.jboss.teiid.resource-adapter.webservice"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.ws.WSManagedConnectionFactory" jndi-name="java:/CustomerRESTWebSvcSource" enabled="true" use-java-context="true"><config-property name="EndPoint">http://datavirt-1-tcyg5:8080/CustomerRESTWebSvc/MyRESTApplication/customerList</config-property></connection-definition></connection-definitions></resource-adapter>'
++ sed -i 's|<!-- ##RESOURCE_ADAPTERS## -->|<resource-adapter id="fileQSExcel"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/excel-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/home/jboss/source/injected/injected-files/excel-files/</config-property></connection-definition></connection-definitions></resource-adapter><resource-adapter id="fileQS"><module slot="main" id="org.jboss.teiid.resource-adapter.file"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.file.FileManagedConnectionFactory" jndi-name="java:/marketdata-file" enabled="true" use-java-context="true"><config-property name="AllowParentPaths">true</config-property><config-property name="ParentDirectory">/home/jboss/source/injected/injected-files/data</config-property></connection-definition></connection-definitions></resource-adapter><resource-adapter id="wsQS"><module slot="main" id="org.jboss.teiid.resource-adapter.webservice"></module><connection-definitions><connection-definition class-name="org.teiid.resource.adapter.ws.WSManagedConnectionFactory" jndi-name="java:/CustomerRESTWebSvcSource" enabled="true" use-java-context="true"><config-property name="EndPoint">http://datavirt-1-tcyg5:8080/CustomerRESTWebSvc/MyRESTApplication/customerList</config-property></connection-definition></connection-definitions></resource-adapter>|' /opt/eap/standalone/configuration/standalone-openshift.xml
 + . /opt/eap/bin/launch/admin.sh
 + configure_administration
 + '[' -n '' ']'
@@ -517,21 +627,21 @@
 + pods_code=200
 + '[' 200 = 200 ']'
 + echo 'Service account has sufficient permissions to view pods in kubernetes (HTTP 200). Clustering will be available.'
-Service account has sufficient permissions to view pods in kubernetes (HTTP 200). Clustering will be available.
 + configure_ha
+Service account has sufficient permissions to view pods in kubernetes (HTTP 200). Clustering will be available.
 ++ hostname -i
-+ IP_ADDR=10.1.0.2
-+ JBOSS_HA_ARGS='-b 10.1.0.2'
++ IP_ADDR=10.1.0.3
++ JBOSS_HA_ARGS='-b 10.1.0.3'
 + '[' -n '' ']'
 + '[' -n '' ']'
-+ '[' -n datavirt-1-5284s ']'
-+ JBOSS_NODE_NAME=datavirt-1-5284s
-+ '[' -n datavirt-1-5284s ']'
++ '[' -n datavirt-1-tcyg5 ']'
++ JBOSS_NODE_NAME=datavirt-1-tcyg5
++ '[' -n datavirt-1-tcyg5 ']'
 + '[' 16 -gt 23 ']'
-+ JBOSS_HA_ARGS='-b 10.1.0.2 -Djboss.node.name=datavirt-1-5284s'
-+ '[' -z xw11Gh4k ']'
-+ JGROUPS_AUTH='\n                <protocol type="AUTH">\n                    <property name="auth_class">org.jgroups.auth.MD5Token</property>\n                    <property name="token_hash">SHA</property>\n                    <property name="auth_value">xw11Gh4k</property>\n                </protocol>\n'
-+ sed -i 's|<!-- ##JGROUPS_AUTH## -->|\n                <protocol type="AUTH">\n                    <property name="auth_class">org.jgroups.auth.MD5Token</property>\n                    <property name="token_hash">SHA</property>\n                    <property name="auth_value">xw11Gh4k</property>\n                </protocol>\n|g' /opt/eap/standalone/configuration/standalone-openshift.xml
++ JBOSS_HA_ARGS='-b 10.1.0.3 -Djboss.node.name=datavirt-1-tcyg5'
++ '[' -z BHtbftkr ']'
++ JGROUPS_AUTH='\n                <protocol type="AUTH">\n                    <property name="auth_class">org.jgroups.auth.MD5Token</property>\n                    <property name="token_hash">SHA</property>\n                    <property name="auth_value">BHtbftkr</property>\n                </protocol>\n'
++ sed -i 's|<!-- ##JGROUPS_AUTH## -->|\n                <protocol type="AUTH">\n                    <property name="auth_class">org.jgroups.auth.MD5Token</property>\n                    <property name="token_hash">SHA</property>\n                    <property name="auth_value">BHtbftkr</property>\n                </protocol>\n|g' /opt/eap/standalone/configuration/standalone-openshift.xml
 + configure_jgroups_encryption
 + jgroups_encrypt=
 + '[' -n '' ']'
@@ -566,26 +676,209 @@ Service account has sufficient permissions to view pods in kubernetes (HTTP 200)
 + configure_keycloak
 + '[' -f /opt/eap/standalone/configuration/secure-deployments ']'
 + '[' -f /opt/eap/standalone/configuration/secure-saml-deployments ']'
-Missing SSO_URL. Unable to properly configure SSO-enabled applications
 + '[' -n '' ']'
 + echo 'Missing SSO_URL. Unable to properly configure SSO-enabled applications'
+Missing SSO_URL. Unable to properly configure SSO-enabled applications
++ . /opt/eap/bin/launch/deploymentScanner.sh
++ configure_deployment_scanner
++ [[ -n '' ]]
++ '[' -n '' ']'
++ sed -i 's|##AUTO_DEPLOY_EXPLODED##|false|' /opt/eap/standalone/configuration/standalone-openshift.xml
 + . /opt/eap/bin/launch/teiid.sh
 ++ set -x
 ++ . /opt/eap/bin/launch/launch-common.sh
 +++ set -x
-+++ hostname
-++ hostname=datavirt-1-5284s
 + configure_teiid
 + import_sql_files
 + IFS=,
 + read -a db_backends
++ for db_backend in '${db_backends[@]}'
++ service_name=datavirt-postgresql
++ service=DATAVIRT-POSTGRESQL
++ service=DATAVIRT_POSTGRESQL
++ db=POSTGRESQL
+++ find_env DATAVIRT_POSTGRESQL_SERVICE_HOST
++++ printenv DATAVIRT_POSTGRESQL_SERVICE_HOST
+++ var=172.30.111.148
+++ envname=DATAVIRT_POSTGRESQL_SERVICE_HOST
+++ '[' -n 172.30.111.148 ']'
+++ echo 172.30.111.148
++ host=172.30.111.148
++ '[' POSTGRESQL == POSTGRESQL ']'
++ '[' -n injected/injected-files/customer-schema-pg.sql ']'
+++ echo injected/injected-files/customer-schema-pg.sql
+++ sed 's/,/ /g'
++ for sql_file in '$(echo $POSTGRESQL_IMPORT_SQL | sed "s/,/ /g")'
++ done=false
++ echo 'Importing Postgresql SQL file injected/injected-files/customer-schema-pg.sql'
++ '[' false '!=' true ']'
+Importing Postgresql SQL file injected/injected-files/customer-schema-pg.sql
++ PGPASSWORD=Hr6Hw4aw
++ /usr/bin/psql -h 172.30.111.148 -d root -U userFds -f /home/jboss/source/injected/injected-files/customer-schema-pg.sql
+psql:/home/jboss/source/injected/injected-files/customer-schema-pg.sql:1: NOTICE:  table "status" does not exist, skipping
+DROP TABLE
+psql:/home/jboss/source/injected/injected-files/customer-schema-pg.sql:2: NOTICE:  table "h2_stock_mat" does not exist, skipping
+DROP TABLE
+psql:/home/jboss/source/injected/injected-files/customer-schema-pg.sql:3: NOTICE:  table "mat_stock_staging" does not exist, skipping
+DROP TABLE
+psql:/home/jboss/source/injected/injected-files/customer-schema-pg.sql:4: NOTICE:  table "customer" does not exist, skipping
+DROP TABLE
+psql:/home/jboss/source/injected/injected-files/customer-schema-pg.sql:5: NOTICE:  table "account" does not exist, skipping
+psql:/home/jboss/source/injected/injected-files/customer-schema-pg.sql:6: NOTICE:  table "product" does not exist, skipping
+DROP TABLE
+psql:/home/jboss/source/injected/injected-files/customer-schema-pg.sql:7: NOTICE:  table "holdings" does not exist, skipping
+DROP TABLE
+DROP TABLE
+DROP TABLE
+psql:/home/jboss/source/injected/injected-files/customer-schema-pg.sql:8: NOTICE:  table "ht_productinfo" does not exist, skipping
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
++ result=0
++ '[' 0 == 0 ']'
++ done=true
++ echo 'Imported Postgresql SQL file injected/injected-files/customer-schema-pg.sql'
++ '[' true '!=' true ']'
+Imported Postgresql SQL file injected/injected-files/customer-schema-pg.sql
+++ hostname
++ hostname=datavirt-1-tcyg5
++ find /opt/eap/standalone/deployments -name '*-vdb.xml'
++ xargs sed -i 's|localhost|datavirt-1-tcyg5|g'
+sed: no input files
 + configure_translators
 + teiid_translators=
-+ '[' -n '' ']'
-+ sed -i 's|<!-- ##TEIID_TRANSLATORS## -->||' /opt/eap/standalone/configuration/standalone-openshift.xml
++ '[' -n TESTTRANSLATOR ']'
+++ echo TESTTRANSLATOR
+++ sed 's/,/ /g'
++ for t_prefix in '$(echo $TRANSLATORS | sed "s/,/ /g")'
+++ find_env TESTTRANSLATOR_NAME
++++ printenv TESTTRANSLATOR_NAME
+++ var=
+++ envname=TESTTRANSLATOR_NAME
+++ '[' -n '' ']'
+++ var=test
+++ '[' -n test ']'
+++ echo test
++ t_name=test
+++ find_env TESTTRANSLATOR_MODULE
++++ printenv TESTTRANSLATOR_MODULE
+++ var=
+++ envname=TESTTRANSLATOR_MODULE
+++ '[' -n '' ']'
+++ var=org.jboss.teiid.translator.test
+++ '[' -n org.jboss.teiid.translator.test ']'
+++ echo org.jboss.teiid.translator.test
++ t_module=org.jboss.teiid.translator.test
++ teiid_translators=' <translator name="test" module="org.jboss.teiid.translator.test"/>'
++ sed -i 's|<!-- ##TEIID_TRANSLATORS## -->| <translator name="test" module="org.jboss.teiid.translator.test"/>|' /opt/eap/standalone/configuration/standalone-openshift.xml
 + echo 'Running jboss-datavirt-6/datavirt63-openshift image, version 1.4-dev'
-+ exec /opt/eap/bin/standalone.sh -c standalone-openshift.xml -bmanagement 127.0.0.1 -b 10.1.0.2 -Djboss.node.name=datavirt-1-5284s -Djboss.messaging.cluster.password=OYHdMQDI
 Running jboss-datavirt-6/datavirt63-openshift image, version 1.4-dev
++ exec /opt/eap/bin/standalone.sh -c standalone-openshift.xml -bmanagement 127.0.0.1 -b 10.1.0.3 -Djboss.node.name=datavirt-1-tcyg5 -Djboss.messaging.cluster.password=SHeb3OkL
 =========================================================================
 
   JBoss Bootstrap Environment
@@ -600,11 +893,11 @@ Running jboss-datavirt-6/datavirt63-openshift image, version 1.4-dev
 
 Picked up JAVA_TOOL_OPTIONS: -Duser.home=/home/jboss -Duser.name=jboss
 I> No access restrictor found, access to all MBean is allowed
-Jolokia: Agent started with URL https://10.1.0.2:8778/jolokia/
-[0m11:49:39,849 INFO  [org.jboss.modules] (main) JBoss Modules version 1.3.7.Final-redhat-1
-[0m[0m11:49:40,103 INFO  [org.jboss.msc] (main) JBoss MSC version 1.1.5.Final-redhat-1
-[0m[0m11:49:40,197 INFO  [org.jboss.as] (MSC service thread 1-8) JBAS015899: JBoss Red Hat JBoss Data Virtualization 6.3.0 (AS 7.5.4.Final-redhat-4) starting
-[0m[32m11:49:40,203 DEBUG [org.jboss.as.config] (MSC service thread 1-8) Configured system properties:
+Jolokia: Agent started with URL https://10.1.0.3:8778/jolokia/
+[0m18:30:38,568 INFO  [org.jboss.modules] (main) JBoss Modules version 1.3.7.Final-redhat-1
+[0m[0m18:30:38,826 INFO  [org.jboss.msc] (main) JBoss MSC version 1.1.5.Final-redhat-1
+[0m[0m18:30:38,919 INFO  [org.jboss.as] (MSC service thread 1-7) JBAS015899: JBoss Red Hat JBoss Data Virtualization 6.3.0 (AS 7.5.4.Final-redhat-4) starting
+[0m[32m18:30:38,929 DEBUG [org.jboss.as.config] (MSC service thread 1-7) Configured system properties:
 	[Standalone] = 
 	awt.toolkit = sun.awt.X11.XToolkit
 	file.encoding = ANSI_X3.4-1968
@@ -649,25 +942,25 @@ Jolokia: Agent started with URL https://10.1.0.2:8778/jolokia/
 	javax.xml.transform.TransformerFactory = __redirected.__TransformerFactory
 	javax.xml.validation.SchemaFactory:http://www.w3.org/2001/XMLSchema = __redirected.__SchemaFactory
 	javax.xml.xpath.XPathFactory:http://java.sun.com/jaxp/xpath/dom = __redirected.__XPathFactory
-	jboss.bind.address = 10.1.0.2
+	jboss.bind.address = 10.1.0.3
 	jboss.bind.address.management = 127.0.0.1
 	jboss.home.dir = /opt/eap
-	jboss.host.name = datavirt-1-5284s
+	jboss.host.name = datavirt-1-tcyg5
 	jboss.messaging.cluster.password = <redacted>
 	jboss.modules.dir = /opt/eap/modules
 	jboss.modules.policy-permissions = true
 	jboss.modules.system.pkgs = org.jboss.logmanager
-	jboss.node.name = datavirt-1-5284s
-	jboss.qualified.host.name = datavirt-1-5284s
+	jboss.node.name = datavirt-1-tcyg5
+	jboss.qualified.host.name = datavirt-1-tcyg5
 	jboss.server.base.dir = /opt/eap/standalone
 	jboss.server.config.dir = /opt/eap/standalone/configuration
 	jboss.server.data.dir = /opt/eap/standalone/data
 	jboss.server.deploy.dir = /opt/eap/standalone/data/content
 	jboss.server.log.dir = /opt/eap/standalone/log
-	jboss.server.name = datavirt-1-5284s
+	jboss.server.name = datavirt-1-tcyg5
 	jboss.server.persist.config = true
 	jboss.server.temp.dir = /opt/eap/standalone/tmp
-	jolokia.agent = https://10.1.0.2:8778/jolokia/
+	jolokia.agent = https://10.1.0.3:8778/jolokia/
 	line.separator = 
 
 	logging.configuration = file:/opt/eap/standalone/configuration/logging.properties
@@ -685,7 +978,7 @@ Jolokia: Agent started with URL https://10.1.0.2:8778/jolokia/
 	sun.cpu.endian = little
 	sun.cpu.isalist = 
 	sun.io.unicode.encoding = UnicodeLittle
-	sun.java.command = /opt/eap/jboss-modules.jar -mp /opt/eap/modules -jaxpmodule javax.xml.jaxp-provider org.jboss.as.standalone -Djboss.home.dir=/opt/eap -Djboss.server.base.dir=/opt/eap/standalone -c standalone-openshift.xml -bmanagement 127.0.0.1 -b 10.1.0.2 -Djboss.node.name=datavirt-1-5284s -Djboss.messaging.cluster.password=OYHdMQDI
+	sun.java.command = /opt/eap/jboss-modules.jar -mp /opt/eap/modules -jaxpmodule javax.xml.jaxp-provider org.jboss.as.standalone -Djboss.home.dir=/opt/eap -Djboss.server.base.dir=/opt/eap/standalone -c standalone-openshift.xml -bmanagement 127.0.0.1 -b 10.1.0.3 -Djboss.node.name=datavirt-1-tcyg5 -Djboss.messaging.cluster.password=SHeb3OkL
 	sun.java.launcher = SUN_STANDARD
 	sun.jnu.encoding = ANSI_X3.4-1968
 	sun.management.compiler = HotSpot 64-Bit Tiered Compilers
@@ -696,32 +989,770 @@ Jolokia: Agent started with URL https://10.1.0.2:8778/jolokia/
 	user.language = en
 	user.name = jboss
 	user.timezone = America/New_York
-[0m[32m11:49:40,203 DEBUG [org.jboss.as.config] (MSC service thread 1-8) VM Arguments: -Duser.home=/home/jboss -Duser.name=jboss -D[Standalone] -XX:+UseCompressedOops -verbose:gc -Xloggc:/opt/eap/standalone/log/gc.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=3M -XX:-TraceClassUnloading -Xms1303m -Xmx1303m -Djava.net.preferIPv4Stack=true -Djboss.modules.system.pkgs=org.jboss.logmanager -Djava.awt.headless=true -Djboss.modules.policy-permissions=true -Xbootclasspath/p:/opt/eap/jboss-modules.jar:/opt/eap/modules/system/layers/base/org/jboss/logmanager/main/jboss-logmanager-1.5.4.Final-redhat-1.jar:/opt/eap/modules/system/layers/base/org/jboss/logmanager/ext/main/javax.json-1.0.4.jar:/opt/eap/modules/system/layers/base/org/jboss/logmanager/ext/main/jboss-logmanager-ext-1.0.0.Alpha2-redhat-1.jar -Djava.util.logging.manager=org.jboss.logmanager.LogManager -javaagent:/opt/eap/jolokia.jar=port=8778,protocol=https,caCert=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt,clientPrincipal=cn=system:master-proxy,useSslClientAuthentication=true,extraClientCheck=true,host=0.0.0.0,discoveryEnabled=false -Djava.security.egd=file:/dev/./urandom -Dorg.jboss.boot.log.file=/opt/eap/standalone/log/server.log -Dlogging.configuration=file:/opt/eap/standalone/configuration/logging.properties 
-[0m[31m11:49:41,108 ERROR [org.jboss.as.server] (Controller Boot Thread) JBAS015956: Caught exception during boot: org.jboss.as.controller.persistence.ConfigurationPersistenceException: JBAS014676: Failed to parse configuration
-	at org.jboss.as.controller.persistence.XmlConfigurationPersister.load(XmlConfigurationPersister.java:141)
-	at org.jboss.as.server.ServerService.boot(ServerService.java:336)
-	at org.jboss.as.controller.AbstractControllerService$1.run(AbstractControllerService.java:263)
+[0m[32m18:30:38,930 DEBUG [org.jboss.as.config] (MSC service thread 1-7) VM Arguments: -Duser.home=/home/jboss -Duser.name=jboss -D[Standalone] -XX:+UseCompressedOops -verbose:gc -Xloggc:/opt/eap/standalone/log/gc.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=3M -XX:-TraceClassUnloading -Xms1303m -Xmx1303m -Djava.net.preferIPv4Stack=true -Djboss.modules.system.pkgs=org.jboss.logmanager -Djava.awt.headless=true -Djboss.modules.policy-permissions=true -Xbootclasspath/p:/opt/eap/jboss-modules.jar:/opt/eap/modules/system/layers/base/org/jboss/logmanager/main/jboss-logmanager-1.5.4.Final-redhat-1.jar:/opt/eap/modules/system/layers/base/org/jboss/logmanager/ext/main/javax.json-1.0.4.jar:/opt/eap/modules/system/layers/base/org/jboss/logmanager/ext/main/jboss-logmanager-ext-1.0.0.Alpha2-redhat-1.jar -Djava.util.logging.manager=org.jboss.logmanager.LogManager -javaagent:/opt/eap/jolokia.jar=port=8778,protocol=https,caCert=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt,clientPrincipal=cn=system:master-proxy,useSslClientAuthentication=true,extraClientCheck=true,host=0.0.0.0,discoveryEnabled=false -Djava.security.egd=file:/dev/./urandom -Dorg.jboss.boot.log.file=/opt/eap/standalone/log/server.log -Dlogging.configuration=file:/opt/eap/standalone/configuration/logging.properties 
+[0m[0m18:30:41,268 INFO  [org.jboss.as.server.deployment.scanner] (DeploymentScanner-threads - 1) JBAS015003: Found integration-platform-console.war in deployment directory. To trigger deployment create a file called integration-platform-console.war.dodeploy
+[0m[0m18:30:41,662 INFO  [org.jboss.as.repository] (ServerService Thread Pool -- 28) JBAS014900: Content added at location /opt/eap/standalone/data/content/fd/c7b127aecb9161f1f674f7581a89c56620694a/content
+[0m[0m18:30:41,703 INFO  [org.jboss.as.repository] (ServerService Thread Pool -- 28) JBAS014900: Content added at location /opt/eap/standalone/data/content/62/0dbdd88f84e855f4635e9cd2ccd89f09cbd676/content
+[0m[0m18:30:41,827 INFO  [org.jboss.as.repository] (ServerService Thread Pool -- 28) JBAS014900: Content added at location /opt/eap/standalone/data/content/59/687c42f4045d778d7322b335028316764f35e8/content
+[0m[0m18:30:41,953 INFO  [org.jboss.security] (Controller Boot Thread) PBOX000361: Default Security Vault Implementation Initialized and Ready
+[0m[0m18:30:41,963 INFO  [org.xnio] (MSC service thread 1-1) XNIO Version 3.0.14.GA-redhat-1
+[0m[0m18:30:41,968 INFO  [org.xnio.nio] (MSC service thread 1-1) XNIO NIO Implementation Version 3.0.14.GA-redhat-1
+[0m[0m18:30:41,972 INFO  [org.jboss.as.server] (Controller Boot Thread) JBAS015888: Creating http management service using socket-binding (management-http)
+[0m[0m18:30:42,007 INFO  [org.jboss.remoting] (MSC service thread 1-1) JBoss Remoting version 3.3.5.Final-redhat-1
+[0m[0m18:30:42,077 INFO  [org.jboss.as.clustering.jgroups] (ServerService Thread Pool -- 39) JBAS010260: Activating JGroups subsystem.
+[0m[0m18:30:42,086 INFO  [org.jboss.as.clustering.infinispan] (ServerService Thread Pool -- 35) JBAS010280: Activating Infinispan subsystem.
+[0m[0m18:30:42,106 INFO  [org.jboss.as.connector.logging] (MSC service thread 1-8) JBAS010408: Starting JCA Subsystem (IronJacamar 1.0.32.Final-redhat-1)
+[0m[0m18:30:42,138 INFO  [org.jboss.as.security] (ServerService Thread Pool -- 50) JBAS013371: Activating Security Subsystem
+[0m[0m18:30:42,148 INFO  [org.jboss.as.jsf] (ServerService Thread Pool -- 42) JBAS012615: Activated the following JSF Implementations: [main, 1.2]
+[0m[0m18:30:42,168 INFO  [org.jboss.as.naming] (ServerService Thread Pool -- 45) JBAS011800: Activating Naming Subsystem
+[0m[0m18:30:42,183 INFO  [org.jboss.as.security] (MSC service thread 1-3) JBAS013370: Current PicketBox version=4.1.1.Final-redhat-1
+[0m[0m18:30:42,268 INFO  [org.jboss.as.webservices] (ServerService Thread Pool -- 54) JBAS015537: Activating WebServices Extension
+[0m[0m18:30:42,363 INFO  [org.modeshape.common.logging.LogFactory] (ServerService Thread Pool -- 56) SLF4J implementation located in the classpath. It will be used by ModeShape for logging.
+[0m[0m18:30:42,397 INFO  [org.jboss.as.naming] (MSC service thread 1-8) JBAS011802: Starting Naming Service
+[0m[0m18:30:42,416 INFO  [org.jboss.as.mail.extension] (MSC service thread 1-3) JBAS015400: Bound mail session [java:jboss/mail/Default]
+[0m[0m18:30:42,710 INFO  [org.jboss.as.connector.subsystems.datasources] (ServerService Thread Pool -- 31) JBAS010403: Deploying JDBC-compliant driver class org.h2.Driver (version 1.3)
+[0m[0m18:30:42,839 INFO  [org.jboss.as.connector.subsystems.datasources] (ServerService Thread Pool -- 31) JBAS010404: Deploying non-JDBC-compliant driver class com.mysql.jdbc.Driver (version 5.1)
+[0m[0m18:30:42,885 INFO  [org.jboss.as.connector.subsystems.datasources] (ServerService Thread Pool -- 31) JBAS010404: Deploying non-JDBC-compliant driver class org.postgresql.Driver (version 9.2)
+[0m[0m18:30:43,018 INFO  [org.jboss.as.connector.subsystems.datasources] (ServerService Thread Pool -- 31) JBAS010404: Deploying non-JDBC-compliant driver class org.modeshape.jdbc.LocalJcrDriver (version 3.8)
+[0m[0m18:30:43,121 INFO  [org.jboss.as.connector.subsystems.datasources] (ServerService Thread Pool -- 31) JBAS010404: Deploying non-JDBC-compliant driver class org.teiid.jdbc.TeiidDriver (version 8.12)
+[0m[0m18:30:43,122 INFO  [org.jboss.as.connector.subsystems.datasources] (ServerService Thread Pool -- 31) JBAS010404: Deploying non-JDBC-compliant driver class org.teiid.jdbc.TeiidDriver (version 8.12)
+[0m[0m18:30:43,135 INFO  [org.apache.coyote.http11.Http11Protocol] (MSC service thread 1-5) JBWEB003001: Coyote HTTP/1.1 initializing on : http-/10.1.0.3:8080
+[0m[0m18:30:43,140 INFO  [org.apache.coyote.http11.Http11Protocol] (MSC service thread 1-5) JBWEB003000: Coyote HTTP/1.1 starting on: http-/10.1.0.3:8080
+[0m[0m18:30:43,298 INFO  [org.jboss.as.connector.subsystems.datasources] (MSC service thread 1-7) JBAS010400: Bound data source [java:/account-dsObjectStore]
+[0m[0m18:30:43,507 INFO  [org.infinispan.configuration.cache.EvictionConfigurationBuilder] (ServerService Thread Pool -- 35) ISPN000152: Passivation configured without an eviction policy being selected. Only manually evicted entities will be passivated.
+[0m[0m18:30:43,511 INFO  [org.infinispan.configuration.cache.EvictionConfigurationBuilder] (ServerService Thread Pool -- 35) ISPN000152: Passivation configured without an eviction policy being selected. Only manually evicted entities will be passivated.
+[0m[0m18:30:43,572 INFO  [org.jboss.ws.common.management] (MSC service thread 1-3) JBWS022052: Starting JBoss Web Services - Stack CXF Server 4.3.5.Final-redhat-3
+[0m[0m18:30:44,052 INFO  [org.modeshape.jcr.JcrRepository] (MSC service thread 1-1) ModeShape version 3.8.4.GA-redhat-10
+[0m[0m18:30:44,715 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-8) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/file/main/
+[0m[0m18:30:44,715 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-6) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/file/main/
+[0m[0m18:30:44,715 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-7) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/salesforce/main/
+[0m[0m18:30:44,715 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-5) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/webservice/main/
+[0m[0m18:30:44,738 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-1) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/file/main/
+[0m[0m18:30:44,740 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-3) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/ldap/main/
+[0m[0m18:30:44,743 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-2) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/google/main/
+[0m[0m18:30:44,835 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-2) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/mongodb/main/
+[0m[0m18:30:44,837 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-8) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/accumulo/main/
+[0m[0m18:30:44,838 INFO  [org.jboss.as.connector.deployers.RADeployer] (MSC service thread 1-1) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/webservice/main/
+[0m[0m18:30:44,926 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-1) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/file/main/
+[0m[0m18:30:44,929 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-5) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/ldap/main/
+[0m[0m18:30:44,929 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-3) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/file/main/
+[0m[0m18:30:44,931 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-6) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/google/main/
+[0m[0m18:30:44,933 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-8) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/salesforce/main/
+[0m[0m18:30:44,942 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-8) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/salesforce/main/
+[0m[0m18:30:44,944 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-5) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/ldap/main/
+[0m[0m18:30:44,944 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-6) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/google/main/
+[0m[0m18:30:44,946 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-7) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/file/main/
+[0m[0m18:30:44,952 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-7) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/file/main/
+[0m[0m18:30:44,960 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-8) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/webservice/main/
+[0m[0m18:30:44,961 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-7) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/accumulo/main/
+[0m[0m18:30:44,962 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-7) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/accumulo/main/
+[0m[0m18:30:44,960 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-6) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/webservice/main/
+[0m[0m18:30:44,962 INFO  [org.jboss.as.connector.subsystems.datasources] (MSC service thread 1-7) JBAS010400: Bound data source [java:/datasources/ModeShapeDS]
+[0m[0m18:30:44,963 INFO  [org.jboss.as.connector.subsystems.datasources] (MSC service thread 1-7) JBAS010400: Bound data source [java:/account-ds]
+[0m[0m18:30:44,964 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-6) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/webservice/main/
+[0m[0m18:30:44,970 INFO  [org.jboss.as.connector.deployment] (MSC service thread 1-3) JBAS010406: Registered connection factory java:/excel-file
+[0m[0m18:30:44,974 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-3) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/file/main/
+[0m[0m18:30:44,975 INFO  [org.jboss.as.connector.deployment] (MSC service thread 1-3) JBAS010401: Bound JCA ConnectionFactory [java:/excel-file]
+[0m[0m18:30:44,990 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-2) IJ020001: Required license terms for file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/mongodb/main/
+[0m[0m18:30:45,005 INFO  [org.jboss.as.connector.deployment] (MSC service thread 1-1) JBAS010406: Registered connection factory java:/marketdata-file
+[0m[0m18:30:45,006 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-2) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/mongodb/main/
+[0m[0m18:30:45,020 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-1) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/file/main/
+[0m[0m18:30:45,021 INFO  [org.jboss.as.connector.deployment] (MSC service thread 1-1) JBAS010401: Bound JCA ConnectionFactory [java:/marketdata-file]
+[0m[0m18:30:45,028 INFO  [org.jboss.as.connector.deployment] (MSC service thread 1-8) JBAS010406: Registered connection factory java:/CustomerRESTWebSvcSource
+[0m[0m18:30:45,033 INFO  [org.jboss.as.connector.deployers.RaXmlDeployer] (MSC service thread 1-8) IJ020002: Deployed: file:/opt/eap/modules/system/layers/dv/org/jboss/teiid/resource-adapter/webservice/main/
+[0m[0m18:30:45,038 INFO  [org.jboss.as.connector.deployment] (MSC service thread 1-6) JBAS010401: Bound JCA ConnectionFactory [java:/CustomerRESTWebSvcSource]
+[0m[0m18:30:45,085 INFO  [org.jgroups.protocols.openshift.KUBE_PING] (MSC service thread 1-4) namespace [demo] set; clustering enabled
+[0m[0m18:30:45,222 INFO  [org.infinispan.factories.GlobalComponentRegistry] (ServerService Thread Pool -- 60) ISPN000128: Infinispan version: Infinispan 'Delirium' 5.2.15.Final
+[0m[0m18:30:45,311 INFO  [org.infinispan.factories.TransactionManagerFactory] (ServerService Thread Pool -- 60) ISPN000161: Using a batchMode transaction manager
+[0m[0m18:30:45,314 INFO  [org.infinispan.factories.TransactionManagerFactory] (ServerService Thread Pool -- 58) ISPN000161: Using a batchMode transaction manager
+[0m[0m18:30:45,315 INFO  [org.infinispan.factories.TransactionManagerFactory] (ServerService Thread Pool -- 61) ISPN000161: Using a batchMode transaction manager
+[0m[0m18:30:45,391 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "jdbc-simple" added.
+[0m[0m18:30:45,396 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "jdbc-ansi" added.
+[0m[0m18:30:45,418 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 59) HQ221000: live server is starting with configuration HornetQ Configuration (clustered=true,backup=false,sharedStore=true,journalDirectory=/opt/eap/standalone/data/messagingjournal,bindingsDirectory=/opt/eap/standalone/data/messagingbindings,largeMessagesDirectory=/opt/eap/standalone/data/messaginglargemessages,pagingDirectory=/opt/eap/standalone/data/messagingpaging)
+[0m[0m18:30:45,418 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 59) HQ221006: Waiting to obtain live lock
+[0m[0m18:30:45,442 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "access" added.
+[0m[0m18:30:45,473 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "db2" added.
+[0m[0m18:30:45,494 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "derby" added.
+[0m[0m18:30:45,542 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 59) HQ221013: Using NIO Journal
+[0m[0m18:30:45,637 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "h2" added.
+[0m[0m18:30:45,660 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "hsql" added.
+[0m[0m18:30:45,672 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "informix" added.
+[0m[0m18:30:45,693 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "metamatrix" added.
+[0m[0m18:30:45,721 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "mysql" added.
+[0m[0m18:30:45,744 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "mysql5" added.
+[0m[0m18:30:45,805 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "oracle" added.
+[0m[0m18:30:45,850 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "postgresql" added.
+[0m[0m18:30:45,855 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 59) HQ221034: Waiting to obtain live lock
+[0m[0m18:30:45,855 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 59) HQ221035: Live Server Obtained live lock
+[0m[0m18:30:45,884 INFO  [org.infinispan.jmx.CacheJmxRegistration] (ServerService Thread Pool -- 58) ISPN000031: MBeans were successfully registered to the platform MBean server.
+[0m[0m18:30:45,900 INFO  [org.infinispan.jmx.CacheJmxRegistration] (ServerService Thread Pool -- 60) ISPN000031: MBeans were successfully registered to the platform MBean server.
+[0m[0m18:30:45,900 INFO  [org.infinispan.jmx.CacheJmxRegistration] (ServerService Thread Pool -- 61) ISPN000031: MBeans were successfully registered to the platform MBean server.
+[0m[0m18:30:45,907 INFO  [org.jboss.as.clustering.infinispan] (ServerService Thread Pool -- 60) JBAS010281: Started preparedplan cache from teiid-cache container
+[0m[0m18:30:45,911 INFO  [org.jboss.as.clustering.infinispan] (ServerService Thread Pool -- 61) JBAS010281: Started resultset cache from teiid-cache container
+[0m[0m18:30:45,913 INFO  [org.jboss.as.clustering.infinispan] (ServerService Thread Pool -- 58) JBAS010281: Started resultset-repl cache from teiid-cache container
+[0m[0m18:30:45,917 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "greenplum" added.
+[0m[0m18:30:45,935 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "sqlserver" added.
+[0m[0m18:30:45,957 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "sybase" added.
+[0m[0m18:30:45,963 INFO  [org.teiid.RUNTIME] (MSC service thread 1-7) TEIID50001 Teiid Engine 8.12.5.redhat-8 Started = Wed Aug 24 18:30:45 EDT 2016
+[0m[0m18:30:45,980 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "teiid" added.
+[0m[0m18:30:45,983 INFO  [org.teiid.RUNTIME] (MSC service thread 1-7) TEIID50038 Teiid Embedded transport enabled. Bound to: teiid/queryengine/embedded
+[0m[0m18:30:45,994 INFO  [org.teiid.RUNTIME] (MSC service thread 1-8) TEIID50038 Teiid Embedded transport enabled. Bound to: teiid/queryengine/odata
+[0m[0m18:30:46,007 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "teradata" added.
+[0m[0m18:30:46,016 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "modeshape" added.
+[0m[0m18:30:46,025 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "ingres" added.
+[0m[0m18:30:46,039 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "ingres93" added.
+[0m[0m18:30:46,054 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "intersystems-cache" added.
+[0m[0m18:30:46,066 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "netezza" added.
+[0m[0m18:30:46,077 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "file" added.
+[0m[0m18:30:46,089 INFO  [org.teiid.RUNTIME] (MSC service thread 1-3) TEIID50012 Teiid JDBC - Name = jdbc, Host = datavirt-1-tcyg5,  Port = 31000, SSL = OFF, security-domains = teiid-security
+[0m[0m18:30:46,107 INFO  [org.teiid.RUNTIME] (MSC service thread 1-4) TEIID50037 Teiid ODBC - Name = odbc, Host = datavirt-1-tcyg5,  Port = 35432, SSL = OFF, security-domains = teiid-security
+[0m[0m18:30:46,123 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "ldap" added.
+[0m[0m18:30:46,135 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "loopback" added.
+[0m[0m18:30:46,152 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "olap" added.
+[0m[0m18:30:46,183 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "ws" added.
+[0m[0m18:30:46,266 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "salesforce" added.
+[0m[0m18:30:46,342 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "hive" added.
+[0m[0m18:30:46,358 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "google-spreadsheet" added.
+[0m[0m18:30:46,457 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "odata" added.
+[0m[0m18:30:46,461 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "sap-nw-gateway" added.
+[0m[0m18:30:46,492 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "mongodb" added.
+[0m[0m18:30:46,635 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "cassandra" added.
+[0m[0m18:30:46,646 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 59) HQ221020: Started Netty Acceptor version 3.6.10.Final-266dbdf 10.1.0.3:5445 for CORE protocol
+[0m[0m18:30:46,651 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 59) HQ221020: Started Netty Acceptor version 3.6.10.Final-266dbdf 10.1.0.3:5455 for CORE protocol
+[0m[0m18:30:46,655 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "accumulo" added.
+[0m[0m18:30:46,663 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "solr" added.
+[0m[0m18:30:46,675 INFO  [org.jgroups.protocols.openshift.KUBE_PING] (ServerService Thread Pool -- 59) Starting JBossServer on port 8888 for channel address: datavirt-1-tcyg5/hornetq-channel
+[0m[0m18:30:46,689 INFO  [org.jgroups.protocols.openshift.KUBE_PING] (ServerService Thread Pool -- 59) JBossServer started.
+[0m[0m18:30:46,695 INFO  [stdout] (ServerService Thread Pool -- 59) 
+[0m[0m18:30:46,695 INFO  [stdout] (ServerService Thread Pool -- 59) -------------------------------------------------------------------
+[0m[0m18:30:46,695 INFO  [stdout] (ServerService Thread Pool -- 59) GMS: address=datavirt-1-tcyg5/hornetq-channel, cluster=hornetq-channel, physical address=10.1.0.3:7600
+[0m[0m18:30:46,695 INFO  [stdout] (ServerService Thread Pool -- 59) -------------------------------------------------------------------
+[0m[0m18:30:46,704 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "excel" added.
+[0m[0m18:30:46,713 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "impala" added.
+[0m[0m18:30:46,721 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "hbase" added.
+[0m[0m18:30:46,727 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "hana" added.
+[0m[0m18:30:46,743 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "infinispan-cache-dsl" added.
+[0m[0m18:30:46,856 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "infinispan-cache" added.
+[0m[0m18:30:46,878 INFO  [org.teiid.RUNTIME] (ServerService Thread Pool -- 57) TEIID50006 Teiid translator "test" added.
+[0m[0m18:30:46,919 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-8) JBAS015876: Starting deployment of "integration-platform-console.war" (runtime-name: "integration-platform-console.war")
+[0m[0m18:30:46,920 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-7) JBAS015876: Starting deployment of "portfolio-vdb.xml" (runtime-name: "portfolio-vdb.xml")
+[0m[0m18:30:46,922 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-7) JBAS015876: Starting deployment of "modeshape-cmis.war" (runtime-name: "modeshape-cmis.war")
+[0m[0m18:30:46,923 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-7) JBAS015876: Starting deployment of "modeshape-rest.war" (runtime-name: "modeshape-rest.war")
+[0m[0m18:30:46,923 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-7) JBAS015876: Starting deployment of "hibernate-portfolio-vdb.xml" (runtime-name: "hibernate-portfolio-vdb.xml")
+[0m[0m18:30:46,923 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-7) JBAS015876: Starting deployment of "ModeShape.vdb" (runtime-name: "ModeShape.vdb")
+[0m[0m18:30:46,923 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-7) JBAS015876: Starting deployment of "teiid-odata.war" (runtime-name: "teiid-odata.war")
+[0m[0m18:30:46,923 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-7) JBAS015876: Starting deployment of "webservice-vdb.xml" (runtime-name: "webservice-vdb.xml")
+[0m[0m18:30:46,924 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-3) JBAS015876: Starting deployment of "teiid-olingo-odata4.war" (runtime-name: "teiid-olingo-odata4.war")
+[0m[0m18:30:46,924 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-3) JBAS015876: Starting deployment of "modeshape-webdav.war" (runtime-name: "modeshape-webdav.war")
+[0m[0m18:30:46,954 INFO  [org.jboss.as.server.deployment.scanner] (MSC service thread 1-7) JBAS015012: Started FileSystemDeploymentService for directory /opt/eap/standalone/deployments
+[0m[0m18:30:47,121 INFO  [org.jboss.as.remoting] (MSC service thread 1-5) JBAS017100: Listening on 10.1.0.3:4447
+[0m[0m18:30:47,126 INFO  [org.jboss.as.remoting] (MSC service thread 1-5) JBAS017100: Listening on 127.0.0.1:9999
+[0m[33m18:30:47,590 WARN  [org.jboss.as.dependency.unsupported] (MSC service thread 1-2) JBAS015868: Deployment "deployment.teiid-odata.war" is using an unsupported module ("org.joda.time:main") which may be changed or removed in future versions without notice.
+[0m[31m18:30:47,784 ERROR [stderr] (MSC service thread 1-7) ScriptEngineManager providers.next(): javax.script.ScriptEngineFactory: Provider jdk.nashorn.api.scripting.NashornScriptEngineFactory not found
+[0m[31m18:30:47,787 ERROR [stderr] (MSC service thread 1-7) ScriptEngineManager providers.next(): javax.script.ScriptEngineFactory: Provider jdk.nashorn.api.scripting.NashornScriptEngineFactory not found
+[0m[31m18:30:47,799 ERROR [stderr] (MSC service thread 1-3) ScriptEngineManager providers.next(): javax.script.ScriptEngineFactory: Provider jdk.nashorn.api.scripting.NashornScriptEngineFactory not found
+[0m[31m18:30:47,800 ERROR [stderr] (MSC service thread 1-3) ScriptEngineManager providers.next(): javax.script.ScriptEngineFactory: Provider jdk.nashorn.api.scripting.NashornScriptEngineFactory not found
+[0m[31m18:30:47,859 ERROR [stderr] (MSC service thread 1-2) ScriptEngineManager providers.next(): javax.script.ScriptEngineFactory: Provider jdk.nashorn.api.scripting.NashornScriptEngineFactory not found
+[0m[31m18:30:47,859 ERROR [stderr] (MSC service thread 1-1) ScriptEngineManager providers.next(): javax.script.ScriptEngineFactory: Provider jdk.nashorn.api.scripting.NashornScriptEngineFactory not found
+[0m[31m18:30:47,859 ERROR [stderr] (MSC service thread 1-1) ScriptEngineManager providers.next(): javax.script.ScriptEngineFactory: Provider jdk.nashorn.api.scripting.NashornScriptEngineFactory not found
+[0m[31m18:30:47,860 ERROR [stderr] (MSC service thread 1-2) ScriptEngineManager providers.next(): javax.script.ScriptEngineFactory: Provider jdk.nashorn.api.scripting.NashornScriptEngineFactory not found
+[0m[0m18:30:48,114 INFO  [org.teiid.RUNTIME.VDBLifeCycleListener] (MSC service thread 1-2) TEIID40118 VDB webservice.1 added to the repository
+[0m[0m18:30:48,115 INFO  [org.teiid.RUNTIME] (MSC service thread 1-2) TEIID50029 VDB webservice.1 model "CustomerSource" metadata is currently being loaded. Start Time: 8/24/16 6:30 PM
+[0m[0m18:30:48,130 INFO  [org.teiid.RUNTIME] (MSC service thread 1-2) TEIID50029 VDB webservice.1 model "Customers" metadata is currently being loaded. Start Time: 8/24/16 6:30 PM
+[0m[0m18:30:48,150 INFO  [org.teiid.RUNTIME.VDBLifeCycleListener] (MSC service thread 1-1) TEIID40118 VDB Portfolio.1 added to the repository
+[0m[0m18:30:48,151 INFO  [org.teiid.RUNTIME] (MSC service thread 1-1) TEIID50029 VDB Portfolio.1 model "MarketData" metadata is currently being loaded. Start Time: 8/24/16 6:30 PM
+[0m[0m18:30:48,159 INFO  [org.teiid.RUNTIME] (MSC service thread 1-1) TEIID50029 VDB Portfolio.1 model "Accounts" metadata is currently being loaded. Start Time: 8/24/16 6:30 PM
+[0m[0m18:30:48,164 INFO  [org.teiid.RUNTIME] (MSC service thread 1-1) TEIID50029 VDB Portfolio.1 model "PersonalValuations" metadata is currently being loaded. Start Time: 8/24/16 6:30 PM
+[0m[0m18:30:48,184 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 2) TEIID50030 VDB webservice.1 model "Customers" metadata loaded. End Time: 8/24/16 6:30 PM
+[0m[33m18:30:48,209 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry jaxws-api.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m18:30:48,209 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry jsr181-api.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m18:30:48,209 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry jsr250-api.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m18:30:48,209 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry saaj-api.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m18:30:48,209 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry saaj-impl.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m18:30:48,209 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry jsr173_api.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m18:30:48,209 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry sjsxp.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m18:30:48,210 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry woodstox.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m18:30:48,210 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry resolver.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m18:30:48,210 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry jaxb-api.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m18:30:48,210 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry jaxb-impl.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m18:30:48,210 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry activation.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m18:30:48,210 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry stax-ex.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m18:30:48,210 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry streambuffer.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[33m18:30:48,210 WARN  [org.jboss.as.server.deployment] (MSC service thread 1-4) JBAS015960: Class Path entry stax-utils.jar in /content/modeshape-cmis.war/WEB-INF/lib/jaxws-rt-2.1.7.jar  does not point to a valid jar for a Class-Path reference.
+[0m[0m18:30:48,216 INFO  [org.teiid.RUNTIME.VDBLifeCycleListener] (MSC service thread 1-5) TEIID40118 VDB ModeShape.1 added to the repository
+[0m[0m18:30:48,217 INFO  [org.teiid.RUNTIME] (MSC service thread 1-1) TEIID50029 VDB Portfolio.1 model "Stocks" metadata is currently being loaded. Start Time: 8/24/16 6:30 PM
+[0m[0m18:30:48,231 INFO  [org.teiid.RUNTIME] (MSC service thread 1-5) TEIID50029 VDB ModeShape.1 model "VDB_Lineage" metadata is currently being loaded. Start Time: 8/24/16 6:30 PM
+[0m[0m18:30:48,232 INFO  [org.teiid.RUNTIME] (MSC service thread 1-1) TEIID50029 VDB Portfolio.1 model "OtherHoldings" metadata is currently being loaded. Start Time: 8/24/16 6:30 PM
+[0m[0m18:30:48,233 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 1) TEIID50030 VDB webservice.1 model "CustomerSource" metadata loaded. End Time: 8/24/16 6:30 PM
+[0m[0m18:30:48,234 INFO  [org.jboss.web] (ServerService Thread Pool -- 68) JBAS018210: Register web context: 
+[0m[0m18:30:48,239 INFO  [org.teiid.RUNTIME] (MSC service thread 1-5) TEIID50029 VDB ModeShape.1 model "Relational_Model_View" metadata is currently being loaded. Start Time: 8/24/16 6:30 PM
+[0m[0m18:30:48,239 INFO  [org.teiid.RUNTIME] (MSC service thread 1-1) TEIID50029 VDB Portfolio.1 model "StocksMatModel" metadata is currently being loaded. Start Time: 8/24/16 6:30 PM
+[0m[0m18:30:48,239 INFO  [org.jboss.web] (ServerService Thread Pool -- 69) JBAS018210: Register web context: /odata
+[0m[0m18:30:48,235 INFO  [org.jboss.web] (ServerService Thread Pool -- 65) JBAS018210: Register web context: /modeshape-webdav
+[0m[0m18:30:48,236 INFO  [org.jboss.web] (ServerService Thread Pool -- 66) JBAS018210: Register web context: /modeshape-rest
+[0m[0m18:30:48,236 INFO  [org.jboss.web] (ServerService Thread Pool -- 62) JBAS018210: Register web context: /odata4
+[0m[0m18:30:48,241 INFO  [org.teiid.RUNTIME] (MSC service thread 1-5) TEIID50029 VDB ModeShape.1 model "ModeShape" metadata is currently being loaded. Start Time: 8/24/16 6:30 PM
+[0m[0m18:30:48,242 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 2) TEIID50030 VDB Portfolio.1 model "PersonalValuations" metadata loaded. End Time: 8/24/16 6:30 PM
+[0m[0m18:30:48,256 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 2) TEIID50030 VDB Portfolio.1 model "Stocks" metadata loaded. End Time: 8/24/16 6:30 PM
+[0m[0m18:30:48,270 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 3) TEIID50030 VDB Portfolio.1 model "MarketData" metadata loaded. End Time: 8/24/16 6:30 PM
+[0m[0m18:30:48,280 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 3) TEIID50030 VDB Portfolio.1 model "OtherHoldings" metadata loaded. End Time: 8/24/16 6:30 PM
+[0m[0m18:30:48,358 INFO  [org.teiid.CONNECTOR] (teiid-async-threads - 4) TestExecutionFactory Commit=true;DatabaseProductName=PostgreSQL;DatabaseProductVersion=9.4.6;DriverMajorVersion=9;DriverMajorVersion=2;DriverName=PostgreSQL Native Driver;DriverVersion=PostgreSQL 9.2 JDBC4.1 (build 1002);IsolationLevel=2
+[0m[33m18:30:48,418 WARN  [org.jboss.as.dependency.private] (MSC service thread 1-8) JBAS015867: Deployment "deployment.modeshape-cmis.war" is using a private module ("com.sun.xml.messaging.saaj:main") which may be changed or removed in future versions without notice.
+[0m[33m18:30:48,419 WARN  [org.jboss.as.dependency.private] (MSC service thread 1-8) JBAS015867: Deployment "deployment.modeshape-cmis.war" is using a private module ("com.sun.xml.messaging.saaj:main") which may be changed or removed in future versions without notice.
+[0m[0m18:30:48,667 INFO  [org.jboss.web] (ServerService Thread Pool -- 70) JBAS018210: Register web context: /modeshape-cmis
+[0m[0m18:30:48,778 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 2) TEIID50030 VDB ModeShape.1 model "VDB_Lineage" metadata loaded. End Time: 8/24/16 6:30 PM
+[0m[0m18:30:48,787 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 3) TEIID50030 VDB ModeShape.1 model "Relational_Model_View" metadata loaded. End Time: 8/24/16 6:30 PM
+[0m[0m18:30:48,886 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 2) TEIID50030 VDB Portfolio.1 model "StocksMatModel" metadata loaded. End Time: 8/24/16 6:30 PM
+[0m[0m18:30:48,888 INFO  [org.hibernate.validator.internal.util.Version] (ServerService Thread Pool -- 69) HV000001: Hibernate Validator 4.3.2.Final-redhat-2
+[0m[0m18:30:48,952 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 2) TEIID50030 VDB ModeShape.1 model "ModeShape" metadata loaded. End Time: 8/24/16 6:30 PM
+[0m[0m18:30:49,089 INFO  [org.apache.chemistry.opencmis.jcr.JcrTypeManager] (ServerService Thread Pool -- 70) Added type 'cmis:folder'.
+[0m[0m18:30:49,117 INFO  [org.apache.chemistry.opencmis.jcr.JcrTypeManager] (ServerService Thread Pool -- 70) Added type 'cmis:document'.
+[0m[0m18:30:49,141 INFO  [org.apache.chemistry.opencmis.jcr.JcrTypeManager] (ServerService Thread Pool -- 70) Added type 'cmis:unversioned-document'.
+[0m[0m18:30:49,245 INFO  [stdout] (ServerService Thread Pool -- 70) --- loaded repository dv
+[0m[0m18:30:49,279 INFO  [javax.enterprise.resource.webservices.jaxws.server.http] (ServerService Thread Pool -- 70) WSSERVLET12: JAX-WS context listener initializing
+[0m[0m18:30:49,425 INFO  [org.teiid.RUNTIME.VDBLifeCycleListener] (teiid-async-threads - 1) TEIID40003 VDB webservice.1 is set to ACTIVE
+[0m[0m18:30:49,497 INFO  [org.teiid.RUNTIME.VDBLifeCycleListener] (teiid-async-threads - 2) TEIID40003 VDB ModeShape.1 is set to ACTIVE
+[0m[0m18:30:49,608 INFO  [org.jboss.resteasy.resteasy_jaxrs.i18n] (ServerService Thread Pool -- 69) RESTEASY000320: Deploying javax.ws.rs.core.Application: class org.teiid.odata.TeiidODataApplication
+[0m[0m18:30:49,617 INFO  [org.jboss.resteasy.resteasy_jaxrs.i18n] (ServerService Thread Pool -- 66) RESTEASY000320: Deploying javax.ws.rs.core.Application: class org.modeshape.web.jcr.rest.JcrApplication
+[0m[0m18:30:50,498 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 59) HQ221007: Server is now live
+[0m[0m18:30:50,498 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 59) HQ221001: HornetQ Server version 2.3.25.SP3 (2.3.x, 123) [66107f22-6a4a-11e6-9f49-cb8d390b8d2c] 
+[0m[0m18:30:50,620 INFO  [org.jboss.as.messaging] (ServerService Thread Pool -- 60) JBAS011601: Bound messaging object to jndi name java:/ConnectionFactory
+[0m[0m18:30:50,911 INFO  [org.jboss.as.connector.deployment] (MSC service thread 1-4) JBAS010406: Registered connection factory java:/JmsXA
+[0m[0m18:30:50,953 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 59) HQ221003: trying to deploy queue jms.queue.ExpiryQueue
+[0m[0m18:30:51,102 INFO  [org.jboss.as.messaging] (ServerService Thread Pool -- 59) JBAS011601: Bound messaging object to jndi name java:/jms/queue/ExpiryQueue
+[0m[0m18:30:51,116 INFO  [org.jboss.as.messaging] (ServerService Thread Pool -- 63) JBAS011601: Bound messaging object to jndi name java:jboss/exported/jms/RemoteConnectionFactory
+[0m[0m18:30:51,117 INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 61) HQ221003: trying to deploy queue jms.queue.DLQ
+[0m[0m18:30:51,177 INFO  [org.jboss.as.messaging] (ServerService Thread Pool -- 61) JBAS011601: Bound messaging object to jndi name java:/jms/queue/DLQ
+[0m[0m18:30:51,178 INFO  [org.hornetq.ra] (MSC service thread 1-4) HornetQ resource adaptor started
+[0m[0m18:30:51,178 INFO  [org.jboss.as.connector.services.resourceadapters.ResourceAdapterActivatorService$ResourceAdapterActivator] (MSC service thread 1-4) IJ020002: Deployed: file://RaActivatorhornetq-ra
+[0m[0m18:30:51,179 INFO  [org.jboss.as.connector.deployment] (MSC service thread 1-4) JBAS010401: Bound JCA ConnectionFactory [java:/JmsXA]
+[0m[0m18:30:54,409 INFO  [javax.enterprise.resource.webservices.jaxws.servlet.http] (ServerService Thread Pool -- 70) WSSERVLET14: JAX-WS servlet initializing
+[0m[0m18:30:54,653 INFO  [org.jboss.as.server] (Controller Boot Thread) JBAS015859: Deployed "teiid-olingo-odata4.war" (runtime-name : "teiid-olingo-odata4.war")
+[0m[0m18:30:54,653 INFO  [org.jboss.as.server] (Controller Boot Thread) JBAS015859: Deployed "teiid-odata.war" (runtime-name : "teiid-odata.war")
+[0m[0m18:30:54,653 INFO  [org.jboss.as.server] (Controller Boot Thread) JBAS015859: Deployed "ModeShape.vdb" (runtime-name : "ModeShape.vdb")
+[0m[0m18:30:54,655 INFO  [org.jboss.as.server] (ServerService Thread Pool -- 56) JBAS015859: Deployed "modeshape-cmis.war" (runtime-name : "modeshape-cmis.war")
+[0m[0m18:30:54,655 INFO  [org.jboss.as.server] (ServerService Thread Pool -- 56) JBAS015859: Deployed "modeshape-webdav.war" (runtime-name : "modeshape-webdav.war")
+[0m[0m18:30:54,654 INFO  [org.jboss.as.server] (ServerService Thread Pool -- 32) JBAS015859: Deployed "webservice-vdb.xml" (runtime-name : "webservice-vdb.xml")
+[0m[0m18:30:54,655 INFO  [org.jboss.as.server] (ServerService Thread Pool -- 32) JBAS015859: Deployed "portfolio-vdb.xml" (runtime-name : "portfolio-vdb.xml")
+[0m[0m18:30:54,656 INFO  [org.jboss.as.server] (ServerService Thread Pool -- 32) JBAS015859: Deployed "hibernate-portfolio-vdb.xml" (runtime-name : "hibernate-portfolio-vdb.xml")
+[0m[0m18:30:54,656 INFO  [org.jboss.as.server] (ServerService Thread Pool -- 32) JBAS015859: Deployed "integration-platform-console.war" (runtime-name : "integration-platform-console.war")
+[0m[0m18:30:54,655 INFO  [org.jboss.as.server] (ServerService Thread Pool -- 56) JBAS015859: Deployed "modeshape-rest.war" (runtime-name : "modeshape-rest.war")
+[0m[0m18:30:54,805 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015961: Http management interface listening on http://127.0.0.1:9990/management
+[0m[0m18:30:54,806 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015951: Admin console listening on http://127.0.0.1:9990
+[0m[0m18:30:54,806 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015874: JBoss Red Hat JBoss Data Virtualization 6.3.0 (AS 7.5.4.Final-redhat-4) started in 16478ms - Started 871 of 970 services (183 services are lazy, passive or on-demand)
+[0m[0m18:30:56,525 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 4) TEIID50030 VDB Portfolio.1 model "Accounts" metadata loaded. End Time: 8/24/16 6:30 PM
+[0m[0m18:30:56,541 INFO  [org.teiid.RUNTIME.VDBLifeCycleListener] (teiid-async-threads - 4) TEIID40003 VDB Portfolio.1 is set to ACTIVE
+[0m[0m18:30:56,546 INFO  [org.teiid.RUNTIME.VDBLifeCycleListener] (MSC service thread 1-1) TEIID40118 VDB Hibernate_Portfolio.1 added to the repository
+[0m[0m18:30:56,546 INFO  [org.teiid.RUNTIME] (MSC service thread 1-1) TEIID50029 VDB Hibernate_Portfolio.1 model "ProductPricingModel" metadata is currently being loaded. Start Time: 8/24/16 6:30 PM
+[0m[0m18:30:56,549 INFO  [org.teiid.RUNTIME] (teiid-async-threads - 3) TEIID50030 VDB Hibernate_Portfolio.1 model "ProductPricingModel" metadata loaded. End Time: 8/24/16 6:30 PM
+[0m[0m18:30:56,565 INFO  [org.teiid.RUNTIME.VDBLifeCycleListener] (teiid-async-threads - 3) TEIID40003 VDB Hibernate_Portfolio.1 is set to ACTIVE
+[0m[0m18:30:56,585 INFO  [org.teiid.COMMAND_LOG] (Teiid Timer0) 	START USER COMMAND:	startTime=2016-08-24 18:30:56.585	requestID=/vafyTEEsYpq.0	txID=null	sessionID=/vafyTEEsYpq	applicationName=internal	principal=embedded-async	vdbName=Portfolio	vdbVersion=1	sql=execute SYSADMIN.matViewStatus('StocksMatModel', 'stockPricesMatView')
+[0m[0m18:30:56,895 INFO  [org.teiid.COMMAND_LOG] (Teiid Timer0) 	START USER COMMAND:	startTime=2016-08-24 18:30:56.894	requestID=uUe2Erk0GyKC.0	txID=null	sessionID=uUe2Erk0GyKC	applicationName=internal	principal=embedded-async	vdbName=Portfolio	vdbVersion=1	sql=execute SYSADMIN.loadMatView('StocksMatModel','stockPricesMatView')
+[0m[0m18:30:56,894 INFO  [org.teiid.COMMAND_LOG] (Worker0_QueryProcessorQueue2) 	END USER COMMAND:	endTime=2016-08-24 18:30:56.894	requestID=/vafyTEEsYpq.0	txID=null	sessionID=/vafyTEEsYpq	principal=embedded-async	vdbName=Portfolio	vdbVersion=1	finalRowCount=0
+[0m[33m18:30:57,121 WARN  [org.teiid.CONNECTOR] (Worker0_QueryProcessorQueue6) Connector worker process failed for atomic-request=uUe2Erk0GyKC.0.66.2: org.teiid.translator.test.TestExecutionException: 0 TEIID11013:TEIID11004 Error executing statement(s): [SQL: INSERT INTO "public"."status" ("vdbname", "vdbversion", "schemaname", "name", "targetschemaname", "targetname", "valid", "loadstate", "updated", "cardinality", "loadnumber") VALUES ('Portfolio', 1, 'StocksMatModel', 'stockPricesMatView', 'Accounts', 'h2_stock_mat', 0, 'LOADING', {ts '2016-08-24 18:30:57.096'}, -1, 1)]
+	at org.teiid.translator.test.TestUpdateExecution.executeTranslatedCommand(TestUpdateExecution.java:293)
+	at org.teiid.translator.test.TestUpdateExecution.execute(TestUpdateExecution.java:84)
+	at org.teiid.dqp.internal.datamgr.ConnectorWorkItem$1.execute(ConnectorWorkItem.java:402)
+	at org.teiid.dqp.internal.datamgr.ConnectorWorkItem.execute(ConnectorWorkItem.java:364)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) [rt.jar:1.8.0_101]
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) [rt.jar:1.8.0_101]
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) [rt.jar:1.8.0_101]
+	at java.lang.reflect.Method.invoke(Method.java:498) [rt.jar:1.8.0_101]
+	at org.teiid.dqp.internal.datamgr.ConnectorManager$1.invoke(ConnectorManager.java:211)
+	at com.sun.proxy.$Proxy103.execute(Unknown Source)
+	at org.teiid.dqp.internal.process.DataTierTupleSource.getResults(DataTierTupleSource.java:306)
+	at org.teiid.dqp.internal.process.DataTierTupleSource$1.call(DataTierTupleSource.java:112)
+	at org.teiid.dqp.internal.process.DataTierTupleSource$1.call(DataTierTupleSource.java:108)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [rt.jar:1.8.0_101]
+	at org.teiid.dqp.internal.process.FutureWork.run(FutureWork.java:65)
+	at org.teiid.dqp.internal.process.DQPWorkContext.runInContext(DQPWorkContext.java:276)
+	at org.teiid.dqp.internal.process.ThreadReuseExecutor$RunnableWrapper.run(ThreadReuseExecutor.java:119)
+	at org.teiid.dqp.internal.process.ThreadReuseExecutor$3.run(ThreadReuseExecutor.java:210)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142) [rt.jar:1.8.0_101]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617) [rt.jar:1.8.0_101]
 	at java.lang.Thread.run(Thread.java:745) [rt.jar:1.8.0_101]
-Caused by: java.lang.IllegalArgumentException
-	at org.jboss.dmr.StringModelValue.asBoolean(StringModelValue.java:154)
-	at org.jboss.dmr.ModelNode.asBoolean(ModelNode.java:262)
-	at org.jboss.as.controller.SimpleAttributeDefinition.parse(SimpleAttributeDefinition.java:331)
-	at org.jboss.as.controller.SimpleAttributeDefinition.parse(SimpleAttributeDefinition.java:188)
-	at org.jboss.as.controller.SimpleAttributeDefinition.parseAndSetParameter(SimpleAttributeDefinition.java:243)
-	at org.jboss.as.server.deployment.scanner.DeploymentScannerParser_1_1.parseScanner(DeploymentScannerParser_1_1.java:167)
-	at org.jboss.as.server.deployment.scanner.DeploymentScannerParser_1_1.readElement(DeploymentScannerParser_1_1.java:114)
-	at org.jboss.as.server.deployment.scanner.DeploymentScannerParser_1_1.readElement(DeploymentScannerParser_1_1.java:50)
-	at org.jboss.staxmapper.XMLMapperImpl.processNested(XMLMapperImpl.java:110)
-	at org.jboss.staxmapper.XMLExtendedStreamReaderImpl.handleAny(XMLExtendedStreamReaderImpl.java:69)
-	at org.jboss.as.server.parsing.StandaloneXml.parseServerProfile(StandaloneXml.java:1094)
-	at org.jboss.as.server.parsing.StandaloneXml.readServerElement_1_4(StandaloneXml.java:469)
-	at org.jboss.as.server.parsing.StandaloneXml.readElement(StandaloneXml.java:145)
-	at org.jboss.as.server.parsing.StandaloneXml.readElement(StandaloneXml.java:107)
-	at org.jboss.staxmapper.XMLMapperImpl.processNested(XMLMapperImpl.java:110)
-	at org.jboss.staxmapper.XMLMapperImpl.parseDocument(XMLMapperImpl.java:69)
-	at org.jboss.as.controller.persistence.XmlConfigurationPersister.load(XmlConfigurationPersister.java:133)
-	... 3 more
+Caused by: org.postgresql.util.PSQLException: ERROR: column "valid" is of type boolean but expression is of type integer
+  Hint: You will need to rewrite or cast the expression.
+  Position: 267
+	at org.postgresql.core.v3.QueryExecutorImpl.receiveErrorResponse(QueryExecutorImpl.java:2157)
+	at org.postgresql.core.v3.QueryExecutorImpl.processResults(QueryExecutorImpl.java:1886)
+	at org.postgresql.core.v3.QueryExecutorImpl.execute(QueryExecutorImpl.java:255)
+	at org.postgresql.jdbc2.AbstractJdbc2Statement.execute(AbstractJdbc2Statement.java:555)
+	at org.postgresql.jdbc2.AbstractJdbc2Statement.executeWithFlags(AbstractJdbc2Statement.java:403)
+	at org.postgresql.jdbc2.AbstractJdbc2Statement.executeUpdate(AbstractJdbc2Statement.java:331)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) [rt.jar:1.8.0_101]
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) [rt.jar:1.8.0_101]
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) [rt.jar:1.8.0_101]
+	at java.lang.reflect.Method.invoke(Method.java:498) [rt.jar:1.8.0_101]
+	at org.postgresql.ds.jdbc23.AbstractJdbc23PooledConnection$StatementHandler.invoke(AbstractJdbc23PooledConnection.java:453)
+	at com.sun.proxy.$Proxy104.executeUpdate(Unknown Source)
+	at org.jboss.jca.adapters.jdbc.WrappedStatement.executeUpdate(WrappedStatement.java:375)
+	at org.teiid.translator.test.TestUpdateExecution.executeTranslatedCommand(TestUpdateExecution.java:207)
+	... 20 more
 
-[0m[31m11:49:41,108 FATAL [org.jboss.as.server] (Controller Boot Thread) JBAS015957: Server boot has failed in an unrecoverable manner; exiting. See previous messages for details.
-[0m[0m11:49:41,121 INFO  [org.jboss.as] (MSC service thread 1-5) JBAS015950: JBoss Red Hat JBoss Data Virtualization 6.3.0 (AS 7.5.4.Final-redhat-4) stopped in 8ms
-[0m
+[0m[33m18:30:57,141 WARN  [org.teiid.MATVIEWS] (Worker1_QueryProcessorQueue7) org.teiid.jdbc.TeiidSQLException: TEIID30504 postgresql-connector: 0 TEIID11013:TEIID11004 Error executing statement(s): [SQL: INSERT INTO "public"."status" ("vdbname", "vdbversion", "schemaname", "name", "targetschemaname", "targetname", "valid", "loadstate", "updated", "cardinality", "loadnumber") VALUES ('Portfolio', 1, 'StocksMatModel', 'stockPricesMatView', 'Accounts', 'h2_stock_mat', 0, 'LOADING', {ts '2016-08-24 18:30:57.096'}, -1, 1)]
+[0m[0m18:30:57,193 INFO  [org.teiid.COMMAND_LOG] (Worker1_QueryProcessorQueue9) 	END USER COMMAND:	endTime=2016-08-24 18:30:57.193	requestID=uUe2Erk0GyKC.0	txID=null	sessionID=uUe2Erk0GyKC	principal=embedded-async	vdbName=Portfolio	vdbVersion=1	finalRowCount=1
+[0m[0m18:32:57,197 INFO  [org.teiid.COMMAND_LOG] (Teiid Timer0) 	START USER COMMAND:	startTime=2016-08-24 18:32:57.197	requestID=rZCiaEwKn6fx.0	txID=null	sessionID=rZCiaEwKn6fx	applicationName=internal	principal=embedded-async	vdbName=Portfolio	vdbVersion=1	sql=execute SYSADMIN.matViewStatus('StocksMatModel', 'stockPricesMatView')
+[0m[0m18:32:57,423 INFO  [org.teiid.COMMAND_LOG] (Teiid Timer0) 	START USER COMMAND:	startTime=2016-08-24 18:32:57.423	requestID=VMBVg+sEENje.0	txID=null	sessionID=VMBVg+sEENje	applicationName=internal	principal=embedded-async	vdbName=Portfolio	vdbVersion=1	sql=execute SYSADMIN.loadMatView('StocksMatModel','stockPricesMatView')
+[0m[0m18:32:57,424 INFO  [org.teiid.COMMAND_LOG] (Worker1_QueryProcessorQueue12) 	END USER COMMAND:	endTime=2016-08-24 18:32:57.424	requestID=rZCiaEwKn6fx.0	txID=null	sessionID=rZCiaEwKn6fx	principal=embedded-async	vdbName=Portfolio	vdbVersion=1	finalRowCount=0
+[0m[33m18:32:57,541 WARN  [org.teiid.CONNECTOR] (Worker1_QueryProcessorQueue16) Connector worker process failed for atomic-request=VMBVg+sEENje.0.66.6: org.teiid.translator.test.TestExecutionException: 0 TEIID11013:TEIID11004 Error executing statement(s): [SQL: INSERT INTO "public"."status" ("vdbname", "vdbversion", "schemaname", "name", "targetschemaname", "targetname", "valid", "loadstate", "updated", "cardinality", "loadnumber") VALUES ('Portfolio', 1, 'StocksMatModel', 'stockPricesMatView', 'Accounts', 'h2_stock_mat', 0, 'LOADING', {ts '2016-08-24 18:32:57.529'}, -1, 1)]
+	at org.teiid.translator.test.TestUpdateExecution.executeTranslatedCommand(TestUpdateExecution.java:293)
+	at org.teiid.translator.test.TestUpdateExecution.execute(TestUpdateExecution.java:84)
+	at org.teiid.dqp.internal.datamgr.ConnectorWorkItem$1.execute(ConnectorWorkItem.java:402)
+	at org.teiid.dqp.internal.datamgr.ConnectorWorkItem.execute(ConnectorWorkItem.java:364)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) [rt.jar:1.8.0_101]
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) [rt.jar:1.8.0_101]
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) [rt.jar:1.8.0_101]
+	at java.lang.reflect.Method.invoke(Method.java:498) [rt.jar:1.8.0_101]
+	at org.teiid.dqp.internal.datamgr.ConnectorManager$1.invoke(ConnectorManager.java:211)
+	at com.sun.proxy.$Proxy103.execute(Unknown Source)
+	at org.teiid.dqp.internal.process.DataTierTupleSource.getResults(DataTierTupleSource.java:306)
+	at org.teiid.dqp.internal.process.DataTierTupleSource$1.call(DataTierTupleSource.java:112)
+	at org.teiid.dqp.internal.process.DataTierTupleSource$1.call(DataTierTupleSource.java:108)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [rt.jar:1.8.0_101]
+	at org.teiid.dqp.internal.process.FutureWork.run(FutureWork.java:65)
+	at org.teiid.dqp.internal.process.DQPWorkContext.runInContext(DQPWorkContext.java:276)
+	at org.teiid.dqp.internal.process.ThreadReuseExecutor$RunnableWrapper.run(ThreadReuseExecutor.java:119)
+	at org.teiid.dqp.internal.process.ThreadReuseExecutor$3.run(ThreadReuseExecutor.java:210)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142) [rt.jar:1.8.0_101]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617) [rt.jar:1.8.0_101]
+	at java.lang.Thread.run(Thread.java:745) [rt.jar:1.8.0_101]
+Caused by: org.postgresql.util.PSQLException: ERROR: column "valid" is of type boolean but expression is of type integer
+  Hint: You will need to rewrite or cast the expression.
+  Position: 267
+	at org.postgresql.core.v3.QueryExecutorImpl.receiveErrorResponse(QueryExecutorImpl.java:2157)
+	at org.postgresql.core.v3.QueryExecutorImpl.processResults(QueryExecutorImpl.java:1886)
+	at org.postgresql.core.v3.QueryExecutorImpl.execute(QueryExecutorImpl.java:255)
+	at org.postgresql.jdbc2.AbstractJdbc2Statement.execute(AbstractJdbc2Statement.java:555)
+	at org.postgresql.jdbc2.AbstractJdbc2Statement.executeWithFlags(AbstractJdbc2Statement.java:403)
+	at org.postgresql.jdbc2.AbstractJdbc2Statement.executeUpdate(AbstractJdbc2Statement.java:331)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) [rt.jar:1.8.0_101]
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) [rt.jar:1.8.0_101]
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) [rt.jar:1.8.0_101]
+	at java.lang.reflect.Method.invoke(Method.java:498) [rt.jar:1.8.0_101]
+	at org.postgresql.ds.jdbc23.AbstractJdbc23PooledConnection$StatementHandler.invoke(AbstractJdbc23PooledConnection.java:453)
+	at com.sun.proxy.$Proxy104.executeUpdate(Unknown Source)
+	at org.jboss.jca.adapters.jdbc.WrappedStatement.executeUpdate(WrappedStatement.java:375)
+	at org.teiid.translator.test.TestUpdateExecution.executeTranslatedCommand(TestUpdateExecution.java:207)
+	... 20 more
+
+[0m[33m18:32:57,545 WARN  [org.teiid.MATVIEWS] (Worker2_QueryProcessorQueue17) org.teiid.jdbc.TeiidSQLException: TEIID30504 postgresql-connector: 0 TEIID11013:TEIID11004 Error executing statement(s): [SQL: INSERT INTO "public"."status" ("vdbname", "vdbversion", "schemaname", "name", "targetschemaname", "targetname", "valid", "loadstate", "updated", "cardinality", "loadnumber") VALUES ('Portfolio', 1, 'StocksMatModel', 'stockPricesMatView', 'Accounts', 'h2_stock_mat', 0, 'LOADING', {ts '2016-08-24 18:32:57.529'}, -1, 1)]
+[0m[0m18:32:57,563 INFO  [org.teiid.COMMAND_LOG] (Worker2_QueryProcessorQueue19) 	END USER COMMAND:	endTime=2016-08-24 18:32:57.563	requestID=VMBVg+sEENje.0	txID=null	sessionID=VMBVg+sEENje	principal=embedded-async	vdbName=Portfolio	vdbVersion=1	finalRowCount=1
+[0m[0m18:32:58,493 INFO  [org.teiid.COMMAND_LOG] (New I/O worker #1) 	START USER COMMAND:	startTime=2016-08-24 18:32:58.493	requestID=ZiIOoAZTHunt.0	txID=null	sessionID=ZiIOoAZTHunt	applicationName=JDBC	principal=teiidUser@teiid-security	vdbName=Portfolio	vdbVersion=1	sql=select * from product
+[0m[0m18:32:58,579 INFO  [org.teiid.COMMAND_LOG] (Worker2_QueryProcessorQueue23) 	END USER COMMAND:	endTime=2016-08-24 18:32:58.579	requestID=ZiIOoAZTHunt.0	txID=null	sessionID=null	principal=null	vdbName=null	vdbVersion=0	finalRowCount=25
+[0m[0m18:32:58,638 INFO  [org.teiid.COMMAND_LOG] (New I/O worker #1) 	START USER COMMAND:	startTime=2016-08-24 18:32:58.638	requestID=k8Jt1+p0VUYL.0	txID=null	sessionID=k8Jt1+p0VUYL	applicationName=JDBC	principal=teiidUser@teiid-security	vdbName=Portfolio	vdbVersion=1	sql=select * from product
+[0m[0m18:32:58,694 INFO  [org.teiid.COMMAND_LOG] (Worker2_QueryProcessorQueue27) 	END USER COMMAND:	endTime=2016-08-24 18:32:58.694	requestID=k8Jt1+p0VUYL.0	txID=null	sessionID=null	principal=null	vdbName=null	vdbVersion=0	finalRowCount=25
+[0m[0m18:33:07,819 INFO  [org.teiid.COMMAND_LOG] (New I/O worker #3) 	START USER COMMAND:	startTime=2016-08-24 18:33:07.819	requestID=8VzM87qbQ5Si.0	txID=null	sessionID=8VzM87qbQ5Si	applicationName=JDBC	principal=teiidUser@teiid-security	vdbName=webservice	vdbVersion=1	sql=select * from CustomersView
+[0m[33m18:33:08,596 WARNING [org.apache.cxf.phase.PhaseInterceptorChain] (Worker1_QueryProcessorQueue29) Interceptor for {http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList}WebClient has thrown exception, unwinding now: org.apache.cxf.interceptor.Fault: Could not send Message.
+	at org.apache.cxf.interceptor.MessageSenderInterceptor$MessageSenderEndingInterceptor.handleMessage(MessageSenderInterceptor.java:64)
+	at org.apache.cxf.phase.PhaseInterceptorChain.doIntercept(PhaseInterceptorChain.java:272)
+	at org.apache.cxf.jaxrs.client.AbstractClient.doRunInterceptorChain(AbstractClient.java:642)
+	at org.apache.cxf.jaxrs.client.WebClient.doChainedInvocation(WebClient.java:1067)
+	at org.apache.cxf.jaxrs.client.WebClient.doInvoke(WebClient.java:878)
+	at org.apache.cxf.jaxrs.client.WebClient.doInvoke(WebClient.java:852)
+	at org.apache.cxf.jaxrs.client.WebClient.invoke(WebClient.java:312)
+	at org.teiid.resource.adapter.ws.WSConnectionImpl$HttpDispatch.invoke(WSConnectionImpl.java:204)
+	at org.teiid.resource.adapter.ws.WSConnectionImpl$HttpDispatch.invoke(WSConnectionImpl.java:123)
+	at org.teiid.translator.ws.BinaryWSProcedureExecution.execute(BinaryWSProcedureExecution.java:156)
+	at org.teiid.dqp.internal.datamgr.ConnectorWorkItem.execute(ConnectorWorkItem.java:364)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) [rt.jar:1.8.0_101]
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) [rt.jar:1.8.0_101]
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) [rt.jar:1.8.0_101]
+	at java.lang.reflect.Method.invoke(Method.java:498) [rt.jar:1.8.0_101]
+	at org.teiid.dqp.internal.datamgr.ConnectorManager$1.invoke(ConnectorManager.java:211)
+	at com.sun.proxy.$Proxy103.execute(Unknown Source)
+	at org.teiid.dqp.internal.process.DataTierTupleSource.getResults(DataTierTupleSource.java:306)
+	at org.teiid.dqp.internal.process.DataTierTupleSource$1.call(DataTierTupleSource.java:112)
+	at org.teiid.dqp.internal.process.DataTierTupleSource$1.call(DataTierTupleSource.java:108)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [rt.jar:1.8.0_101]
+	at org.teiid.dqp.internal.process.FutureWork.run(FutureWork.java:65)
+	at org.teiid.dqp.internal.process.DQPWorkContext.runInContext(DQPWorkContext.java:276)
+	at org.teiid.dqp.internal.process.ThreadReuseExecutor$RunnableWrapper.run(ThreadReuseExecutor.java:119)
+	at org.teiid.dqp.internal.process.ThreadReuseExecutor$3.run(ThreadReuseExecutor.java:210)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142) [rt.jar:1.8.0_101]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617) [rt.jar:1.8.0_101]
+	at java.lang.Thread.run(Thread.java:745) [rt.jar:1.8.0_101]
+Caused by: java.net.ConnectException: ConnectException invoking http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList: Connection refused
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method) [rt.jar:1.8.0_101]
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62) [rt.jar:1.8.0_101]
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45) [rt.jar:1.8.0_101]
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423) [rt.jar:1.8.0_101]
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.mapException(HTTPConduit.java:1347)
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.close(HTTPConduit.java:1331)
+	at org.apache.cxf.transport.AbstractConduit.close(AbstractConduit.java:56)
+	at org.apache.cxf.transport.http.HTTPConduit.close(HTTPConduit.java:633)
+	at org.apache.cxf.interceptor.MessageSenderInterceptor$MessageSenderEndingInterceptor.handleMessage(MessageSenderInterceptor.java:62)
+	... 27 more
+Caused by: java.net.ConnectException: Connection refused
+	at java.net.PlainSocketImpl.socketConnect(Native Method) [rt.jar:1.8.0_101]
+	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:350) [rt.jar:1.8.0_101]
+	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:206) [rt.jar:1.8.0_101]
+	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:188) [rt.jar:1.8.0_101]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392) [rt.jar:1.8.0_101]
+	at java.net.Socket.connect(Socket.java:589) [rt.jar:1.8.0_101]
+	at sun.net.NetworkClient.doConnect(NetworkClient.java:175) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.openServer(HttpClient.java:432) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.openServer(HttpClient.java:527) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.<init>(HttpClient.java:211) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.New(HttpClient.java:308) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.New(HttpClient.java:326) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.getNewHttpClient(HttpURLConnection.java:1169) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.plainConnect0(HttpURLConnection.java:1105) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnection.java:999) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.connect(HttpURLConnection.java:933) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1513) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1441) [rt.jar:1.8.0_101]
+	at java.net.HttpURLConnection.getResponseCode(HttpURLConnection.java:480) [rt.jar:1.8.0_101]
+	at org.apache.cxf.transport.http.URLConnectionHTTPConduit$URLConnectionWrappedOutputStream.getResponseCode(URLConnectionHTTPConduit.java:266)
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.handleResponseInternal(HTTPConduit.java:1550)
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.handleResponse(HTTPConduit.java:1520)
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.close(HTTPConduit.java:1318)
+	... 30 more
+
+[0m[31m18:33:08,597 ERROR [org.teiid.CONNECTOR] (Worker1_QueryProcessorQueue29) Connector worker process failed for atomic-request=8VzM87qbQ5Si.0.3.10: javax.ws.rs.client.ClientException: java.net.ConnectException: ConnectException invoking http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList: Connection refused
+	at org.apache.cxf.jaxrs.client.AbstractClient.checkClientException(AbstractClient.java:583)
+	at org.apache.cxf.jaxrs.client.AbstractClient.preProcessResult(AbstractClient.java:565)
+	at org.apache.cxf.jaxrs.client.WebClient.doResponse(WebClient.java:1111)
+	at org.apache.cxf.jaxrs.client.WebClient.doChainedInvocation(WebClient.java:1068)
+	at org.apache.cxf.jaxrs.client.WebClient.doInvoke(WebClient.java:878)
+	at org.apache.cxf.jaxrs.client.WebClient.doInvoke(WebClient.java:852)
+	at org.apache.cxf.jaxrs.client.WebClient.invoke(WebClient.java:312)
+	at org.teiid.resource.adapter.ws.WSConnectionImpl$HttpDispatch.invoke(WSConnectionImpl.java:204)
+	at org.teiid.resource.adapter.ws.WSConnectionImpl$HttpDispatch.invoke(WSConnectionImpl.java:123)
+	at org.teiid.translator.ws.BinaryWSProcedureExecution.execute(BinaryWSProcedureExecution.java:156)
+	at org.teiid.dqp.internal.datamgr.ConnectorWorkItem.execute(ConnectorWorkItem.java:364)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) [rt.jar:1.8.0_101]
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) [rt.jar:1.8.0_101]
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) [rt.jar:1.8.0_101]
+	at java.lang.reflect.Method.invoke(Method.java:498) [rt.jar:1.8.0_101]
+	at org.teiid.dqp.internal.datamgr.ConnectorManager$1.invoke(ConnectorManager.java:211)
+	at com.sun.proxy.$Proxy103.execute(Unknown Source)
+	at org.teiid.dqp.internal.process.DataTierTupleSource.getResults(DataTierTupleSource.java:306)
+	at org.teiid.dqp.internal.process.DataTierTupleSource$1.call(DataTierTupleSource.java:112)
+	at org.teiid.dqp.internal.process.DataTierTupleSource$1.call(DataTierTupleSource.java:108)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [rt.jar:1.8.0_101]
+	at org.teiid.dqp.internal.process.FutureWork.run(FutureWork.java:65)
+	at org.teiid.dqp.internal.process.DQPWorkContext.runInContext(DQPWorkContext.java:276)
+	at org.teiid.dqp.internal.process.ThreadReuseExecutor$RunnableWrapper.run(ThreadReuseExecutor.java:119)
+	at org.teiid.dqp.internal.process.ThreadReuseExecutor$3.run(ThreadReuseExecutor.java:210)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142) [rt.jar:1.8.0_101]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617) [rt.jar:1.8.0_101]
+	at java.lang.Thread.run(Thread.java:745) [rt.jar:1.8.0_101]
+Caused by: java.net.ConnectException: ConnectException invoking http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList: Connection refused
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method) [rt.jar:1.8.0_101]
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62) [rt.jar:1.8.0_101]
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45) [rt.jar:1.8.0_101]
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423) [rt.jar:1.8.0_101]
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.mapException(HTTPConduit.java:1347)
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.close(HTTPConduit.java:1331)
+	at org.apache.cxf.transport.AbstractConduit.close(AbstractConduit.java:56)
+	at org.apache.cxf.transport.http.HTTPConduit.close(HTTPConduit.java:633)
+	at org.apache.cxf.interceptor.MessageSenderInterceptor$MessageSenderEndingInterceptor.handleMessage(MessageSenderInterceptor.java:62)
+	at org.apache.cxf.phase.PhaseInterceptorChain.doIntercept(PhaseInterceptorChain.java:272)
+	at org.apache.cxf.jaxrs.client.AbstractClient.doRunInterceptorChain(AbstractClient.java:642)
+	at org.apache.cxf.jaxrs.client.WebClient.doChainedInvocation(WebClient.java:1067)
+	... 24 more
+Caused by: java.net.ConnectException: Connection refused
+	at java.net.PlainSocketImpl.socketConnect(Native Method) [rt.jar:1.8.0_101]
+	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:350) [rt.jar:1.8.0_101]
+	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:206) [rt.jar:1.8.0_101]
+	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:188) [rt.jar:1.8.0_101]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392) [rt.jar:1.8.0_101]
+	at java.net.Socket.connect(Socket.java:589) [rt.jar:1.8.0_101]
+	at sun.net.NetworkClient.doConnect(NetworkClient.java:175) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.openServer(HttpClient.java:432) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.openServer(HttpClient.java:527) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.<init>(HttpClient.java:211) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.New(HttpClient.java:308) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.New(HttpClient.java:326) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.getNewHttpClient(HttpURLConnection.java:1169) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.plainConnect0(HttpURLConnection.java:1105) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnection.java:999) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.connect(HttpURLConnection.java:933) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1513) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1441) [rt.jar:1.8.0_101]
+	at java.net.HttpURLConnection.getResponseCode(HttpURLConnection.java:480) [rt.jar:1.8.0_101]
+	at org.apache.cxf.transport.http.URLConnectionHTTPConduit$URLConnectionWrappedOutputStream.getResponseCode(URLConnectionHTTPConduit.java:266)
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.handleResponseInternal(HTTPConduit.java:1550)
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.handleResponse(HTTPConduit.java:1520)
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.close(HTTPConduit.java:1318)
+	... 30 more
+
+[0m[0m18:33:08,600 INFO  [org.teiid.COMMAND_LOG] (Worker2_QueryProcessorQueue30) 	ERROR USER COMMAND:	endTime=2016-08-24 18:33:08.6	requestID=8VzM87qbQ5Si.0	txID=null	sessionID=8VzM87qbQ5Si	principal=teiidUser@teiid-security	vdbName=webservice	vdbVersion=1	finalRowCount=null
+[0m[31m18:33:08,601 ERROR [org.teiid.PROCESSOR] (Worker2_QueryProcessorQueue30) TEIID30019 Unexpected exception for request 8VzM87qbQ5Si.0: javax.ws.rs.client.ClientException: java.net.ConnectException: ConnectException invoking http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList: Connection refused
+	at org.apache.cxf.jaxrs.client.AbstractClient.checkClientException(AbstractClient.java:583)
+	at org.apache.cxf.jaxrs.client.AbstractClient.preProcessResult(AbstractClient.java:565)
+	at org.apache.cxf.jaxrs.client.WebClient.doResponse(WebClient.java:1111)
+	at org.apache.cxf.jaxrs.client.WebClient.doChainedInvocation(WebClient.java:1068)
+	at org.apache.cxf.jaxrs.client.WebClient.doInvoke(WebClient.java:878)
+	at org.apache.cxf.jaxrs.client.WebClient.doInvoke(WebClient.java:852)
+	at org.apache.cxf.jaxrs.client.WebClient.invoke(WebClient.java:312)
+	at org.teiid.resource.adapter.ws.WSConnectionImpl$HttpDispatch.invoke(WSConnectionImpl.java:204)
+	at org.teiid.resource.adapter.ws.WSConnectionImpl$HttpDispatch.invoke(WSConnectionImpl.java:123)
+	at org.teiid.translator.ws.BinaryWSProcedureExecution.execute(BinaryWSProcedureExecution.java:156)
+	at org.teiid.dqp.internal.datamgr.ConnectorWorkItem.execute(ConnectorWorkItem.java:364)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) [rt.jar:1.8.0_101]
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) [rt.jar:1.8.0_101]
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) [rt.jar:1.8.0_101]
+	at java.lang.reflect.Method.invoke(Method.java:498) [rt.jar:1.8.0_101]
+	at org.teiid.dqp.internal.datamgr.ConnectorManager$1.invoke(ConnectorManager.java:211)
+	at com.sun.proxy.$Proxy103.execute(Unknown Source)
+	at org.teiid.dqp.internal.process.DataTierTupleSource.getResults(DataTierTupleSource.java:306)
+	at org.teiid.dqp.internal.process.DataTierTupleSource$1.call(DataTierTupleSource.java:112)
+	at org.teiid.dqp.internal.process.DataTierTupleSource$1.call(DataTierTupleSource.java:108)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [rt.jar:1.8.0_101]
+	at org.teiid.dqp.internal.process.FutureWork.run(FutureWork.java:65)
+	at org.teiid.dqp.internal.process.DQPWorkContext.runInContext(DQPWorkContext.java:276)
+	at org.teiid.dqp.internal.process.ThreadReuseExecutor$RunnableWrapper.run(ThreadReuseExecutor.java:119)
+	at org.teiid.dqp.internal.process.ThreadReuseExecutor$3.run(ThreadReuseExecutor.java:210)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142) [rt.jar:1.8.0_101]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617) [rt.jar:1.8.0_101]
+	at java.lang.Thread.run(Thread.java:745) [rt.jar:1.8.0_101]
+Caused by: java.net.ConnectException: ConnectException invoking http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList: Connection refused
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method) [rt.jar:1.8.0_101]
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62) [rt.jar:1.8.0_101]
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45) [rt.jar:1.8.0_101]
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423) [rt.jar:1.8.0_101]
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.mapException(HTTPConduit.java:1347)
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.close(HTTPConduit.java:1331)
+	at org.apache.cxf.transport.AbstractConduit.close(AbstractConduit.java:56)
+	at org.apache.cxf.transport.http.HTTPConduit.close(HTTPConduit.java:633)
+	at org.apache.cxf.interceptor.MessageSenderInterceptor$MessageSenderEndingInterceptor.handleMessage(MessageSenderInterceptor.java:62)
+	at org.apache.cxf.phase.PhaseInterceptorChain.doIntercept(PhaseInterceptorChain.java:272)
+	at org.apache.cxf.jaxrs.client.AbstractClient.doRunInterceptorChain(AbstractClient.java:642)
+	at org.apache.cxf.jaxrs.client.WebClient.doChainedInvocation(WebClient.java:1067)
+	... 24 more
+Caused by: java.net.ConnectException: Connection refused
+	at java.net.PlainSocketImpl.socketConnect(Native Method) [rt.jar:1.8.0_101]
+	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:350) [rt.jar:1.8.0_101]
+	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:206) [rt.jar:1.8.0_101]
+	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:188) [rt.jar:1.8.0_101]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392) [rt.jar:1.8.0_101]
+	at java.net.Socket.connect(Socket.java:589) [rt.jar:1.8.0_101]
+	at sun.net.NetworkClient.doConnect(NetworkClient.java:175) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.openServer(HttpClient.java:432) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.openServer(HttpClient.java:527) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.<init>(HttpClient.java:211) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.New(HttpClient.java:308) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.New(HttpClient.java:326) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.getNewHttpClient(HttpURLConnection.java:1169) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.plainConnect0(HttpURLConnection.java:1105) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnection.java:999) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.connect(HttpURLConnection.java:933) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1513) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1441) [rt.jar:1.8.0_101]
+	at java.net.HttpURLConnection.getResponseCode(HttpURLConnection.java:480) [rt.jar:1.8.0_101]
+	at org.apache.cxf.transport.http.URLConnectionHTTPConduit$URLConnectionWrappedOutputStream.getResponseCode(URLConnectionHTTPConduit.java:266)
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.handleResponseInternal(HTTPConduit.java:1550)
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.handleResponse(HTTPConduit.java:1520)
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.close(HTTPConduit.java:1318)
+	... 30 more
+
+[0m[0m18:33:08,661 INFO  [org.teiid.COMMAND_LOG] (Worker2_QueryProcessorQueue30) 	END USER COMMAND:	endTime=2016-08-24 18:33:08.661	requestID=8VzM87qbQ5Si.0	txID=null	sessionID=8VzM87qbQ5Si	principal=teiidUser@teiid-security	vdbName=webservice	vdbVersion=1	finalRowCount=0
+[0m[0m18:33:08,749 INFO  [org.teiid.COMMAND_LOG] (New I/O worker #3) 	START USER COMMAND:	startTime=2016-08-24 18:33:08.749	requestID=JMOijWNvLC2R.0	txID=null	sessionID=JMOijWNvLC2R	applicationName=JDBC	principal=teiidUser@teiid-security	vdbName=webservice	vdbVersion=1	sql=select * from CustomersView
+[0m[33m18:33:08,758 WARNING [org.apache.cxf.phase.PhaseInterceptorChain] (Worker1_QueryProcessorQueue32) Interceptor for {http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList}WebClient has thrown exception, unwinding now: org.apache.cxf.interceptor.Fault: Could not send Message.
+	at org.apache.cxf.interceptor.MessageSenderInterceptor$MessageSenderEndingInterceptor.handleMessage(MessageSenderInterceptor.java:64)
+	at org.apache.cxf.phase.PhaseInterceptorChain.doIntercept(PhaseInterceptorChain.java:272)
+	at org.apache.cxf.jaxrs.client.AbstractClient.doRunInterceptorChain(AbstractClient.java:642)
+	at org.apache.cxf.jaxrs.client.WebClient.doChainedInvocation(WebClient.java:1067)
+	at org.apache.cxf.jaxrs.client.WebClient.doInvoke(WebClient.java:878)
+	at org.apache.cxf.jaxrs.client.WebClient.doInvoke(WebClient.java:852)
+	at org.apache.cxf.jaxrs.client.WebClient.invoke(WebClient.java:312)
+	at org.teiid.resource.adapter.ws.WSConnectionImpl$HttpDispatch.invoke(WSConnectionImpl.java:204)
+	at org.teiid.resource.adapter.ws.WSConnectionImpl$HttpDispatch.invoke(WSConnectionImpl.java:123)
+	at org.teiid.translator.ws.BinaryWSProcedureExecution.execute(BinaryWSProcedureExecution.java:156)
+	at org.teiid.dqp.internal.datamgr.ConnectorWorkItem.execute(ConnectorWorkItem.java:364)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) [rt.jar:1.8.0_101]
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) [rt.jar:1.8.0_101]
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) [rt.jar:1.8.0_101]
+	at java.lang.reflect.Method.invoke(Method.java:498) [rt.jar:1.8.0_101]
+	at org.teiid.dqp.internal.datamgr.ConnectorManager$1.invoke(ConnectorManager.java:211)
+	at com.sun.proxy.$Proxy103.execute(Unknown Source)
+	at org.teiid.dqp.internal.process.DataTierTupleSource.getResults(DataTierTupleSource.java:306)
+	at org.teiid.dqp.internal.process.DataTierTupleSource$1.call(DataTierTupleSource.java:112)
+	at org.teiid.dqp.internal.process.DataTierTupleSource$1.call(DataTierTupleSource.java:108)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [rt.jar:1.8.0_101]
+	at org.teiid.dqp.internal.process.FutureWork.run(FutureWork.java:65)
+	at org.teiid.dqp.internal.process.DQPWorkContext.runInContext(DQPWorkContext.java:276)
+	at org.teiid.dqp.internal.process.ThreadReuseExecutor$RunnableWrapper.run(ThreadReuseExecutor.java:119)
+	at org.teiid.dqp.internal.process.ThreadReuseExecutor$3.run(ThreadReuseExecutor.java:210)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142) [rt.jar:1.8.0_101]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617) [rt.jar:1.8.0_101]
+	at java.lang.Thread.run(Thread.java:745) [rt.jar:1.8.0_101]
+Caused by: java.net.ConnectException: ConnectException invoking http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList: Connection refused
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method) [rt.jar:1.8.0_101]
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62) [rt.jar:1.8.0_101]
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45) [rt.jar:1.8.0_101]
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423) [rt.jar:1.8.0_101]
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.mapException(HTTPConduit.java:1347)
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.close(HTTPConduit.java:1331)
+	at org.apache.cxf.transport.AbstractConduit.close(AbstractConduit.java:56)
+	at org.apache.cxf.transport.http.HTTPConduit.close(HTTPConduit.java:633)
+	at org.apache.cxf.interceptor.MessageSenderInterceptor$MessageSenderEndingInterceptor.handleMessage(MessageSenderInterceptor.java:62)
+	... 27 more
+Caused by: java.net.ConnectException: Connection refused
+	at java.net.PlainSocketImpl.socketConnect(Native Method) [rt.jar:1.8.0_101]
+	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:350) [rt.jar:1.8.0_101]
+	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:206) [rt.jar:1.8.0_101]
+	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:188) [rt.jar:1.8.0_101]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392) [rt.jar:1.8.0_101]
+	at java.net.Socket.connect(Socket.java:589) [rt.jar:1.8.0_101]
+	at sun.net.NetworkClient.doConnect(NetworkClient.java:175) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.openServer(HttpClient.java:432) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.openServer(HttpClient.java:527) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.<init>(HttpClient.java:211) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.New(HttpClient.java:308) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.New(HttpClient.java:326) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.getNewHttpClient(HttpURLConnection.java:1169) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.plainConnect0(HttpURLConnection.java:1105) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnection.java:999) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.connect(HttpURLConnection.java:933) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1513) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1441) [rt.jar:1.8.0_101]
+	at java.net.HttpURLConnection.getResponseCode(HttpURLConnection.java:480) [rt.jar:1.8.0_101]
+	at org.apache.cxf.transport.http.URLConnectionHTTPConduit$URLConnectionWrappedOutputStream.getResponseCode(URLConnectionHTTPConduit.java:266)
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.handleResponseInternal(HTTPConduit.java:1550)
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.handleResponse(HTTPConduit.java:1520)
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.close(HTTPConduit.java:1318)
+	... 30 more
+
+[0m[31m18:33:08,758 ERROR [org.teiid.CONNECTOR] (Worker1_QueryProcessorQueue32) Connector worker process failed for atomic-request=JMOijWNvLC2R.0.3.11: javax.ws.rs.client.ClientException: java.net.ConnectException: ConnectException invoking http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList: Connection refused
+	at org.apache.cxf.jaxrs.client.AbstractClient.checkClientException(AbstractClient.java:583)
+	at org.apache.cxf.jaxrs.client.AbstractClient.preProcessResult(AbstractClient.java:565)
+	at org.apache.cxf.jaxrs.client.WebClient.doResponse(WebClient.java:1111)
+	at org.apache.cxf.jaxrs.client.WebClient.doChainedInvocation(WebClient.java:1068)
+	at org.apache.cxf.jaxrs.client.WebClient.doInvoke(WebClient.java:878)
+	at org.apache.cxf.jaxrs.client.WebClient.doInvoke(WebClient.java:852)
+	at org.apache.cxf.jaxrs.client.WebClient.invoke(WebClient.java:312)
+	at org.teiid.resource.adapter.ws.WSConnectionImpl$HttpDispatch.invoke(WSConnectionImpl.java:204)
+	at org.teiid.resource.adapter.ws.WSConnectionImpl$HttpDispatch.invoke(WSConnectionImpl.java:123)
+	at org.teiid.translator.ws.BinaryWSProcedureExecution.execute(BinaryWSProcedureExecution.java:156)
+	at org.teiid.dqp.internal.datamgr.ConnectorWorkItem.execute(ConnectorWorkItem.java:364)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) [rt.jar:1.8.0_101]
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) [rt.jar:1.8.0_101]
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) [rt.jar:1.8.0_101]
+	at java.lang.reflect.Method.invoke(Method.java:498) [rt.jar:1.8.0_101]
+	at org.teiid.dqp.internal.datamgr.ConnectorManager$1.invoke(ConnectorManager.java:211)
+	at com.sun.proxy.$Proxy103.execute(Unknown Source)
+	at org.teiid.dqp.internal.process.DataTierTupleSource.getResults(DataTierTupleSource.java:306)
+	at org.teiid.dqp.internal.process.DataTierTupleSource$1.call(DataTierTupleSource.java:112)
+	at org.teiid.dqp.internal.process.DataTierTupleSource$1.call(DataTierTupleSource.java:108)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [rt.jar:1.8.0_101]
+	at org.teiid.dqp.internal.process.FutureWork.run(FutureWork.java:65)
+	at org.teiid.dqp.internal.process.DQPWorkContext.runInContext(DQPWorkContext.java:276)
+	at org.teiid.dqp.internal.process.ThreadReuseExecutor$RunnableWrapper.run(ThreadReuseExecutor.java:119)
+	at org.teiid.dqp.internal.process.ThreadReuseExecutor$3.run(ThreadReuseExecutor.java:210)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142) [rt.jar:1.8.0_101]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617) [rt.jar:1.8.0_101]
+	at java.lang.Thread.run(Thread.java:745) [rt.jar:1.8.0_101]
+Caused by: java.net.ConnectException: ConnectException invoking http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList: Connection refused
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method) [rt.jar:1.8.0_101]
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62) [rt.jar:1.8.0_101]
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45) [rt.jar:1.8.0_101]
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423) [rt.jar:1.8.0_101]
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.mapException(HTTPConduit.java:1347)
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.close(HTTPConduit.java:1331)
+	at org.apache.cxf.transport.AbstractConduit.close(AbstractConduit.java:56)
+	at org.apache.cxf.transport.http.HTTPConduit.close(HTTPConduit.java:633)
+	at org.apache.cxf.interceptor.MessageSenderInterceptor$MessageSenderEndingInterceptor.handleMessage(MessageSenderInterceptor.java:62)
+	at org.apache.cxf.phase.PhaseInterceptorChain.doIntercept(PhaseInterceptorChain.java:272)
+	at org.apache.cxf.jaxrs.client.AbstractClient.doRunInterceptorChain(AbstractClient.java:642)
+	at org.apache.cxf.jaxrs.client.WebClient.doChainedInvocation(WebClient.java:1067)
+	... 24 more
+Caused by: java.net.ConnectException: Connection refused
+	at java.net.PlainSocketImpl.socketConnect(Native Method) [rt.jar:1.8.0_101]
+	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:350) [rt.jar:1.8.0_101]
+	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:206) [rt.jar:1.8.0_101]
+	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:188) [rt.jar:1.8.0_101]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392) [rt.jar:1.8.0_101]
+	at java.net.Socket.connect(Socket.java:589) [rt.jar:1.8.0_101]
+	at sun.net.NetworkClient.doConnect(NetworkClient.java:175) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.openServer(HttpClient.java:432) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.openServer(HttpClient.java:527) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.<init>(HttpClient.java:211) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.New(HttpClient.java:308) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.New(HttpClient.java:326) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.getNewHttpClient(HttpURLConnection.java:1169) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.plainConnect0(HttpURLConnection.java:1105) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnection.java:999) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.connect(HttpURLConnection.java:933) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1513) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1441) [rt.jar:1.8.0_101]
+	at java.net.HttpURLConnection.getResponseCode(HttpURLConnection.java:480) [rt.jar:1.8.0_101]
+	at org.apache.cxf.transport.http.URLConnectionHTTPConduit$URLConnectionWrappedOutputStream.getResponseCode(URLConnectionHTTPConduit.java:266)
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.handleResponseInternal(HTTPConduit.java:1550)
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.handleResponse(HTTPConduit.java:1520)
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.close(HTTPConduit.java:1318)
+	... 30 more
+
+[0m[0m18:33:08,766 INFO  [org.teiid.COMMAND_LOG] (Worker2_QueryProcessorQueue33) 	ERROR USER COMMAND:	endTime=2016-08-24 18:33:08.766	requestID=JMOijWNvLC2R.0	txID=null	sessionID=JMOijWNvLC2R	principal=teiidUser@teiid-security	vdbName=webservice	vdbVersion=1	finalRowCount=null
+[0m[31m18:33:08,766 ERROR [org.teiid.PROCESSOR] (Worker2_QueryProcessorQueue33) TEIID30019 Unexpected exception for request JMOijWNvLC2R.0: javax.ws.rs.client.ClientException: java.net.ConnectException: ConnectException invoking http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList: Connection refused
+	at org.apache.cxf.jaxrs.client.AbstractClient.checkClientException(AbstractClient.java:583)
+	at org.apache.cxf.jaxrs.client.AbstractClient.preProcessResult(AbstractClient.java:565)
+	at org.apache.cxf.jaxrs.client.WebClient.doResponse(WebClient.java:1111)
+	at org.apache.cxf.jaxrs.client.WebClient.doChainedInvocation(WebClient.java:1068)
+	at org.apache.cxf.jaxrs.client.WebClient.doInvoke(WebClient.java:878)
+	at org.apache.cxf.jaxrs.client.WebClient.doInvoke(WebClient.java:852)
+	at org.apache.cxf.jaxrs.client.WebClient.invoke(WebClient.java:312)
+	at org.teiid.resource.adapter.ws.WSConnectionImpl$HttpDispatch.invoke(WSConnectionImpl.java:204)
+	at org.teiid.resource.adapter.ws.WSConnectionImpl$HttpDispatch.invoke(WSConnectionImpl.java:123)
+	at org.teiid.translator.ws.BinaryWSProcedureExecution.execute(BinaryWSProcedureExecution.java:156)
+	at org.teiid.dqp.internal.datamgr.ConnectorWorkItem.execute(ConnectorWorkItem.java:364)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) [rt.jar:1.8.0_101]
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) [rt.jar:1.8.0_101]
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) [rt.jar:1.8.0_101]
+	at java.lang.reflect.Method.invoke(Method.java:498) [rt.jar:1.8.0_101]
+	at org.teiid.dqp.internal.datamgr.ConnectorManager$1.invoke(ConnectorManager.java:211)
+	at com.sun.proxy.$Proxy103.execute(Unknown Source)
+	at org.teiid.dqp.internal.process.DataTierTupleSource.getResults(DataTierTupleSource.java:306)
+	at org.teiid.dqp.internal.process.DataTierTupleSource$1.call(DataTierTupleSource.java:112)
+	at org.teiid.dqp.internal.process.DataTierTupleSource$1.call(DataTierTupleSource.java:108)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [rt.jar:1.8.0_101]
+	at org.teiid.dqp.internal.process.FutureWork.run(FutureWork.java:65)
+	at org.teiid.dqp.internal.process.DQPWorkContext.runInContext(DQPWorkContext.java:276)
+	at org.teiid.dqp.internal.process.ThreadReuseExecutor$RunnableWrapper.run(ThreadReuseExecutor.java:119)
+	at org.teiid.dqp.internal.process.ThreadReuseExecutor$3.run(ThreadReuseExecutor.java:210)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142) [rt.jar:1.8.0_101]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617) [rt.jar:1.8.0_101]
+	at java.lang.Thread.run(Thread.java:745) [rt.jar:1.8.0_101]
+Caused by: java.net.ConnectException: ConnectException invoking http://localhost:8080/CustomerRESTWebSvc/MyRESTApplication/customerList: Connection refused
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method) [rt.jar:1.8.0_101]
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62) [rt.jar:1.8.0_101]
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45) [rt.jar:1.8.0_101]
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423) [rt.jar:1.8.0_101]
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.mapException(HTTPConduit.java:1347)
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.close(HTTPConduit.java:1331)
+	at org.apache.cxf.transport.AbstractConduit.close(AbstractConduit.java:56)
+	at org.apache.cxf.transport.http.HTTPConduit.close(HTTPConduit.java:633)
+	at org.apache.cxf.interceptor.MessageSenderInterceptor$MessageSenderEndingInterceptor.handleMessage(MessageSenderInterceptor.java:62)
+	at org.apache.cxf.phase.PhaseInterceptorChain.doIntercept(PhaseInterceptorChain.java:272)
+	at org.apache.cxf.jaxrs.client.AbstractClient.doRunInterceptorChain(AbstractClient.java:642)
+	at org.apache.cxf.jaxrs.client.WebClient.doChainedInvocation(WebClient.java:1067)
+	... 24 more
+Caused by: java.net.ConnectException: Connection refused
+	at java.net.PlainSocketImpl.socketConnect(Native Method) [rt.jar:1.8.0_101]
+	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:350) [rt.jar:1.8.0_101]
+	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:206) [rt.jar:1.8.0_101]
+	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:188) [rt.jar:1.8.0_101]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392) [rt.jar:1.8.0_101]
+	at java.net.Socket.connect(Socket.java:589) [rt.jar:1.8.0_101]
+	at sun.net.NetworkClient.doConnect(NetworkClient.java:175) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.openServer(HttpClient.java:432) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.openServer(HttpClient.java:527) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.<init>(HttpClient.java:211) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.New(HttpClient.java:308) [rt.jar:1.8.0_101]
+	at sun.net.www.http.HttpClient.New(HttpClient.java:326) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.getNewHttpClient(HttpURLConnection.java:1169) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.plainConnect0(HttpURLConnection.java:1105) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnection.java:999) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.connect(HttpURLConnection.java:933) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1513) [rt.jar:1.8.0_101]
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1441) [rt.jar:1.8.0_101]
+	at java.net.HttpURLConnection.getResponseCode(HttpURLConnection.java:480) [rt.jar:1.8.0_101]
+	at org.apache.cxf.transport.http.URLConnectionHTTPConduit$URLConnectionWrappedOutputStream.getResponseCode(URLConnectionHTTPConduit.java:266)
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.handleResponseInternal(HTTPConduit.java:1550)
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.handleResponse(HTTPConduit.java:1520)
+	at org.apache.cxf.transport.http.HTTPConduit$WrappedOutputStream.close(HTTPConduit.java:1318)
+	... 30 more
+
+[0m[0m18:33:08,789 INFO  [org.teiid.COMMAND_LOG] (Worker2_QueryProcessorQueue33) 	END USER COMMAND:	endTime=2016-08-24 18:33:08.789	requestID=JMOijWNvLC2R.0	txID=null	sessionID=JMOijWNvLC2R	principal=teiidUser@teiid-security	vdbName=webservice	vdbVersion=1	finalRowCount=0

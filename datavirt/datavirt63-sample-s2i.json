@@ -8,10 +8,10 @@
             "tags": "eap,javaee,java,jboss,xpaas",
             "version": "1.4.0"
         },
-        "name": "datavirt63-basic-s2i"
+        "name": "datavirt63-sample-s2i"
     },
     "labels": {
-        "template": "datavirt63-basic-s2i",
+        "template": "datavirt63-sample-s2i",
         "xpaas": "1.4.0"
     },
     "parameters": [
@@ -36,7 +36,7 @@
         {
             "description": "Git source URI for application",
             "name": "SOURCE_REPOSITORY_URL",
-            "value": "https://github.com/bdecoste/jdv-test",
+            "value": "https://github.com/bdecoste/jdv-sample",
             "required": true
         },
         {
@@ -54,13 +54,13 @@
         {
             "description": "List of directories from which archives will be copied into the deployment folder.  If unspecified, all archives in /target will be copied.",
             "name": "ARTIFACT_DIR",
-            "value": "webservices-as-a-datasource/target,hibernate-on-top-of-teiid/target,jdg-local-cache/target",
+            "value": "webservices-as-a-datasource/target,hibernate-on-top-of-teiid/target",
             "required": false
         },
         {
             "description": "Database JNDI name used by application to resolve the datasource, e.g. java:/jboss/datasources/postgresql",
             "name": "DB_JNDI",
-            "value": "java:jboss/datasources/TodoListDS",
+            "value": "java:/account-ds",
             "required": false
         },
         {
@@ -145,19 +145,19 @@
         {
             "description": "Comma-delimted list of .sql files to import into the database",
             "name": "POSTGRESQL_IMPORT_SQL",
-            "value": "",
+            "value": "injected/injected-files/customer-schema-pg.sql",
             "required": false
         },
         {
             "description": "Comma delimited list of properties files from ConfigMap volumes containing datasource properties",
             "name": "DATASOURCE_CONFIG_MAP",
-            "value": "",
+            "value": "/etc/jdv-sample/jdv-sample.properties",
             "required": false
         },
         {
             "description": "Path to directory or tarball injected from secondary image",
             "name": "DATAVIRT_INJECTED_MODULES",
-            "value": "",
+            "value": "injected/injected-modules",
             "required": false
         }
     ],
@@ -309,7 +309,7 @@
                             "from": {
                                 "kind": "ImageStreamTag",
                                 "namespace": "${IMAGE_STREAM_NAMESPACE}",
-                                "name": "jdv-test:latest"
+                                "name": "jdv-sample:latest"
                             },
                             "paths": [
                                 {
@@ -430,8 +430,8 @@
                                 "imagePullPolicy": "Always",
                                 "volumeMounts": [
                                     {
-                                        "name": "jdv-test-volume",
-                                        "mountPath": "/etc/jdv-test",
+                                        "name": "jdv-sample-volume",
+                                        "mountPath": "/etc/jdv-sample",
                                         "readOnly": true
                                     }
                                 ],
@@ -546,9 +546,9 @@
                         ],
                         "volumes": [
                             {
-                                "name": "jdv-test-volume",
+                                "name": "jdv-sample-volume",
                                 "configMap": {
-                                    "name": "jdv-test-configmap"
+                                    "name": "jdv-sample-configmap"
                                 }
                             }
                         ]
