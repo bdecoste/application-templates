@@ -156,8 +156,32 @@
         },
         {
             "description": "Path to directory or tarball injected from secondary image",
-            "name": "DATAVIRT_INJECTED_MODULES",
+            "name": "INJECTED_MODULES",
             "value": "injected/injected-modules",
+            "required": false
+        },
+        {
+            "description": "Password for teiidUser",
+            "name": "ADMINUSER_PASSWORD",
+            "value": "",
+            "required": false
+        },
+        {
+            "description": "Password for teiidUser",
+            "name": "TEIIDUSER_PASSWORD",
+            "value": "",
+            "required": false
+        },
+        {
+            "description": "Password for teiidUser",
+            "name": "DASHBOARDADMIN_PASSWORD",
+            "value": "",
+            "required": false
+        },
+        {
+            "description": "Password for teiidUser",
+            "name": "MODESHAPEUSER_PASSWORD",
+            "value": "",
             "required": false
         }
     ],
@@ -343,8 +367,8 @@
                                 "value": "${CONTEXT_DIR}"
                             },
                             {
-                                "name": "DATAVIRT_INJECTED_MODULES",
-                                "value": "${DATAVIRT_INJECTED_MODULES}"
+                                "name": "INJECTED_MODULES",
+                                "value": "${INJECTED_MODULES}"
                             }
                         ]
                     }
@@ -539,8 +563,23 @@
                                     {
                                         "name": "DATASOURCE_CONFIG_MAP",
                                         "value": "${DATASOURCE_CONFIG_MAP}"
+                                    },
+                                    {
+                                        "name": "ADMINUSER_PASSWORD",
+                                        "value": "${ADMINUSER_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "TEIIDUSER_PASSWORD",
+                                        "value": "${TEIIDUSER_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "DASHBOARDADMIN_PASSWORD",
+                                        "value": "${DASHBOARDADMIN_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "MODESHAPEUSER_PASSWORD",
+                                        "value": "${MODESHAPEUSER_PASSWORD}"
                                     }
-
                                 ]
                             }
                         ],
