@@ -457,6 +457,11 @@
                                         "name": "jdv-sample-volume",
                                         "mountPath": "/etc/jdv-sample",
                                         "readOnly": true
+                                    },
+                                    {
+                                        "name": "teiid-keystore-volume",
+                                        "mountPath": "/etc/teiid-secret-volume",
+                                        "readOnly": true
                                     }
                                 ],
                                 "livenessProbe": {
@@ -588,6 +593,12 @@
                                 "name": "jdv-sample-volume",
                                 "configMap": {
                                     "name": "jdv-sample-configmap"
+                                }
+                            },
+                            {
+                                "name": "teiid-keystore-volume",
+                                "secret": {
+                                    "secretName": "datavirt-app-secret"
                                 }
                             }
                         ]
