@@ -183,6 +183,24 @@
             "name": "MODESHAPEUSER_PASSWORD",
             "value": "",
             "required": false
+        },
+         {
+            "description": "Keystore file for jdbc secure transport",
+            "name": "DATAVIRT_TRANSPORT_KEYSTORE",
+            "value": "keystore.jks",
+            "required": false
+        },
+         {
+            "description": "Alias for jdbc secure transport keystore",
+            "name": "DATAVIRT_TRANSPORT_KEYSTORE_ALIAS",
+            "value": "jboss",
+            "required": false
+        },
+         {
+            "description": "Password for jdbc secure transport keystore",
+            "name": "DATAVIRT_TRANSPORT_KEYSTORE_PASSWORD",
+            "value": "mykeystorepass",
+            "required": false
         }
     ],
     "objects": [
@@ -226,6 +244,30 @@
             },
             "metadata": {
                 "name": "jdbc-${APPLICATION_NAME}",
+                "labels": {
+                    "application": "${APPLICATION_NAME}"
+                },
+                "annotations": {
+                    "description": "The Teiid jdbc port."
+                }
+            }
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "spec": {
+                "ports": [
+                    {
+                        "port": 31443,
+                        "targetPort": 31443
+                    }
+                ],
+                "selector": {
+                    "deploymentConfig": "${APPLICATION_NAME}"
+                }
+            },
+            "metadata": {
+                "name": "securejdbc-${APPLICATION_NAME}",
                 "labels": {
                     "application": "${APPLICATION_NAME}"
                 },
@@ -502,6 +544,11 @@
                                         "name": "jdbc",
                                         "containerPort": 31000,
                                         "protocol": "TCP"
+                                    },
+                                    {
+                                        "name": "secure-jdbc",
+                                        "containerPort": 31443,
+                                        "protocol": "TCP"
                                     }
                                 ],
                                 "env": [
@@ -584,6 +631,18 @@
                                     {
                                         "name": "MODESHAPEUSER_PASSWORD",
                                         "value": "${MODESHAPEUSER_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "DATAVIRT_TRANSPORT_KEYSTORE",
+                                        "value": "/etc/teiid-secret-volume/${DATAVIRT_TRANSPORT_KEYSTORE}"
+                                    },
+                                    {
+                                        "name": "DATAVIRT_TRANSPORT_KEYSTORE_ALIAS",
+                                        "value": "${DATAVIRT_TRANSPORT_KEYSTORE_ALIAS}"
+                                    },
+                                    {
+                                        "name": "DATAVIRT_TRANSPORT_KEYSTORE_PASSWORD",
+                                        "value": "${DATAVIRT_TRANSPORT_KEYSTORE_PASSWORD}"
                                     }
                                 ]
                             }
