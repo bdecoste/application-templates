@@ -144,8 +144,8 @@
         },
         {
             "description": "Comma-delimted list of .sql files to import into the database",
-            "name": "POSTGRESQL_IMPORT_SQL",
-            "value": "injected/injected-files/customer-schema-pg.sql",
+            "name": "IMPORT_SQL",
+            "value": "injected/injected-files/import-postgresql.sh",
             "required": false
         },
         {
@@ -609,8 +609,8 @@
                                         "value": "${JGROUPS_CLUSTER_PASSWORD}"
                                     },
                                     {
-                                        "name": "POSTGRESQL_IMPORT_SQL",
-                                        "value": "${POSTGRESQL_IMPORT_SQL}"
+                                        "name": "IMPORT_SQL",
+                                        "value": "${IMPORT_SQL}"
                                     },
                                     {
                                         "name": "DATASOURCE_CONFIG_MAP",
