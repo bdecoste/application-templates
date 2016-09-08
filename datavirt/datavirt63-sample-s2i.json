@@ -151,13 +151,7 @@
         {
             "description": "Comma delimited list of properties files from ConfigMap volumes containing datasource properties",
             "name": "DATASOURCE_CONFIG_MAP",
-            "value": "/etc/jdv-sample/jdv-sample.properties",
-            "required": false
-        },
-        {
-            "description": "Path to directory or tarball injected from secondary image",
-            "name": "INJECTED_MODULES",
-            "value": "injected/injected-modules",
+            "value": "/etc/jdv-sample/datasources.properties",
             "required": false
         },
         {
@@ -375,16 +369,25 @@
                             "from": {
                                 "kind": "ImageStreamTag",
                                 "namespace": "${IMAGE_STREAM_NAMESPACE}",
-                                "name": "jdv-sample:latest"
+                                "name": "jdv-sample-eap:1.0"
                             },
                             "paths": [
                                 {
-                                    "destinationDir": "injected",
-                                    "sourcePath": "/tmp/injected-files"
-                                },
+                                    "destinationDir": "injected-eap",
+                                    "sourcePath": "/injected"
+                                }
+                             ]
+                        },
+                        {
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "namespace": "${IMAGE_STREAM_NAMESPACE}",
+                                "name": "jdv-sample-teiid:1.0"
+                            },
+                            "paths": [
                                 {
-                                    "destinationDir": "injected",
-                                    "sourcePath": "/tmp/injected-modules"
+                                    "destinationDir": "injected-teiid",
+                                    "sourcePath": "/injected"
                                 }
                              ]
                         }
@@ -409,8 +412,8 @@
                                 "value": "${CONTEXT_DIR}"
                             },
                             {
-                                "name": "INJECTED_MODULES",
-                                "value": "${INJECTED_MODULES}"
+                                "name": "INJECTED_DIRECTORIES",
+                                "value": "injected-eap/injected,injected-teiid/injected"
                             }
                         ]
                     }
