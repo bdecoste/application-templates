@@ -178,24 +178,43 @@
             "value": "",
             "required": false
         },
-         {
+        {
             "description": "Keystore file for jdbc secure transport",
             "name": "DATAVIRT_TRANSPORT_KEYSTORE",
             "value": "keystore.jks",
             "required": false
         },
-         {
+        {
             "description": "Alias for jdbc secure transport keystore",
             "name": "DATAVIRT_TRANSPORT_KEYSTORE_ALIAS",
             "value": "jboss",
             "required": false
         },
-         {
+        {
             "description": "Password for jdbc secure transport keystore",
             "name": "DATAVIRT_TRANSPORT_KEYSTORE_PASSWORD",
             "value": "mykeystorepass",
             "required": false
+        },
+        {
+            "description": "Comma delimited list of usernames to add",
+            "name": "DATAVIRT_USERS",
+            "value": "restUser",
+            "required": false
+        },
+        {
+            "description": "Comma delimited list of passwords corresponding to DATAVIRT_USERS",
+            "name": "DATAVIRT_USER_PASSWORDS",
+            "value": "P@ssword1",
+            "required": false
+        },
+        {
+            "description": "Comma delimited list of groups/roles corresponding to DATAVIRT_USERS",
+            "name": "DATAVIRT_USER_GROUPS",
+            "value": "rest",
+            "required": false
         }
+
     ],
     "objects": [
         {
@@ -637,6 +656,18 @@
                                     {
                                         "name": "DATAVIRT_TRANSPORT_KEYSTORE_PASSWORD",
                                         "value": "${DATAVIRT_TRANSPORT_KEYSTORE_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "DATAVIRT_USERS",
+                                        "value": "${DATAVIRT_USERS}"
+                                    },
+                                    {
+                                        "name": "DATAVIRT_USER_PASSWORDS",
+                                        "value": "${DATAVIRT_USER_PASSWORDS}"
+                                    },
+                                    {
+                                        "name": "DATAVIRT_USER_GROUPS",
+                                        "value": "${DATAVIRT_USER_GROUPS}"
                                     }
                                 ]
                             }
