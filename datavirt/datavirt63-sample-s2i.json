@@ -145,7 +145,7 @@
         {
             "description": "Comma-delimted list of .sql files to import into the database",
             "name": "IMPORT_SQL",
-            "value": "injected/injected-files/import-postgresql.sh",
+            "value": "injected-eap/injected-files/import-postgresql.sh",
             "required": false
         },
         {
@@ -369,25 +369,16 @@
                             "from": {
                                 "kind": "ImageStreamTag",
                                 "namespace": "${IMAGE_STREAM_NAMESPACE}",
-                                "name": "jdv-sample-eap:1.0"
+                                "name": "jdv-sample:1.0"
                             },
                             "paths": [
                                 {
-                                    "destinationDir": "injected-eap",
-                                    "sourcePath": "/injected"
-                                }
-                             ]
-                        },
-                        {
-                            "from": {
-                                "kind": "ImageStreamTag",
-                                "namespace": "${IMAGE_STREAM_NAMESPACE}",
-                                "name": "jdv-sample-teiid:1.0"
-                            },
-                            "paths": [
+                                    "destinationDir": ".",
+                                    "sourcePath": "/injected-eap"
+                                },
                                 {
-                                    "destinationDir": "injected-teiid",
-                                    "sourcePath": "/injected"
+                                    "destinationDir": ".",
+                                    "sourcePath": "/injected-jdv"
                                 }
                              ]
                         }
@@ -413,7 +404,7 @@
                             },
                             {
                                 "name": "INJECTED_DIRECTORIES",
-                                "value": "injected-eap/injected,injected-teiid/injected"
+                                "value": "injected-eap,injected-jdv"
                             }
                         ]
                     }
