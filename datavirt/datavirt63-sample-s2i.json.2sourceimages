@@ -57,12 +57,6 @@
             "value": "webservices-as-a-datasource/target,hibernate-on-top-of-teiid/target",
             "required": false
         },
-         {
-            "description": "List of directories from which VDBS will be copied into the deployment folder.  If unspecified, all archives in source will be copied.",
-            "name": "VDB_DIR",
-            "value": "",
-            "required": false
-        },
         {
             "description": "Database JNDI name used by application to resolve the datasource, e.g. java:/jboss/datasources/postgresql",
             "name": "DB_JNDI",
@@ -184,43 +178,24 @@
             "value": "",
             "required": false
         },
-        {
+         {
             "description": "Keystore file for jdbc secure transport",
             "name": "DATAVIRT_TRANSPORT_KEYSTORE",
             "value": "keystore.jks",
             "required": false
         },
-        {
+         {
             "description": "Alias for jdbc secure transport keystore",
             "name": "DATAVIRT_TRANSPORT_KEYSTORE_ALIAS",
             "value": "jboss",
             "required": false
         },
-        {
+         {
             "description": "Password for jdbc secure transport keystore",
             "name": "DATAVIRT_TRANSPORT_KEYSTORE_PASSWORD",
             "value": "mykeystorepass",
             "required": false
-        },
-        {
-            "description": "Comma delimited list of usernames to add",
-            "name": "DATAVIRT_USERS",
-            "value": "restUser",
-            "required": false
-        },
-        {
-            "description": "Comma delimited list of passwords corresponding to DATAVIRT_USERS",
-            "name": "DATAVIRT_USER_PASSWORDS",
-            "value": "P@ssword1",
-            "required": false
-        },
-        {
-            "description": "Comma delimited list of groups/roles corresponding to DATAVIRT_USERS",
-            "name": "DATAVIRT_USER_GROUPS",
-            "value": "rest",
-            "required": false
         }
-
     ],
     "objects": [
         {
@@ -394,16 +369,25 @@
                             "from": {
                                 "kind": "ImageStreamTag",
                                 "namespace": "${IMAGE_STREAM_NAMESPACE}",
-                                "name": "jdv-sample:1.0"
+                                "name": "jdv-sample-eap:1.0"
                             },
                             "paths": [
                                 {
-                                    "destinationDir": ".",
-                                    "sourcePath": "/injected-eap"
-                                },
+                                    "destinationDir": "injected-eap",
+                                    "sourcePath": "/injected"
+                                }
+                             ]
+                        },
+                        {
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "namespace": "${IMAGE_STREAM_NAMESPACE}",
+                                "name": "jdv-sample-teiid:1.0"
+                            },
+                            "paths": [
                                 {
-                                    "destinationDir": ".",
-                                    "sourcePath": "/injected-jdv"
+                                    "destinationDir": "injected-teiid",
+                                    "sourcePath": "/injected"
                                 }
                              ]
                         }
@@ -422,10 +406,6 @@
                             {
                                 "name": "ARTIFACT_DIR",
                                 "value": "${ARTIFACT_DIR}"
-                            },
-                            {
-                                "name": "VDB_DIR",
-                                "value": "${VDB_DIR}"
                             },
                             {
                                 "name": "CONTEXT_DIR",
@@ -666,18 +646,6 @@
                                     {
                                         "name": "DATAVIRT_TRANSPORT_KEYSTORE_PASSWORD",
                                         "value": "${DATAVIRT_TRANSPORT_KEYSTORE_PASSWORD}"
-                                    },
-                                    {
-                                        "name": "DATAVIRT_USERS",
-                                        "value": "${DATAVIRT_USERS}"
-                                    },
-                                    {
-                                        "name": "DATAVIRT_USER_PASSWORDS",
-                                        "value": "${DATAVIRT_USER_PASSWORDS}"
-                                    },
-                                    {
-                                        "name": "DATAVIRT_USER_GROUPS",
-                                        "value": "${DATAVIRT_USER_GROUPS}"
                                     }
                                 ]
                             }
