@@ -432,7 +432,7 @@
                                 "value": "${CONTEXT_DIR}"
                             },
                             {
-                                "name": "INJECTED_DIRECTORIES",
+                                "name": "CUSTOM_INSTALL_DIRECTORIES",
                                 "value": "injected-eap,injected-jdv"
                             }
                         ]
@@ -571,6 +571,11 @@
                                     {
                                         "name": "secure-jdbc",
                                         "containerPort": 31443,
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "name": "management",
+                                        "containerPort": 9999,
                                         "protocol": "TCP"
                                     }
                                 ],

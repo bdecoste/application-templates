@@ -22,13 +22,13 @@
                 "dockerImageRepository": "registry.example.com:5000/jboss-datavirt-6/datavirt63-openshift",
                 "tags": [
                     {
-                        "name": "1.4",
+                        "name": "1.0",
                         "annotations": {
                             "description": "datavirt",
                             "iconClass": "icon-keycloak",
                             "tags": "datavirt",
                             "supports":"datavirt:6.3",
-                            "version": "1.4"
+                            "version": "1.0"
                         }
                     }
                 ]
