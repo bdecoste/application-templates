@@ -36,19 +36,19 @@
         {
             "description": "Git source URI for application",
             "name": "SOURCE_REPOSITORY_URL",
-            "value": "https://github.com/bdecoste/datavirt-quickstarts",
+            "value": "",
             "required": true
         },
         {
             "description": "Git branch/tag reference",
             "name": "SOURCE_REPOSITORY_REF",
-            "value": "master",
+            "value": "",
             "required": false
         },
         {
             "description": "List of directories from which archives will be copied into the deployment folder.  If unspecified, all archives in /target will be copied.",
             "name": "ARTIFACT_DIR",
-            "value": "webservices-as-a-datasource/target,hibernate-on-top-of-teiid/target,jdg-local-cache/target",
+            "value": "",
             "required": false
         },
         {
