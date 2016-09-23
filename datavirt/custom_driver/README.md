@@ -1,8 +1,6 @@
-#JDV with two external datasources
-This example shows how to deploy JDV with 2 external datasources:
- * Postgresql: exposed as an OpenShift Service/Endpoint
- * Oracle: exposed directly
+#JDV with Custom Driver/Module (teiid)
+This example shows how to deploy JDV with a custom driver
 
 ##Structure
- * ose-dba: The source required to build the source/injected image used to configure the Oracle driver module and the datasource definitions to be exposed as a Secret
+ * ose-dba: The source required to build the source/injected image used to configure the custome driver module and the driver configuration
  * ose-cicd: The template used to deploy JDV

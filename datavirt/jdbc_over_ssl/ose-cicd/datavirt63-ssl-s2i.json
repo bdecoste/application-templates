@@ -4,14 +4,14 @@
     "metadata": {
         "annotations": {
             "iconClass": "icon-jboss",
-            "description": "Application template for deploying JDV with customer driver/module (teiid)",
+            "description": "Application template for deploying JDV exposing jdbc over ssl",
             "tags": "jdv,datavirt,java,jboss,xpaas",
             "version": "1.0.0"
         },
-        "name": "datavirt63-driver-s2i"
+        "name": "datavirt63-ssl-s2i"
     },
     "labels": {
-        "template": "datavirt63-driver-s2i",
+        "template": "datavirt63-ssl-s2i",
         "xpaas": "1.0.0"
     },
     "parameters": [
@@ -86,10 +86,22 @@
             "required": true
         },
         {
-            "description": "Namespace for source/injected extensions image stream",
-            "name": "EXTENSIONS_NAMESPACE",
-            "value": "",
-            "required": true
+            "description": "Keystore file for jdbc secure transport",
+            "name": "DATAVIRT_TRANSPORT_KEYSTORE",
+            "value": "keystore.jks",
+            "required": false
+        },
+        {
+            "description": "Alias for jdbc secure transport keystore",
+            "name": "DATAVIRT_TRANSPORT_KEYSTORE_ALIAS",
+            "value": "jboss",
+            "required": false
+        },
+        {
+            "description": "Password for jdbc secure transport keystore",
+            "name": "DATAVIRT_TRANSPORT_KEYSTORE_PASSWORD",
+            "value": "mykeystorepass",
+            "required": false
         }
     ],
     "objects": [
@@ -138,6 +150,30 @@
                 },
                 "annotations": {
                     "description": "The Teiid jdbc port."
+                }
+            }
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "spec": {
+                "ports": [
+                    {
+                        "port": 31443,
+                        "targetPort": 31443
+                    }
+                ],
+                "selector": {
+                    "deploymentConfig": "${APPLICATION_NAME}"
+                }
+            },
+            "metadata": {
+                "name": "securejdbc-${APPLICATION_NAME}",
+                "labels": {
+                    "application": "${APPLICATION_NAME}"
+                },
+                "annotations": {
+                    "description": "The Teiid jdbc over ssl port."
                 }
             }
         },
@@ -251,22 +287,7 @@
                     "git": {
                         "uri": "${SOURCE_REPOSITORY_URL}",
                         "ref": "${SOURCE_REPOSITORY_REF}"
-                    },
-                    "images": [
-                        {
-                            "from": {
-                                "kind": "ImageStreamTag",
-                                "namespace": "${EXTENSIONS_NAMESPACE}",
-                                "name": "jdv-extensions:1.0"
-                            },
-                            "paths": [
-                                {
-                                    "destinationDir": ".",
-                                    "sourcePath": "/injected"
-                                }
-                             ]
-                        }
-                    ]
+                    }
                 },
                 "strategy": {
                     "type": "Source",
@@ -281,10 +302,6 @@
                             {
                                 "name": "ARTIFACT_DIR",
                                 "value": "${ARTIFACT_DIR}"
-                            },
-                            {
-                                "name": "CUSTOM_INSTALL_DIRECTORIES",
-                                "value": "injected"
                             }
                         ]
                     }
@@ -368,6 +385,13 @@
                                 "name": "${APPLICATION_NAME}",
                                 "image": "${APPLICATION_NAME}",
                                 "imagePullPolicy": "Always",
+                                "volumeMounts": [
+                                    {
+                                        "name": "jdv-keystore-volume",
+                                        "mountPath": "/etc/jdv-secret-volume",
+                                        "readOnly": true
+                                    }
+                                ],
                                 "livenessProbe": {
                                     "exec": {
                                         "command": [
@@ -406,6 +430,11 @@
                                         "name": "jdbc",
                                         "containerPort": 31000,
                                         "protocol": "TCP"
+                                    },
+                                    {
+                                        "name": "secure-jdbc",
+                                        "containerPort": 31443,
+                                        "protocol": "TCP"
                                     }
                                 ],
                                 "env": [
@@ -432,8 +461,28 @@
                                     {
                                         "name": "JGROUPS_CLUSTER_PASSWORD",
                                         "value": "${JGROUPS_CLUSTER_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "DATAVIRT_TRANSPORT_KEYSTORE",
+                                        "value": "/etc/jdv-secret-volume/${DATAVIRT_TRANSPORT_KEYSTORE}"
+                                    },
+                                    {
+                                        "name": "DATAVIRT_TRANSPORT_KEYSTORE_ALIAS",
+                                        "value": "${DATAVIRT_TRANSPORT_KEYSTORE_ALIAS}"
+                                    },
+                                    {
+                                        "name": "DATAVIRT_TRANSPORT_KEYSTORE_PASSWORD",
+                                        "value": "${DATAVIRT_TRANSPORT_KEYSTORE_PASSWORD}"
                                     }
                                 ]
+                            }
+                        ],
+                        "volumes": [
+                            {
+                                "name": "jdv-keystore-volume",
+                                "secret": {
+                                    "secretName": "datavirt-app-secret"
+                                }
                             }
                         ]
                     }
