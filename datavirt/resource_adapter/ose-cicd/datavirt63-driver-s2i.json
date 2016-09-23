@@ -4,14 +4,14 @@
     "metadata": {
         "annotations": {
             "iconClass": "icon-jboss",
-            "description": "Application template for deploying JDV with custom driver/module (teiid)",
+            "description": "Application template for deploying JDV with custom resourc adapter(s)",
             "tags": "jdv,datavirt,java,jboss,xpaas",
             "version": "1.0.0"
         },
-        "name": "datavirt63-driver-s2i"
+        "name": "datavirt63-ra-s2i"
     },
     "labels": {
-        "template": "datavirt63-driver-s2i",
+        "template": "datavirt63-ra-s2i",
         "xpaas": "1.0.0"
     },
     "parameters": [
