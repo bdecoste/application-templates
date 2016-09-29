@@ -209,22 +209,7 @@
                     "git": {
                         "uri": "${SOURCE_REPOSITORY_URL}",
                         "ref": "${SOURCE_REPOSITORY_REF}"
-                    },
-                    "images": [
-                        {
-                            "from": {
-                                "kind": "ImageStreamTag",
-                                "namespace": "${IMAGE_STREAM_NAMESPACE}",
-                                "name": "jdv-extensions:1.0"
-                            },
-                            "paths": [
-                                {
-                                    "destinationDir": ".",
-                                    "sourcePath": "/injected"
-                                }
-                             ]
-                        }
-                    ]
+                    }
                 },
                 "strategy": {
                     "type": "Source",
@@ -239,10 +224,6 @@
                             {
                                 "name": "ARTIFACT_DIR",
                                 "value": "${ARTIFACT_DIR}"
-                            },
-                            {
-                                "name": "CUSTOM_INSTALL_DIRECTORIES",
-                                "value": "injected"
                             }
                         ]
                     }

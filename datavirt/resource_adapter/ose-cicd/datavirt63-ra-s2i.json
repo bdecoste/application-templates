@@ -4,7 +4,7 @@
     "metadata": {
         "annotations": {
             "iconClass": "icon-jboss",
-            "description": "Application template for deploying JDV with custom resourc adapter(s)",
+            "description": "Application template for deploying JDV with resource adapter extension",
             "tags": "jdv,datavirt,java,jboss,xpaas",
             "version": "1.0.0"
         },
@@ -142,48 +142,6 @@
             }
         },
         {
-            "kind": "Service",
-            "apiVersion": "v1",
-            "spec": {
-                "ports": [
-                    {
-                        "name": "postgresql",
-                        "port": 5432,
-                        "targetPort": 5432,
-                        "nodePort": 0,
-                        "protocol": "TCP"
-                    }
-                ],
-                "selector": {
-                }
-            },
-            "metadata": {
-                "name": "${APPLICATION_NAME}-postgresql"
-            }
-        },
-        {
-            "kind": "Endpoints",
-            "apiVersion": "v1",
-            "subsets": [
-                {
-                    "addresses": [
-                        {
-                            "ip": "192.168.1.48"
-                        }
-                    ],
-                    "ports": [
-                        {
-                            "name": "postgresql",
-                            "port": 5432
-                        }
-                    ]
-                }
-            ],
-            "metadata": {
-                "name": "${APPLICATION_NAME}-postgresql"
-            }
-        },
-        {
             "kind": "Route",
             "apiVersion": "v1",
             "id": "${APPLICATION_NAME}-http",
@@ -251,22 +209,7 @@
                     "git": {
                         "uri": "${SOURCE_REPOSITORY_URL}",
                         "ref": "${SOURCE_REPOSITORY_REF}"
-                    },
-                    "images": [
-                        {
-                            "from": {
-                                "kind": "ImageStreamTag",
-                                "namespace": "${EXTENSIONS_NAMESPACE}",
-                                "name": "jdv-extensions:1.0"
-                            },
-                            "paths": [
-                                {
-                                    "destinationDir": ".",
-                                    "sourcePath": "/injected"
-                                }
-                             ]
-                        }
-                    ]
+                    }
                 },
                 "strategy": {
                     "type": "Source",
@@ -281,10 +224,6 @@
                             {
                                 "name": "ARTIFACT_DIR",
                                 "value": "${ARTIFACT_DIR}"
-                            },
-                            {
-                                "name": "CUSTOM_INSTALL_DIRECTORIES",
-                                "value": "injected"
                             }
                         ]
                     }
@@ -368,6 +307,13 @@
                                 "name": "${APPLICATION_NAME}",
                                 "image": "${APPLICATION_NAME}",
                                 "imagePullPolicy": "Always",
+                                "volumeMounts": [
+                                    {
+                                        "name": "jdv-ra-volume",
+                                        "mountPath": "/etc/jdv-extensions",
+                                        "readOnly": true
+                                    }
+                                ],
                                 "livenessProbe": {
                                     "exec": {
                                         "command": [
@@ -432,8 +378,20 @@
                                     {
                                         "name": "JGROUPS_CLUSTER_PASSWORD",
                                         "value": "${JGROUPS_CLUSTER_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "DATASOURCE_PROPERTIES_FILES",
+                                        "value": "/etc/jdv-extensions/resourceadapters.properties"
                                     }
                                 ]
+                            }
+                        ],
+                        "volumes": [
+                             {
+                                "name": "jdv-ra-volume",
+                                "secret": {
+                                    "secretName": "resourceadapters-secret"
+                                }
                             }
                         ]
                     }
