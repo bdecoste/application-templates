@@ -88,7 +88,43 @@
         {
             "description": "Namespace for source/injected extensions image stream",
             "name": "EXTENSIONS_NAMESPACE",
-            "value": "",
+            "value": "openshift",
+            "required": true
+        },
+        {
+            "description": "Tag for source/injected image",
+            "name": "EXTENSIONS_IMAGE_TAG",
+            "value": "jdv-extensions:1.0",
+            "required": true
+        },
+        {
+            "description": "Source path for source/injected extensions image",
+            "name": "EXTENSIONS_SOURCE_PATH",
+            "value": "/injected",
+            "required": true
+        },
+        {
+            "description": "Destination directory for source/injected extensions image",
+            "name": "EXTENSIONS_DESTINATION_DIR",
+            "value": ".",
+            "required": true
+        },
+        {
+            "description": "Comma-delimited list of directories containing install.sh for customizing the image. Typically corresponds to EXTENSIONS_SOURCE_PATH",
+            "name": "CUSTOM_INSTALL_DIRECTORIES",
+            "value": "injected",
+            "required": true
+        },
+        {
+            "description": "Secret providing configuratoin for extension datasouces and resource adapters",
+            "name": "EXTENSIONS_SECRET",
+            "value": "datasources-extensions-secret",
+            "required": true
+        }
+        {
+            "description": "Properties filename privided by EXTENSIONS_SECRET",
+            "name": "EXTENSIONS_PROPERTIES_FILE",
+            "value": "datasources.properties",
             "required": true
         }
     ],
@@ -257,12 +293,12 @@
                             "from": {
                                 "kind": "ImageStreamTag",
                                 "namespace": "${EXTENSIONS_NAMESPACE}",
-                                "name": "jdv-extensions:1.0"
+                                "name": "${EXTENSIONS_IMAGE_TAG}"
                             },
                             "paths": [
                                 {
-                                    "destinationDir": ".",
-                                    "sourcePath": "/injected"
+                                    "destinationDir": "${EXTENSIONS_DESTINATION_DIR}",
+                                    "sourcePath": "${EXTENSIONS_SOURCE_PATH}"
                                 }
                              ]
                         }
@@ -284,7 +320,7 @@
                             },
                             {
                                 "name": "CUSTOM_INSTALL_DIRECTORIES",
-                                "value": "injected"
+                                "value": "${CUSTOM_INSTALL_DIRECTORIES}"
                             }
                         ]
                     }
@@ -371,7 +407,7 @@
                                 "volumeMounts": [
                                     {
                                         "name": "jdv-external-volume",
-                                        "mountPath": "/etc/jdv-datasources",
+                                        "mountPath": "/etc/jdv-extensions",
                                         "readOnly": true
                                     }
                                 ],
@@ -442,7 +478,7 @@
                                     },
                                     {
                                         "name": "DATASOURCE_PROPERTIES_FILES",
-                                        "value": "/etc/jdv-datasources/datasources.properties"
+                                        "value": "/etc/jdv-extensions/${EXTENSIONS_PROPERTIES_FILE}"
                                     }
                                 ]
                             }
@@ -451,7 +487,7 @@
                              {
                                 "name": "jdv-external-volume",
                                 "secret": {
-                                    "secretName": "datasources-external-secret"
+                                    "secretName": "${EXTENSIONS_SECRET}"
                                 }
                             }
                         ]

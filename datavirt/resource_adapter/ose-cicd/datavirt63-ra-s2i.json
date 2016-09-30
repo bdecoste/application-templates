@@ -86,9 +86,15 @@
             "required": true
         },
         {
-            "description": "Namespace for source/injected extensions image stream",
-            "name": "EXTENSIONS_NAMESPACE",
-            "value": "",
+            "description": "Secret providing configuratoin for extension datasouces and resource adapters",
+            "name": "EXTENSIONS_SECRET",
+            "value": "ra-extension-secret",
+            "required": true
+        }
+        {
+            "description": "Properties filename privided by EXTENSIONS_SECRET",
+            "name": "EXTENSIONS_PROPERTIES_FILE",
+            "value": "resourceadapters.properties",
             "required": true
         }
     ],
@@ -368,10 +374,6 @@
                                         }
                                     },
                                     {
-                                        "name": "DB_SERVICE_PREFIX_MAPPING",
-                                        "value": "${APPLICATION_NAME}-postgresql=POSTGRESQL"
-                                    },
-                                    {
                                         "name": "HORNETQ_CLUSTER_PASSWORD",
                                         "value": "${HORNETQ_CLUSTER_PASSWORD}"
                                     },
@@ -381,7 +383,7 @@
                                     },
                                     {
                                         "name": "DATASOURCE_PROPERTIES_FILES",
-                                        "value": "/etc/jdv-extensions/resourceadapters.properties"
+                                        "value": "/etc/jdv-extensions/${EXTENSIONS_PROPERTIES_FILE}"
                                     }
                                 ]
                             }
@@ -390,7 +392,7 @@
                              {
                                 "name": "jdv-ra-volume",
                                 "secret": {
-                                    "secretName": "resourceadapters-secret"
+                                    "secretName": "${EXTENSIONS_SECRET}"
                                 }
                             }
                         ]

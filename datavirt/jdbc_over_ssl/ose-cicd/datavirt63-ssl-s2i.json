@@ -178,48 +178,6 @@
             }
         },
         {
-            "kind": "Service",
-            "apiVersion": "v1",
-            "spec": {
-                "ports": [
-                    {
-                        "name": "postgresql",
-                        "port": 5432,
-                        "targetPort": 5432,
-                        "nodePort": 0,
-                        "protocol": "TCP"
-                    }
-                ],
-                "selector": {
-                }
-            },
-            "metadata": {
-                "name": "${APPLICATION_NAME}-postgresql"
-            }
-        },
-        {
-            "kind": "Endpoints",
-            "apiVersion": "v1",
-            "subsets": [
-                {
-                    "addresses": [
-                        {
-                            "ip": "192.168.1.48"
-                        }
-                    ],
-                    "ports": [
-                        {
-                            "name": "postgresql",
-                            "port": 5432
-                        }
-                    ]
-                }
-            ],
-            "metadata": {
-                "name": "${APPLICATION_NAME}-postgresql"
-            }
-        },
-        {
             "kind": "Route",
             "apiVersion": "v1",
             "id": "${APPLICATION_NAME}-http",
@@ -449,10 +407,6 @@
                                                 "fieldPath": "metadata.namespace"
                                             }
                                         }
-                                    },
-                                    {
-                                        "name": "DB_SERVICE_PREFIX_MAPPING",
-                                        "value": "${APPLICATION_NAME}-postgresql=POSTGRESQL"
                                     },
                                     {
                                         "name": "HORNETQ_CLUSTER_PASSWORD",
