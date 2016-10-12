@@ -513,6 +513,22 @@
                                     {
                                         "name": "JGROUPS_CLUSTER_PASSWORD",
                                         "value": "${JGROUPS_CLUSTER_PASSWORD}"
+                                    },
+                                     {
+                                        "name": "TEIID_USERNAME",
+                                        "value": "${TEIID_USERNAME}"
+                                    },
+                                    {
+                                        "name": "TEIID_PASSWORD",
+                                        "value": "${TEIID_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "MODESHAPE_USERNAME",
+                                        "value": "${MODESHAPE_USERNAME}"
+                                    },
+                                    {
+                                        "name": "MODESHAPE_PASSWORD",
+                                        "value": "${MODESHAPE_PASSWORD}"
                                     }
                                 ]
                             }
