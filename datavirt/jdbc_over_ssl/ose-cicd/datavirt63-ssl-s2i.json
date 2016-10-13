@@ -36,7 +36,7 @@
         {
             "description": "Git source URI for application",
             "name": "SOURCE_REPOSITORY_URL",
-            "value": "",
+            "value": "http://github.com/bdecoste/jdv-h2-vdb",
             "required": true
         },
         {
@@ -417,8 +417,12 @@
                                         "value": "${JGROUPS_CLUSTER_PASSWORD}"
                                     },
                                     {
+                                        "name": "DATAVIRT_TRANSPORT_KEYSTORE_DIR",
+                                        "value": "/etc/jdv-secret-volume"
+                                    },
+                                    {
                                         "name": "DATAVIRT_TRANSPORT_KEYSTORE",
-                                        "value": "/etc/jdv-secret-volume/${DATAVIRT_TRANSPORT_KEYSTORE}"
+                                        "value": "${DATAVIRT_TRANSPORT_KEYSTORE}"
                                     },
                                     {
                                         "name": "DATAVIRT_TRANSPORT_KEYSTORE_ALIAS",
