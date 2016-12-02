@@ -200,6 +200,79 @@
             }
         },
         {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": { 
+                "name": "jdv-jdg-extensions",
+                "labels": {
+                    "application": "${APPLICATION_NAME}"
+                }
+            },
+            "spec": {
+                "tags": [
+                    {
+                        "name": "1.0",
+                        "annotations": {
+                            "supports":"jdv-jdg-extensions:1.0",
+                            "version": "1.0"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "kind": "BuildConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "jdv-jdg-extensions",
+                "labels": {
+                    "application": "${APPLICATION_NAME}"
+                }
+            },
+            "spec": {
+                "source": {
+                    "type": "Git",
+                    "git": {
+                        "uri": "http://github.com/bdecoste/openshift-quickstarts",
+                        "ref": "jdv-jdg"
+                    },
+                    "contextDir": "datavirt/jdg-remote-cache-materialization"
+                },
+                "strategy": {
+                    "type": "Docker",
+                    "dockerfilePath": "Dockerfile"
+                },
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "namespace": "demo",
+                        "name": "jdv-jdg-extensions:1.0"
+                    }
+                },
+                "triggers": [
+                    {
+                        "type": "GitHub",
+                        "github": {
+                            "secret": "${GITHUB_WEBHOOK_SECRET}"
+                        }
+                    },
+                    {
+                        "type": "Generic",
+                        "generic": {
+                            "secret": "${GENERIC_WEBHOOK_SECRET}"
+                        }
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChange": {}
+                    },
+                    {
+                        "type": "ConfigChange"
+                    }
+                ]
+            }
+        },
+        {
             "kind": "BuildConfig",
             "apiVersion": "v1",
             "metadata": {

@@ -41,21 +41,27 @@
             "description": "The URL of the repository with your application source code.",
             "displayName": "Git Repository URL",
             "name": "SOURCE_REPOSITORY_URL",
-            "value": "https://github.com/jboss-openshift/openshift-quickstarts",
+            "value": "https://github.com/bdecoste/openshift-quickstarts",
             "required": true
         },
         {
             "description": "Set this to a branch name, tag or other ref of your repository if you are not using the default branch.",
             "displayName": "Git Reference",
             "name": "SOURCE_REPOSITORY_REF",
-            "value": "master",
+            "value": "jdv-jdg",
             "required": false
         },
         {
             "description": "Set this to the relative path to your project if it is not in the root of your repository.",
             "displayName": "Context Directory",
             "name": "CONTEXT_DIR",
-            "value": "datavirt/dynamicvdb-datafederation/app",
+            "value": "datavirt",
+            "required": false
+        },
+        {
+            "description": "List of directories from which VDBS will be copied into the deployment folder.  If unspecified, all archives in source will be copied.",
+            "name": "VDB_DIRS",
+            "value": "jdg-remote-cache-materialization/app,dynamicvdb-datafederation/app",
             "required": false
         },
         {
@@ -132,6 +138,12 @@
             "displayName": "Deploy Exploded Archives",
             "name": "AUTO_DEPLOY_EXPLODED",
             "value": "false",
+            "required": false
+        },
+        {
+            "description": "Comma-separated list of connector types that should be configured (defaults to 'memcached,hotrod,rest')",
+            "name": "INFINISPAN_CONNECTORS",
+            "value": "hotrod,memcached,rest",
             "required": false
         }
     ],
@@ -293,6 +305,10 @@
                             {
                                 "name": "CUSTOM_INSTALL_DIRECTORIES",
                                 "value": "extensions/*"
+                            },
+                            {
+                                "name": "VDB_DIRS",
+                                "value": "${VDB_DIRS}"
                             }
                         ]
                     }
