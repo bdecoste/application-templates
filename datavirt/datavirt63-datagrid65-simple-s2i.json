@@ -452,6 +452,10 @@
                                         "value": "application=${APPLICATION_NAME}"
                                     },
                                     {
+                                        "name": "DB_SERVICE_PREFIX_MAPPING",
+                                        "value": "${APPLICATION_NAME}-blah=BLAH"
+                                    },
+                                    {
                                         "name": "OPENSHIFT_KUBE_PING_NAMESPACE",
                                         "valueFrom": {
                                             "fieldRef": {
