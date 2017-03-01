@@ -88,6 +88,11 @@
             "name": "IMAGE_STREAM_NAMESPACE",
             "value": "openshift",
             "required": true
+        },
+        {
+            "name": "TOMCAT_SHUTDOWN",
+            "value": "",
+            "required": false
         }
     ],
     "objects": [
@@ -282,6 +287,10 @@
                                     {
                                         "name": "JWS_ADMIN_PASSWORD",
                                         "value": "${JWS_ADMIN_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "TOMCAT_SHUTDOWN",
+                                        "value": "${TOMCAT_SHUTDOWN}"
                                     }
                                 ]
                             }
