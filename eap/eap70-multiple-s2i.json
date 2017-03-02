@@ -105,7 +105,15 @@
         {
             "displayName": "JGroups Cluster Password",
             "description": "JGroups cluster password",
-            "name": "JGROUPS_CLUSTER_PASSWORD",
+            "name": "APP_CLUSTER_PASSWORD",
+            "from": "[a-zA-Z0-9]{8}",
+            "generate": "expression",
+            "required": true
+        },
+        {
+            "displayName": "JGroups Cluster Password",
+            "description": "JGroups cluster password",
+            "name": "BACKEND_CLUSTER_PASSWORD",
             "from": "[a-zA-Z0-9]{8}",
             "generate": "expression",
             "required": true
@@ -715,7 +723,7 @@
                                         "protocol": "TCP"
                                     },
                                     {
-                                        "name": "ping",
+                                        "name": "app-ping",
                                         "containerPort": 8889,
                                         "protocol": "TCP"
                                     }
@@ -747,7 +755,7 @@
                                     },
                                     {
                                         "name": "JGROUPS_CLUSTER_PASSWORD",
-                                        "value": "${JGROUPS_CLUSTER_PASSWORD}"
+                                        "value": "${APP_CLUSTER_PASSWORD}"
                                     },
                                     {
                                         "name": "AUTO_DEPLOY_EXPLODED",
@@ -760,6 +768,10 @@
                                     {
                                         "name": "OPENSHIFT_KUBE_PING_SERVER_PORT",
                                         "value": "8889"
+                                    },
+                                    {
+                                        "name": "OPENSHIFT_KUBE_PING_PORT_NAME",
+                                        "value": "app-ping"
                                     }
                                 ]
                             },
@@ -815,7 +827,7 @@
                                         "protocol": "TCP"
                                     },
                                     {
-                                        "name": "ping",
+                                        "name": "backend-ping",
                                         "containerPort": 8890,
                                         "protocol": "TCP"
                                     }
@@ -823,7 +835,7 @@
                                 "env": [
                                     {
                                         "name": "OPENSHIFT_KUBE_PING_LABELS",
-                                        "value": "application=backend"
+                                        "value": "application=eap-app"
                                     },
                                     {
                                         "name": "OPENSHIFT_KUBE_PING_NAMESPACE",
@@ -847,7 +859,7 @@
                                     },
                                     {
                                         "name": "JGROUPS_CLUSTER_PASSWORD",
-                                        "value": "${JGROUPS_CLUSTER_PASSWORD}"
+                                        "value": "${APP_CLUSTER_PASSWORD}"
                                     },
                                     {
                                         "name": "AUTO_DEPLOY_EXPLODED",
@@ -860,6 +872,10 @@
                                     {
                                         "name": "OPENSHIFT_KUBE_PING_SERVER_PORT",
                                         "value": "8890"
+                                    },
+                                    {
+                                        "name": "OPENSHIFT_KUBE_PING_PORT_NAME",
+                                        "value": "backend-ping"
                                     }
                                 ]
                             }
