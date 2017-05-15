@@ -87,6 +87,21 @@
             "name": "IMAGE_STREAM_NAMESPACE",
             "value": "openshift",
             "required": true
+        },
+        {
+            "name": "AB_JOLOKIA_USER",
+            "value": "bdecoste",
+            "required": false
+        },
+        {
+            "name": "AB_JOLOKIA_PASSWORD",
+            "value": "Password1",
+            "required": false
+        },
+        {
+            "name": "AB_JOLOKIA_PASSWORD_RANDOM",
+            "value": "false",
+            "required": false
         }
     ],
     "objects": [
@@ -329,6 +344,18 @@
                                     {
                                         "name": "AMQ_STORAGE_USAGE_LIMIT",
                                         "value": "${AMQ_STORAGE_USAGE_LIMIT}"
+                                    },
+                                    {
+                                        "name": "AB_JOLOKIA_USER",
+                                        "value": "${AB_JOLOKIA_USER}"
+                                    },
+                                    {
+                                        "name": "AB_JOLOKIA_PASSWORD",
+                                        "value": "${AB_JOLOKIA_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "AB_JOLOKIA_PASSWORD_RANDOM",
+                                        "value": "${AB_JOLOKIA_PASSWORD_RANDOM}"
                                     }
                                 ]
                             }

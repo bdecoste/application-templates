@@ -144,14 +144,14 @@
             "displayName": "SSO Admin Username",
             "description": "SSO Server admin username",
             "name": "SSO_ADMIN_USERNAME",
-            "value": "admin",
+            "value": "",
             "required": false
         },
         {
             "displayName": "SSO Admin Password",
             "description": "SSO Server admin  password",
             "name": "SSO_ADMIN_PASSWORD",
-            "value": "admin",
+            "value": "",
             "required": false
         },
         {
