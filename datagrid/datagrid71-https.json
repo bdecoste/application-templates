@@ -137,9 +137,9 @@
             "required": false
         },
         {
-            "displayName": "REST Encryption",
-            "description": "Enable REST Encryption, true or false",
-            "name": "REST_ENCRYPTION",
+            "displayName": "Hotrod Encryption",
+            "description": "Enable Hotrod Encryption, true or false",
+            "name": "HOTROD_ENCRYPTION",
             "value": "true",
             "required": false
         },
@@ -509,8 +509,8 @@
                                         "value": "${REST_SECURITY_DOMAIN}"
                                     },
                                     {
-                                        "name": "REST_ENCRYPTION",
-                                        "value": "${REST_ENCRYPTION}"
+                                        "name": "HOTROD_ENCRYPTION",
+                                        "value": "${HOTROD_ENCRYPTION}"
                                     },
                                     {
                                         "name": "JGROUPS_ENCRYPT_SECRET",
