@@ -3,25 +3,25 @@
     "apiVersion": "v1",
     "metadata": {
         "annotations": {
-            "iconClass": "icon-tomcat",
-            "description": "Application template for JWS applications built using S2I.",
-            "tags": "tomcat,tomcat8,java,jboss,xpaas",
+            "iconClass": "icon-jboss",
+            "description": "Application template for EAP 6 applications built using S2I.",
+            "tags": "eap,javaee,java,jboss,xpaas",
             "version": "1.4.0",
-            "openshift.io/display-name": "Red Hat JBoss Web Server 3.0 Tomcat 8 (no https)"
+            "openshift.io/display-name": "Red Hat JBoss EAP 6.4 (no https)"
         },
-        "name": "jws30-tomcat8-basic-s2i"
+        "name": "eap64-basic-s2i"
     },
     "labels": {
-        "template": "jws30-tomcat8-basic-s2i",
+        "template": "eap64-basic-s2i",
         "xpaas": "1.4.0"
     },
-    "message": "A new JWS application for Tomcat 8 has been created in your project. The username/password for administering your JWS is ${JWS_ADMIN_USERNAME}/${JWS_ADMIN_PASSWORD}.",
+    "message": "A new EAP 6 based application has been created in your project.",
     "parameters": [
         {
             "displayName": "Application Name",
             "description": "The name for the application.",
             "name": "APPLICATION_NAME",
-            "value": "jws-app",
+            "value": "eap-app",
             "required": true
         },
         {
@@ -35,35 +35,41 @@
             "displayName": "Git Repository URL",
             "description": "Git source URI for application",
             "name": "SOURCE_REPOSITORY_URL",
-            "value": "https://github.com/jboss-openshift/openshift-quickstarts.git",
+            "value": "https://github.com/jboss-developer/jboss-eap-quickstarts",
             "required": true
         },
         {
             "displayName": "Git Reference",
             "description": "Git branch/tag reference",
             "name": "SOURCE_REPOSITORY_REF",
-            "value": "1.2",
+            "value": "6.4.x",
             "required": false
         },
         {
             "displayName": "Context Directory",
             "description": "Path within Git project to build; empty for root project directory.",
             "name": "CONTEXT_DIR",
-            "value": "tomcat-websocket-chat",
+            "value": "kitchensink",
             "required": false
         },
         {
-            "displayName": "JWS Admin Username",
-            "description": "JWS Admin User",
-            "name": "JWS_ADMIN_USERNAME",
-            "from": "[a-zA-Z0-9]{8}",
-            "generate": "expression",
-            "required": true
+            "displayName": "Queues",
+            "description": "Queue names",
+            "name": "HORNETQ_QUEUES",
+            "value": "",
+            "required": false
         },
         {
-            "displayName": "JWS Admin Password",
-            "description": "JWS Admin Password",
-            "name": "JWS_ADMIN_PASSWORD",
+            "displayName": "Topics",
+            "description": "Topic names",
+            "name": "HORNETQ_TOPICS",
+            "value": "",
+            "required": false
+        },
+        {
+            "displayName": "HornetQ Password",
+            "description": "HornetQ cluster admin password",
+            "name": "HORNETQ_CLUSTER_PASSWORD",
             "from": "[a-zA-Z0-9]{8}",
             "generate": "expression",
             "required": true
@@ -90,6 +96,21 @@
             "name": "IMAGE_STREAM_NAMESPACE",
             "value": "openshift",
             "required": true
+        },
+        {
+            "displayName": "JGroups Cluster Password",
+            "description": "JGroups cluster password",
+            "name": "JGROUPS_CLUSTER_PASSWORD",
+            "from": "[a-zA-Z0-9]{8}",
+            "generate": "expression",
+            "required": true
+        },
+        {
+            "displayName": "Deploy Exploded Archives",
+            "description": "Controls whether exploded deployment content should be automatically deployed",
+            "name": "AUTO_DEPLOY_EXPLODED",
+            "value": "false",
+            "required": false
         },
         {
             "displayName": "Maven mirror URL",
@@ -195,8 +216,9 @@
                         "from": {
                             "kind": "ImageStreamTag",
                             "namespace": "${IMAGE_STREAM_NAMESPACE}",
-                            "name": "jboss-webserver30-tomcat8-openshift:1.2"
-                        }
+                            "name": "jboss-eap64-openshift:1.5"
+                        },
+                        "incremental": true
                     }
                 },
                 "output": {
@@ -278,12 +300,21 @@
                                 "name": "${APPLICATION_NAME}",
                                 "image": "${APPLICATION_NAME}",
                                 "imagePullPolicy": "Always",
+                                "livenessProbe": {
+                                    "exec": {
+                                        "command": [
+                                            "/bin/bash",
+                                            "-c",
+                                            "/opt/eap/bin/livenessProbe.sh"
+                                        ]
+                                    }
+                                },
                                 "readinessProbe": {
                                     "exec": {
                                         "command": [
                                             "/bin/bash",
                                             "-c",
-                                            "curl --noproxy '*' -s -u ${JWS_ADMIN_USERNAME}:${JWS_ADMIN_PASSWORD} 'http://localhost:8080/manager/jmxproxy/?get=Catalina%3Atype%3DServer&att=stateName' |grep -iq 'stateName *= *STARTED'"
+                                            "/opt/eap/bin/readinessProbe.sh"
                                         ]
                                     }
                                 },
@@ -297,16 +328,45 @@
                                         "name": "http",
                                         "containerPort": 8080,
                                         "protocol": "TCP"
+                                    },
+                                    {
+                                        "name": "ping",
+                                        "containerPort": 8888,
+                                        "protocol": "TCP"
                                     }
                                 ],
                                 "env": [
                                     {
-                                        "name": "JWS_ADMIN_USERNAME",
-                                        "value": "${JWS_ADMIN_USERNAME}"
+                                        "name": "OPENSHIFT_KUBE_PING_LABELS",
+                                        "value": "application=${APPLICATION_NAME}"
                                     },
                                     {
-                                        "name": "JWS_ADMIN_PASSWORD",
-                                        "value": "${JWS_ADMIN_PASSWORD}"
+                                        "name": "OPENSHIFT_KUBE_PING_NAMESPACE",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "fieldPath": "metadata.namespace"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "HORNETQ_CLUSTER_PASSWORD",
+                                        "value": "${HORNETQ_CLUSTER_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "HORNETQ_QUEUES",
+                                        "value": "${HORNETQ_QUEUES}"
+                                    },
+                                    {
+                                        "name": "HORNETQ_TOPICS",
+                                        "value": "${HORNETQ_TOPICS}"
+                                    },
+                                    {
+                                        "name": "JGROUPS_CLUSTER_PASSWORD",
+                                        "value": "${JGROUPS_CLUSTER_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "AUTO_DEPLOY_EXPLODED",
+                                        "value": "${AUTO_DEPLOY_EXPLODED}"
                                     }
                                 ]
                             }

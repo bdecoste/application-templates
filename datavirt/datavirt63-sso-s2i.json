@@ -293,15 +293,6 @@
                         "imageChange": {}
                     },
                     {
-                        "type": "ImageChange",
-                        "imageChange": {
-                            "from": {
-                                "kind": "ImageStreamTag",
-                                "name": "jboss-datagrid65-client-openshift:1.0"
-                            }
-                        }
-                    },
-                    {
                         "type": "ConfigChange"
                     }
                 ]
@@ -362,6 +353,16 @@
                                     {
                                         "name": "configuration",
                                         "mountPath": "/etc/datavirt-environment",
+                                        "readOnly": true
+                                    },
+                                    {
+                                        "name": "domains-secret",
+                                        "mountPath": "/etc/security-domains",
+                                        "readOnly": true
+                                    },
+                                    {
+                                        "name": "keycloak-secret",
+                                        "mountPath": "/opt/eap/keycloak",
                                         "readOnly": true
                                     }
                                 ],
@@ -443,8 +444,32 @@
                                         "value": "${MODESHAPE_PASSWORD}"
                                     },
                                     {
+                                        "name": "SCRIPT_DEBUG",
+                                        "value": "false"
+                                    },
+                                    {
+                                        "name": "JDBC_SECURITY_DOMAIN",
+                                        "value": "sso"
+                                    },
+                                    {
                                         "name": "ENV_FILES",
-                                        "value": "/etc/datavirt-environment/*"
+                                        "value": "/etc/datavirt-environment/*,/etc/security-domains/*"
+                                    },
+                                    {
+                                        "name": "SSO_REALM",
+                                        "value": "master"
+                                    },
+                                    {
+                                        "name": "SSO_URL",
+                                        "value": "http://sso-demo.cloudapps.example.com/auth"
+                                    },
+                                    {
+                                        "name": "SSO_USERNAME",
+                                        "value": "admin"
+                                    },
+                                    {
+                                        "name": "SSO_PASSWORD",
+                                        "value": "admin"
                                     }
                                 ]
                             }
@@ -454,6 +479,18 @@
                                 "name": "configuration",
                                 "secret": {
                                     "secretName": "${CONFIGURATION_NAME}"
+                                }
+                            },
+                            {
+                                "name": "domains-secret",
+                                "secret": {
+                                    "secretName": "domains-secret"
+                                }
+                            },
+                            {
+                                "name": "keycloak-secret",
+                                "secret": {
+                                    "secretName": "keycloak-secret"
                                 }
                             }
                         ]

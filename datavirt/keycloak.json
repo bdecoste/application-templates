@@ -1,0 +1,8 @@
+{
+  "realm": "demo",
+  "realm-public-key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoNu6JwSi6qmxUo8rh8XlhziuGC3uEf8rc6iR/Xkw4c6GruqrUgbfkz6zZ+tQw51dffYOWEk4/kO1HpcKJqoZx12r91TFGGXB0WAGhhSkeS7HneIzjskW/yhBBwsCSHM9Sz05PyWOsqGqYbwlf0XbcrVpEVlIYtpaVaGUS6dUQIjnT0AjbETJYBNC8SaYaZvVnGCUluNO3+WgxvU0jt4T0txKM2sAOQlodDUlhAYNG3B/9rCZlczEU0nXCbCrEM2Jbx8L+0Gt6gpYxYA4y80ElTwFZMtfwl3AZu0ixuOAe0lsBaLyruwWSw6c0XMmUYpU37dx2er2gxydk5k2uxTgEQIDAQAB",
+  "auth-server-url": "http://sso-demo.cloudapps.example.com/auth",
+  "ssl-required": "external",
+  "resource": "admin-cli",
+  "public-client": true
+}
