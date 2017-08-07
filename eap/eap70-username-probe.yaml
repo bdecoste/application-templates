@@ -1,0 +1,38 @@
+
+
+apiVersion: v1
+kind: Template
+metadata:
+  name: test-template
+  annotations:
+    description: "Description"
+    tags: "eap"
+objects:
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    name: eap-yaml
+  spec:
+    containers:
+    - env:
+      - name: SCRIPT_DEBUG
+        value: "true"
+      - name: ADMIN_PASSWORD
+        value: Password1!
+      - name: ADMIN_USERNAME
+        value: admin,-./=@\
+      image: jboss-eap-7/eap70-openshift:1.4
+      readinessProbe:
+        exec:
+          command: 
+            - /bin/bash
+            - -c
+            - /opt/eap/bin/livenessProbe.sh
+      name: master
+      ports:
+      - containerPort: 8080
+        protocol: TCP
+labels:
+  test: master
+
+

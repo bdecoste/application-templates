@@ -203,13 +203,19 @@
                             "secret": {
                                 "name": "settings-secret"
                             },
-                            "destinationDir": "/home/jboss"
+                            "destinationDir": "/tmp/settings"
                         },
                         {
                             "secret": {
                                 "name": "mavencreds-secret"
                             },
-                            "destinationDir": "/home/jboss"
+                            "destinationDir": "/tmp/maven"
+                        },
+                        {
+                            "secret": {
+                                "name": "key-secret"
+                            },
+                            "destinationDir": "/tmp/keys"
                         }
                     ]
                 },
@@ -226,33 +232,19 @@
                                 "value": "${ARTIFACT_DIR}"
                             },
                             {
+                                "name": "ENV_FILES",
+                                "value": "/tmp/maven/maven_creds.properties"
+                            },
+                            {
                                 "name": "MAVEN_ARGS",
-                                "value": "deploy -s /home/jboss/settings.xml -DaltDeploymentRepository=snapshots::default::http://192.168.122.2:8081/repository/snapshots/"
-                            },
-                            {
-                                "name": "REPO_USERNAME",
-                                "valueFrom": {
-                                    "secretKeyRef" : {
-                                        "name" : "mavencreds-secret",
-                                        "key" : "REPO_USERNAME"
-                                    }
-                                }
-                            },
-                            {
-                                "name": "REPO_PASSWORD",
-                                "valueFrom": {
-                                    "secretKeyRef" : {
-                                        "name" : "mavencreds-secret",
-                                        "key" : "REPO_PASSWORD"
-                                    }
-                                }
+                                "value": "deploy -s /tmp/settings/settings.xml -DaltDeploymentRepository=snapshots::default::https://192.168.122.2:8444/repository/snapshots/ -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true"
                             }
                         ],
                         "forcePull": true,
                         "from": {
                             "kind": "ImageStreamTag",
                             "namespace": "${IMAGE_STREAM_NAMESPACE}",
-                            "name": "jboss-eap70-openshift:1.5"
+                            "name": "jboss-eap70-openshift:1.4"
                         },
                         "incremental": true
                     }

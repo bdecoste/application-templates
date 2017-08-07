@@ -124,6 +124,16 @@
             "name": "ARTIFACT_DIR",
             "value": "",
             "required": false
+        },
+        {
+            "name": "ADMIN_USERNAME",
+            "value": "",
+            "required": false
+        },
+        {
+            "name": "ADMIN_PASSWORD",
+            "value": "",
+            "required": false
         }
     ],
     "objects": [
@@ -220,7 +230,7 @@
                         "from": {
                             "kind": "ImageStreamTag",
                             "namespace": "${IMAGE_STREAM_NAMESPACE}",
-                            "name": "jboss-eap70-openshift:1.5"
+                            "name": "jboss-eap70-openshift:1.4"
                         }
                     }
                 },
@@ -383,12 +393,8 @@
                                         "value": "${AUTO_DEPLOY_EXPLODED}"
                                     },
                                     {
-                                        "name": "ADMIN_USERNAME",
-                                        "value": "admin2"
-                                    },
-                                    {
                                         "name": "ADMIN_PASSWORD",
-                                        "value": "lollerskates11$"
+                                        "value": "${ADMIN_PASSWORD}"
                                     }
                                 ]
                             }
