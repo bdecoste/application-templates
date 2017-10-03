@@ -4,137 +4,98 @@
     "metadata": {
         "annotations": {
             "iconClass": "icon-jboss",
-            "description": "Application template for JDG 6.5 applications.",
-            "tags": "datagrid,jboss,xpaas",
-            "version": "1.4.0",
-            "openshift.io/display-name": "Red Hat JBoss Data Grid 6.5 (Ephemeral, no https)"
+            "description": "Application template for EAP 6 applications built using S2I.",
+            "tags": "eap,javaee,java,jboss,xpaas",
+            "version": "1.4.0"
         },
-        "name": "datagrid65-basic"
+        "name": "datagrid71-test"
     },
     "labels": {
-        "template": "datagrid65-basic",
-        "xpaas": "1.4.0"
+        "template": "datagrid71-test",
+        "xpaas": "1.0.0"
     },
-    "message": "A new data grid service has been created in your project. It supports connector type(s) \"${INFINISPAN_CONNECTORS}\".",
     "parameters": [
         {
-            "displayName": "Application Name",
             "description": "The name for the application.",
             "name": "APPLICATION_NAME",
-            "value": "datagrid-app",
+            "value": "datagrid",
             "required": true
         },
         {
-            "displayName": "Custom http Route Hostname",
             "description": "Custom hostname for http service route.  Leave blank for default hostname, e.g.: <application-name>-<project>.<default-domain-suffix>",
             "name": "HOSTNAME_HTTP",
             "value": "",
             "required": false
         },
         {
-            "displayName": "Username",
-            "description": "User name for JDG user.",
-            "name": "USERNAME",
+            "description": "Custom hostname for https service route.  Leave blank for default hostname, e.g.: <application-name>.<project>.<default-domain-suffix>",
+            "name": "HOSTNAME_HTTPS",
             "value": "",
             "required": false
         },
         {
-            "displayName": "Password",
-            "description": "The password to access the JDG Caches. Must be different than username; must not be root, admin, or administrator; must contain at least 8 characters, 1 alphabetic character(s), 1 digit(s), and 1 non-alphanumeric symbol(s). (optional)",
-            "name": "PASSWORD",
-            "value": "",
-            "required": false
-        },
-        {
-            "displayName": "ImageStream Namespace",
             "description": "Namespace in which the ImageStreams for Red Hat Middleware images are installed. These ImageStreams are normally installed in the openshift namespace. You should only need to modify this if you've installed the ImageStreams in a different namespace/project.",
             "name": "IMAGE_STREAM_NAMESPACE",
             "value": "openshift",
             "required": true
         },
         {
-            "displayName": "Infinispan Connectors",
+            "description": "JGroups cluster password",
+            "name": "JGROUPS_CLUSTER_PASSWORD",
+            "from": "[a-zA-Z0-9]{8}",
+            "generate": "expression",
+            "required": true
+        },
+        {
+            "description": "User name for JDG user.",
+            "name": "USERNAME",
+            "value": "jdguser",
+            "required": false
+        },
+        {
+            "description": "Password for JDG user.",
+            "name": "PASSWORD",
+            "value": "P@ssword1",
+            "required": false
+        },
+        {
+            "description": "Enable HOTROD Auth",
+            "name": "HOTROD_AUTHENTICATION",
+            "value": "",
+            "required": false
+        },
+        {
             "description": "Comma-separated list of connector types that should be configured (defaults to 'memcached,hotrod,rest')",
             "name": "INFINISPAN_CONNECTORS",
             "value": "hotrod,memcached,rest",
             "required": false
         },
         {
-            "displayName": "Cache Names",
             "description": "Comma-separated list of caches to configure.  By default, a distributed-cache, with a mode of SYNC will be configured for each entry.",
             "name": "CACHE_NAMES",
-            "value": "",
+            "value": "addressbook,addressbook_indexed,memcachedCache",
             "required": false
         },
         {
-            "displayName": "Datavirt Cache Names",
-            "description": "Comma-separated list of caches to configure for use by Red Hat JBoss Data Virtualization for materialization of views.  Three caches will be created for each named cache: <name>, <name>_staging and <name>_alias.",
-            "name": "DATAVIRT_CACHE_NAMES",
-            "value": "",
-            "required": false
-        },
-        {
-            "displayName": "Default Cache Type",
-            "description": "Default cache type for all caches. If empty then distributed will be the default",
-            "name": "CACHE_TYPE_DEFAULT",
-            "value": "",
-            "required": false
-        },
-        {
-            "displayName": "Encryption Requires SSL Client Authentication?",
             "description": "",
             "name": "ENCRYPTION_REQUIRE_SSL_CLIENT_AUTH",
             "value": "",
             "required": false
         },
         {
-            "displayName": "Memcached Cache Name",
             "description": "The name of the cache to expose through this memcached connector (defaults to 'default')",
             "name": "MEMCACHED_CACHE",
-            "value": "default",
+            "value": "memcachedCache",
             "required": false
         },
         {
-            "displayName": "REST Security Domain",
             "description": "The domain, declared in the security subsystem, that should be used to authenticate access to the REST endpoint",
             "name": "REST_SECURITY_DOMAIN",
             "value": "",
             "required": false
-        },
-        {
-            "displayName": "JGroups Cluster Password",
-            "description": "JGroups cluster password",
-            "name": "JGROUPS_CLUSTER_PASSWORD",
-            "from": "[a-zA-Z0-9]{8}",
-            "generate": "expression",
-            "required": true
         }
     ],
     "objects": [
-        {
-            "kind": "Service",
-            "apiVersion": "v1",
-            "spec": {
-                "ports": [
-                    {
-                        "port": 8080,
-                        "targetPort": 8080
-                    }
-                ],
-                "selector": {
-                    "deploymentConfig": "${APPLICATION_NAME}"
-                }
-            },
-            "metadata": {
-                "name": "${APPLICATION_NAME}",
-                "labels": {
-                    "application": "${APPLICATION_NAME}"
-                },
-                "annotations": {
-                    "description": "The web server's HTTP port."
-                }
-            }
-        },
         {
             "kind": "Service",
             "apiVersion": "v1",
@@ -184,50 +145,6 @@
             }
         },
         {
-            "kind": "Service",
-            "apiVersion": "v1",
-            "spec": {
-                "ports": [
-                    {
-                        "port": 8787,
-                        "targetPort": 8787
-                    }
-                ],
-                "selector": {
-                    "deploymentConfig": "${APPLICATION_NAME}"
-                }
-            },
-            "metadata": {
-                "name": "${APPLICATION_NAME}-debug",
-                "labels": {
-                    "application": "${APPLICATION_NAME}"
-                },
-                "annotations": {
-                    "description": "Hot Rod service for clustered applications."
-                }
-            }
-        },
-        {
-            "kind": "Route",
-            "apiVersion": "v1",
-            "id": "${APPLICATION_NAME}-http",
-            "metadata": {
-                "name": "${APPLICATION_NAME}",
-                "labels": {
-                    "application": "${APPLICATION_NAME}"
-                },
-                "annotations": {
-                    "description": "Route for application's HTTP service."
-                }
-            },
-            "spec": {
-                "host": "${HOSTNAME_HTTP}",
-                "to": {
-                    "name": "${APPLICATION_NAME}"
-                }
-            }
-        },
-        {
             "kind": "DeploymentConfig",
             "apiVersion": "v1",
             "metadata": {
@@ -251,7 +168,7 @@
                             "from": {
                                 "kind": "ImageStreamTag",
                                 "namespace": "${IMAGE_STREAM_NAMESPACE}",
-                                "name": "jboss-datagrid65-openshift:1.4"
+                                "name": "jboss-datagrid71-openshift:1.0"
                             }
                         }
                     },
@@ -276,26 +193,8 @@
                         "containers": [
                             {
                                 "name": "${APPLICATION_NAME}",
-                                "image": "jboss-datagrid65-openshift",
+                                "image": "jboss-datagrid71-openshift",
                                 "imagePullPolicy": "Always",
-                                "livenessProbe": {
-                                    "exec": {
-                                        "command": [
-                                            "/bin/bash",
-                                            "-c",
-                                            "/opt/datagrid/bin/livenessProbe.sh"
-                                        ]
-                                    }
-                                },
-                                "readinessProbe": {
-                                    "exec": {
-                                        "command": [
-                                            "/bin/bash",
-                                            "-c",
-                                            "/opt/datagrid/bin/readinessProbe.sh"
-                                        ]
-                                    }
-                                },
                                 "ports": [
                                     {
                                         "name": "jolokia",
@@ -318,18 +217,8 @@
                                         "protocol": "TCP"
                                     },
                                     {
-                                        "name": "hotrod-internal",
-                                        "containerPort": 11222,
-                                        "protocol": "TCP"
-                                    },
-                                    {
                                         "name": "hotrod",
                                         "containerPort": 11333,
-                                        "protocol": "TCP"
-                                    },
-                                    {
-                                        "name": "debug",
-                                        "containerPort": 8787,
                                         "protocol": "TCP"
                                     }
                                 ],
@@ -363,14 +252,6 @@
                                         "value": "${CACHE_NAMES}"
                                     },
                                     {
-                                        "name": "DATAVIRT_CACHE_NAMES",
-                                        "value": "${DATAVIRT_CACHE_NAMES}"
-                                    },
-                                    {
-                                        "name": "CACHE_TYPE_DEFAULT",
-                                        "value": "${CACHE_TYPE_DEFAULT}"
-                                    },
-                                    {
                                         "name": "ENCRYPTION_REQUIRE_SSL_CLIENT_AUTH",
                                         "value": "${ENCRYPTION_REQUIRE_SSL_CLIENT_AUTH}"
                                     },
@@ -391,8 +272,68 @@
                                         "value": "${JGROUPS_CLUSTER_PASSWORD}"
                                     },
                                     {
-                                        "name": "DEBUG",
+                                        "name": "ADMIN_USERNAME",
+                                        "value": "jdguser"
+                                    },
+                                    {
+                                        "name": "ADMIN_PASSWORD",
+                                        "value": "P@ssword1"
+                                    },
+                                    {
+                                        "name": "ADMIN_GROUP",
+                                        "value": "REST,admin,___schema_manager"
+                                    },
+                                    {
+                                        "name": "HOTROD_AUTHENTICATION",
                                         "value": "true"
+                                    },
+                                    {
+                                        "name": "CONTAINER_SECURITY_ROLE_MAPPER",
+                                        "value": "identity-role-mapper"
+                                    },
+                                    {
+                                        "name": "CONTAINER_SECURITY_ROLES",
+                                        "value": "admin=ALL,___schema_manager=ALL"
+                                    },
+                                    {
+                                        "name": "addressbook_indexed_CACHE_START",
+                                        "value": "EAGER"
+                                    },
+                                    {
+                                        "name": "addressbook_indexed_CACHE_INDEX",
+                                        "value": "ALL"
+                                    },
+                                    {
+                                        "name": "addressbook_indexed_INDEXING_PROPERTIES",
+                                        "value": "default.directory_provider=ram"
+                                    },
+                                    {
+                                        "name": "addressbook_indexed_LOCKING_ACQUIRE_TIMEOUT",
+                                        "value": "20000"
+                                    },
+                                    {
+                                        "name": "addressbook_indexed_LOCKING_CONCURRENCY_LEVEL",
+                                        "value": "500"
+                                    },
+                                    {
+                                        "name": "addressbook_indexed_LOCKING_STRIPING",
+                                        "value": "false"
+                                    },
+                                    {
+                                        "name": "addressbook_CACHE_START",
+                                        "value": "EAGER"
+                                    },
+                                    {
+                                        "name": "addressbook_LOCKING_ACQUIRE_TIMEOUT",
+                                        "value": "20000"
+                                    },
+                                    {
+                                        "name": "addressbook_LOCKING_CONCURRENCY_LEVEL",
+                                        "value": "500"
+                                    },
+                                    {
+                                        "name": "addressbook_LOCKING_STRIPING",
+                                        "value": "false"
                                     },
                                     {
                                         "name": "SCRIPT_DEBUG",

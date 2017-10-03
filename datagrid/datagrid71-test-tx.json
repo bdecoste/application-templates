@@ -4,15 +4,15 @@
     "metadata": {
         "annotations": {
             "iconClass": "icon-jboss",
-            "description": "Application template for JDG 6.5 applications.",
+            "description": "Application template for JDG 7.1 applications.",
             "tags": "datagrid,jboss,xpaas",
             "version": "1.4.0",
-            "openshift.io/display-name": "Red Hat JBoss Data Grid 6.5 (Ephemeral, no https)"
+            "openshift.io/display-name": "Red Hat JBoss Data Grid 7.1 (Ephemeral, no https)"
         },
-        "name": "datagrid65-basic"
+        "name": "datagrid71-basic"
     },
     "labels": {
-        "template": "datagrid65-basic",
+        "template": "datagrid71-basic",
         "xpaas": "1.4.0"
     },
     "message": "A new data grid service has been created in your project. It supports connector type(s) \"${INFINISPAN_CONNECTORS}\".",
@@ -91,7 +91,35 @@
             "displayName": "Memcached Cache Name",
             "description": "The name of the cache to expose through this memcached connector (defaults to 'default')",
             "name": "MEMCACHED_CACHE",
-            "value": "default",
+            "value": "memcached",
+            "required": false
+        },
+        {
+            "displayName": "ADMIN_GROUP",
+            "description": "Comma delimited list of groups/roles for the Application Realm User",
+            "name": "ADMIN_GROUP",
+            "value": "",
+            "required": false
+        },
+        {
+            "displayName": "HOTROD_AUTHENTICATION",
+            "description": "True/False for HotRod Authentication",
+            "name": "HOTROD_AUTHENTICATION",
+            "value": "",
+            "required": false
+        },
+        {
+            "displayName": "CONTAINER_SECURITY_ROLE_MAPPER",
+            "description": "Container Role Mapper",
+            "name": "CONTAINER_SECURITY_ROLE_MAPPER",
+            "value": "",
+            "required": false
+        },
+        {
+            "displayName": "CONTAINER_SECURITY_ROLES",
+            "description": "Comma Delimited List of Container Roles",
+            "name": "CONTAINER_SECURITY_ROLES",
+            "value": "",
             "required": false
         },
         {
@@ -251,7 +279,7 @@
                             "from": {
                                 "kind": "ImageStreamTag",
                                 "namespace": "${IMAGE_STREAM_NAMESPACE}",
-                                "name": "jboss-datagrid65-openshift:1.4"
+                                "name": "jboss-datagrid71-openshift:1.0"
                             }
                         }
                     },
@@ -276,7 +304,7 @@
                         "containers": [
                             {
                                 "name": "${APPLICATION_NAME}",
-                                "image": "jboss-datagrid65-openshift",
+                                "image": "jboss-datagrid71-openshift",
                                 "imagePullPolicy": "Always",
                                 "livenessProbe": {
                                     "exec": {
@@ -360,7 +388,19 @@
                                     },
                                     {
                                         "name": "CACHE_NAMES",
-                                        "value": "${CACHE_NAMES}"
+                                        "value": "TEST"
+                                    },
+                                    {
+                                        "name": "TEST_TRANSACTION_MODE",
+                                        "value": "NONE"
+                                    },
+                                    {
+                                        "name": "TEST_LOCKING_ISOLATION",
+                                        "value": "READ_COMMITTED"
+                                    },
+                                    {
+                                        "name": "TEST_STATE_TRANSFER_TIMEOUT",
+                                        "value": "120000"
                                     },
                                     {
                                         "name": "DATAVIRT_CACHE_NAMES",
@@ -389,6 +429,22 @@
                                     {
                                         "name": "JGROUPS_CLUSTER_PASSWORD",
                                         "value": "${JGROUPS_CLUSTER_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "ADMIN_GROUP",
+                                        "value": "${ADMIN_GROUP}"
+                                    },
+                                    {
+                                        "name": "HOTROD_AUTHENTICATION",
+                                        "value": "${HOTROD_AUTHENTICATION}"
+                                    },
+                                    {
+                                        "name": "CONTAINER_SECURITY_ROLE_MAPPER",
+                                        "value": "${CONTAINER_SECURITY_ROLE_MAPPER}"
+                                    },
+                                    {
+                                        "name": "CONTAINER_SECURITY_ROLES",
+                                        "value": "${CONTAINER_SECURITY_ROLES}"
                                     },
                                     {
                                         "name": "DEBUG",

@@ -518,22 +518,7 @@
                         "uri": "${SOURCE_REPOSITORY_URL}",
                         "ref": "${SOURCE_REPOSITORY_REF}"
                     },
-                    "contextDir": "${CONTEXT_DIR}",
-                    "images": [
-                        {
-                            "from": {
-                                "kind": "ImageStreamTag",
-                                "namespace": "${IMAGE_STREAM_NAMESPACE}",
-                                "name": "jboss-datagrid65-client-openshift:1.2"
-                            },
-                            "paths": [
-                                {
-                                    "destinationDir": "./${CONTEXT_DIR}/extensions/datagrid65",
-                                    "sourcePath": "/extensions/."
-                                }
-                            ]
-                        }
-                    ]
+                    "contextDir": "${CONTEXT_DIR}"
                 },
                 "strategy": {
                     "type": "Source",
@@ -542,7 +527,7 @@
                         "from": {
                             "kind": "ImageStreamTag",
                             "namespace": "${IMAGE_STREAM_NAMESPACE}",
-                            "name": "jboss-datavirt63-openshift:1.2"
+                            "name": "jboss-datavirt64-openshift:1.0"
                         },
                         "env": [
                             {
@@ -586,15 +571,6 @@
                     {
                         "type": "ImageChange",
                         "imageChange": {}
-                    },
-                    {
-                        "type": "ImageChange",
-                        "imageChange": {
-                            "from": {
-                                "kind": "ImageStreamTag",
-                                "name": "jboss-datagrid65-client-openshift:1.0"
-                            }
-                        }
                     },
                     {
                         "type": "ConfigChange"
@@ -783,11 +759,11 @@
                                     },
                                     {
                                         "name": "TEIID_USERNAME",
-                                        "value": "${TEIID_USERNAME}"
+                                        "value": "teiidUser"
                                     },
                                     {
                                         "name": "TEIID_PASSWORD",
-                                        "value": "${TEIID_PASSWORD}"
+                                        "value": "P@ssword1"
                                     },
                                     {
                                         "name": "MODESHAPE_USERNAME",
@@ -811,11 +787,11 @@
                                     },
                                     {
                                         "name": "DATAVIRT_TRANSPORT_KEY_ALIAS",
-                                        "value": "${HTTPS_NAME}"
+                                        "value": "jboss"
                                     },
                                     {
                                         "name": "DATAVIRT_TRANSPORT_KEYSTORE_PASSWORD",
-                                        "value": "${HTTPS_PASSWORD}"
+                                        "value": "mykeystorepass"
                                     },
                                     {
                                         "name": "SSO_URL",
