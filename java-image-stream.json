@@ -1,0 +1,41 @@
+{
+    "kind": "List",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "jboss-image-streams",
+        "annotations": {
+            "description": "ImageStream definitions for JBoss Middleware products."
+        }
+    },
+    "items": [
+        {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "redhat-openjdk18-openshift",
+                "annotations": {
+                    "openshift.io/display-name": "Red Hat OpenJDK 8",
+                    "openshift.io/image.insecureRepository": "true"
+                }
+            },
+            "spec": {
+                "dockerImageRepository": "registry.example.com:5000/redhat-openjdk-18/openjdk18-openshift",
+                "tags": [
+                    {
+                        "name": "1.2",
+                        "annotations": {
+                            "openshift.io/display-name": "Red Hat OpenJDK 8",
+                            "description": "Build and run Java applications using Maven and OpenJDK 8.",
+                            "iconClass": "icon-jboss",
+                            "tags": "builder,java,xpaas,openjdk",
+                            "supports": "java:8,xpaas:1.0",
+                            "sampleRepo": "https://github.com/jboss-openshift/openshift-quickstarts",
+                            "sampleContextDir": "undertow-servlet",
+                            "version": "1.2"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}

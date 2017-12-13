@@ -1,0 +1,116 @@
+{
+    "kind": "List",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "jboss-image-streams",
+        "annotations": {
+            "description": "ImageStream definitions for JBoss Middleware products."
+        }
+    },
+    "items": [
+        {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "jdv-sample",
+                 "annotations": {
+                    "description": "Provides JBoss SSO EAP6  S2I images.",
+                    "openshift.io/image.insecureRepository": "true"
+                }
+            },
+            "spec": {
+                "dockerImageRepository": "registry.example.com:5000/jboss-jdv-6/jdv-sample",
+                "tags": [
+                    {
+                        "name": "1.0",
+                        "annotations": {
+                            "description": "datavirt",
+                            "iconClass": "icon-jdv",
+                            "tags": "datavirt",
+                            "supports":"datavirt:6.3",
+                            "version": "1.0"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "jdv-jdg-sample",
+                 "annotations": {
+                    "description": "Provides JBoss SSO EAP6  S2I images.",
+                    "openshift.io/image.insecureRepository": "true"
+                }
+            },
+            "spec": {
+                "dockerImageRepository": "registry.example.com:5000/jboss-jdv-6/jdv-jdg-sample",
+                "tags": [
+                    {
+                        "name": "1.0",
+                        "annotations": {
+                            "description": "datavirt",
+                            "iconClass": "icon-jdv",
+                            "tags": "datavirt",
+                            "supports":"datavirt:6.3",
+                            "version": "1.0"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "jdv-sample-eap",
+                 "annotations": {
+                    "description": "Provides JBoss SSO EAP6  S2I images.",
+                    "openshift.io/image.insecureRepository": "true"
+                }
+            },
+            "spec": {
+                "dockerImageRepository": "registry.example.com:5000/jboss-jdv-6/jdv-sample-eap",
+                "tags": [
+                    {
+                        "name": "1.0",
+                        "annotations": {
+                            "description": "datavirt",
+                            "iconClass": "icon-jdv",
+                            "tags": "datavirt",
+                            "supports":"datavirt:6.3",
+                            "version": "1.0"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "jdv-sample-teiid",
+                 "annotations": {
+                    "description": "Provides JBoss SSO EAP6  S2I images.",
+                    "openshift.io/image.insecureRepository": "true"
+                }
+            },
+            "spec": {
+                "dockerImageRepository": "registry.example.com:5000/jboss-jdv-6/jdv-sample-teiid",
+                "tags": [
+                    {
+                        "name": "1.0",
+                        "annotations": {
+                            "description": "datavirt",
+                            "iconClass": "icon-jdv",
+                            "tags": "datavirt",
+                            "supports":"datavirt:6.3",
+                            "version": "1.0"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}

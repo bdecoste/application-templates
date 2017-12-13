@@ -1,0 +1,38 @@
+{
+    "kind": "List",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "jboss-image-streams",
+        "annotations": {
+            "description": "ImageStream definitions for JBoss Middleware products."
+        }
+    },
+    "items": [
+        {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "jboss-datagrid-openshift",
+                 "annotations": {
+                    "description": "Provides JBoss SSO EAP6  S2I images.",
+                    "openshift.io/image.insecureRepository": "true"
+                }
+            },
+            "spec": {
+                "dockerImageRepository": "registry.example.com:5000/jboss/datagrid",
+                "tags": [
+                    {
+                        "name": "latest",
+                        "annotations": {
+                            "description": "datagrid",
+                            "iconClass": "icon-keycloak",
+                            "tags": "datavirt",
+                            "supports":"datagrid:6.5",
+                            "version": "latest"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}
